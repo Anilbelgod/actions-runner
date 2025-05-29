@@ -48,16 +48,16 @@ on:
     #   docker-build-push-secrets:
     #     description: "The secrets for authorizing access to private repos for a docker build"
     #     required: false      
-    outputs:
-      image:
-        description: "Docker Image"
-        value: ${{ jobs.build-image.outputs.image }}
-      image-tag:
-        description: "Docker image tag"
-        value: ${{ jobs.build-image.outputs.image-tag }}
-      version:
-        description: "The verion of the app"
-        value: ${{ jobs.build-image.outputs.version }}
+    # outputs:
+    #   image:
+    #     description: "Docker Image"
+    #     value: ${{ jobs.build-image.outputs.image }}
+    #   image-tag:
+    #     description: "Docker image tag"
+    #     value: ${{ jobs.build-image.outputs.image-tag }}
+    #   version:
+    #     description: "The verion of the app"
+    #     value: ${{ jobs.build-image.outputs.version }}
 
 permissions:
   id-token: write
@@ -179,6 +179,9 @@ jobs:
   #         service: app
   #         command: test/test.sh
   #         registry: ${{ inputs.registry }}
+
+
+
 
 
 
