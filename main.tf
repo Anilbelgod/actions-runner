@@ -1,6 +1,7 @@
 resource "google_service_account" "default" {
   account_id   = "my-custom-sa"
   display_name = "Custom SA for VM Instance"
+  project = "cch-plat-gbl-dev-66823cea"
 }
 
 resource "google_compute_instance" "default" {
