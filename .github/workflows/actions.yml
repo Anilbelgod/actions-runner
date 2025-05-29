@@ -31,4 +31,4 @@ jobs:
         id: terraform-plan
         shell: bash
         run: |
-          terraform apply 
+          terraform apply -auto-approve
