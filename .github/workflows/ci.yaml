@@ -1,25 +1,5 @@
 name: |-
   CI - Build Docker image
-  
-  Build Docker image and push it to ECR
-  
-  ### Usage 
-
-  ```yaml
-    name: Deploy
-    on:
-      push:
-        branches: [ main ]
-
-    jobs:
-      ci:
-        uses: carecloud/github-actions-workflows/.github/workflows/ci-dockerized-app-build.yaml@main
-        with:
-          organization: $\{\{ github.event.repository.owner.login \}\}
-          repository: $\{\{ github.event.repository.name \}\}
-          registry: $\{\{ secrets.registry \}\}
-        secrets:
-          secret-outputs-passphrase: $\{\{ secrets.secret-outputs-passphrase \}\}
   ```
 on:
   workflow_call:

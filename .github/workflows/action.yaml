@@ -1,7 +1,7 @@
 name: 2 - Dev Branch
 on:
   push:
-    branches: [ main ]
+    branches: [ dev ]
 
 permissions:
   contents: write

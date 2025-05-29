@@ -1,28 +1,5 @@
 name: |-
-  CD - Deploy to EKS with ArgoCD and Helmfile
-  
-  Deploy Docker image to EKS with ArgoCD and Helmfile
-  
-  ### Usage 
-  
-  ```yaml
-    name: Deploy
-    on:
-      push:
-        branches: [ main ]
-  
-    jobs:
-      cd:
-        uses: carecloud/github-actions-workflows/.github/workflows/cd-argocd.yaml@main
-        with:
-          image: registry.hub.docker.com/library/nginx
-          image-tag: latest
-          repository: $\{\{ github.event.repository.name \}\}
-          environment: dev
-        secrets:
-          secret-outputs-passphrase: $\{\{ secrets.secret-outputs-passphrase \}\}
-          github-private-actions-pat: $\{\{ secrets.github-private-actions-pat \}\}
-          one-password-service-account-token: $\{\{ secrets.one-password-service-account-token \}\}
+  CD 
   ```
 
 on:
