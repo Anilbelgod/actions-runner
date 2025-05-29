@@ -1,13 +1,21 @@
 name: Actions Runner Controller Demo
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - dev # Replace 'main' with the branch name you want to target
 
+jobs:
 jobs:
   terraform-plan:
     runs-on: gha-runner-scale-set
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.7 # or any version you prefer
 
       - name: Terraform Init
         id: init
