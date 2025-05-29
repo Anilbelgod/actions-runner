@@ -67,6 +67,8 @@ jobs:
   setup:
     runs-on: ["gha-runner-scale-set"]
     steps:
+      - name: Set up Docker
+        uses: docker/setup-docker-action@v4
       - name: Determine the application name for configuration purposes
         id: config-app-name
         uses: cloudposse/github-action-yaml-config-query@0.1.2
