@@ -14,6 +14,11 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '16' # Specify the Node.js version you need
+      - name: Debug Environment Variables
+        shell: bash
+        run: |
+          echo "GOOGLE_APPLICATION_CREDENTIALS: $GOOGLE_APPLICATION_CREDENTIALS"
+          cat $GOOGLE_APPLICATION_CREDENTIALS
 
 
       - name: Set up Terraform
