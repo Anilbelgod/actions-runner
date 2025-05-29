@@ -1,8 +1,4 @@
-resource "google_service_account" "default" {
-  account_id   = "my-custom-sa"
-  display_name = "Custom SA for VM Instance"
-  project = "cch-plat-gbl-dev-66823cea"
-}
+
 
 resource "google_compute_instance" "default" {
   name         = "my-instance"
@@ -40,9 +36,4 @@ resource "google_compute_instance" "default" {
 
   metadata_startup_script = "echo hi > /test.txt"
 
-  service_account {
-    # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
-    email  = google_service_account.default.email
-    scopes = ["cloud-platform"]
-  }
 }
