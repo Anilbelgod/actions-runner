@@ -121,22 +121,19 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # setup:
-  #   runs-on: ["self-hosted"]
-  #   steps:
-  #     - name: Convert Dynamic Helm Values JSON to YAML
-  #       uses: carecloud/github-action-convert-json-to-yaml@main
-  #       id: convert-dynamic-helm-values
-  #       with:                                                     #! TBD
-  #         json: '${{ inputs.dynamic-helm-values-json }}'
-  #   outputs:
-  #     dynamic-helm-values-yaml: ${{ steps.convert-dynamic-helm-values.outputs.yaml }}
-  ci:
-    runs-on: ["gha-runner-scale-set"]  
+  setup:
+    runs-on: ["self-hosted"]
     steps:
-      - name: CI  
-        uses: ./.github/workflows/ci.yaml
-        with:
+      - name: Convert Dynamic Helm Values JSON to YAML
+        uses: carecloud/github-action-convert-json-to-yaml@main
+        id: convert-dynamic-helm-values
+        with:                                                     #! TBD
+          json: '${{ inputs.dynamic-helm-values-json }}'
+    outputs:
+      dynamic-helm-values-yaml: ${{ steps.convert-dynamic-helm-values.outputs.yaml }}
+  ci:
+    uses: ./.github/workflows/ci.yaml
+    with:
           organization: ${{ inputs.organization }}
           environment: dev
           repository: ${{ inputs.repository }}
