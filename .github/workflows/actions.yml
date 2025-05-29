@@ -3,8 +3,20 @@ on:
   workflow_dispatch:
 
 jobs:
-  Explore-GitHub-Actions:
-    # You need to use the INSTALLATION_NAME from the previous step
-    runs-on: arc-runner-set-runs
+  terraform-plan:
+    runs-on: gha-runner-scale-set
     steps:
-    - run: echo "🎉 This job uses runner scale set runners!"
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Terraform Init
+        id: init
+        shell: bash
+        run: |
+          terraform init -chdir=../bucket
+
+      - name: Terraform Apply
+        id: terraform-plan
+        shell: bash
+        run: |
+          terraform apply -chdir=../bucket
