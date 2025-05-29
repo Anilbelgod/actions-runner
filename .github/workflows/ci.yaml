@@ -69,6 +69,14 @@ jobs:
     steps:
       - name: Set up Docker
         uses: docker/setup-docker-action@v4
+        with:
+          daemon-config: |
+              {
+                "debug": true,
+                "features": {
+                  "containerd-snapshotter": true
+                }
+              }
       - name: Determine the application name for configuration purposes
         id: config-app-name
         uses: cloudposse/github-action-yaml-config-query@0.1.2
