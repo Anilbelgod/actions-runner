@@ -32,3 +32,5 @@ jobs:
         shell: bash
         run: |
           terraform apply -auto-approve
+
+          
