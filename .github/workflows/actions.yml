@@ -20,10 +20,10 @@ jobs:
         id: init
         shell: bash
         run: |
-          terraform init -chdir=../bucket
+          terraform init -chdir=bucket
 
       - name: Terraform Apply
         id: terraform-plan
         shell: bash
         run: |
-          terraform apply -chdir=../bucket
+          terraform apply -chdir=bucket
