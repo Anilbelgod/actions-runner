@@ -1,0 +1,76 @@
+---
+#
+# This is the canonical configuration for the `README.md`
+# Run `make readme` to rebuild the `README.md`
+#
+
+# Name of this project
+name: example-app-on-eks-with-argocd
+
+# Tags of this project
+tags:
+  - example-app
+  - github-action
+  - Docker
+  - ECR
+  - EKS
+  - Helmfile
+  - CI/CD
+
+# Logo for this project
+#logo: docs/logo.png
+
+# License of this project
+license: "APACHE2"
+
+# Canonical GitHub repo
+github_repo: cloudposse/example-app-on-eks-with-argocd
+
+# Badges to display
+badges:
+  - name: "Latest Release"
+    image: "https://img.shields.io/github/release/cloudposse/example-app-on-eks.svg"
+    url: "https://github.com/cloudposse/example-app-on-eks/releases/latest"
+  - name: "Slack Community"
+    image: "https://slack.cloudposse.com/badge.svg"
+    url: "https://slack.cloudposse.com"
+
+related:
+  - name: "github-actions-workflows"
+    description: "Reusable workflows for different types of projects"
+    url: "https://github.com/cloudposse/github-actions-workflows"
+
+# Short description of this project
+description: |-
+  Example Dockerized application deployed on EKS with Helmfile.
+
+usage: |-
+  The workflows included with this example are consolidated to this single repository and are intentionally not divided into [GitHub reusable workflows](https://docs.github.com/en/actions/using-workflows/reusing-workflows). We've done this to better demo a single example and simplify development overhead. However, in practice an organization may have many application repositories that use the same workflows. In that case, we recommend moving the reusable workflows into separate repositories, where they can be shared across application repositories from a central point. In this example move all `eks-argocd-*` and all `workflow-*` workflow files to the reusable location, such as a new repository called `github-action-workflows`.
+
+  ```console
+  .github/workflows
+  ├── eks-argocd-feature-branch.yml
+  ├── eks-argocd-hotfix-branch.yml
+  ├── eks-argocd-hotfix-mixin.yml
+  ├── eks-argocd-hotfix-release.yml
+  ├── eks-argocd-main-branch.yml
+  ├── eks-argocd-release.yml
+  ├── feature-branch.yml
+  ├── main-branch.yaml
+  ├── release.yaml
+  ├── workflow-cd-argocd.yml
+  ├── workflow-cd-preview-argocd.yml
+  ├── workflow-ci-dockerized-app-build.yml
+  ├── workflow-ci-dockerized-app-promote.yml
+  ├── workflow-controller-draft-release.yml
+  └── workflow-controller-hotfix-release.yml
+  ```
+
+introduction: |-
+  * [Docker](https://docs.docker.com/engine/reference/builder/) for developing, shipping, and running,
+  * [ECR](https://aws.amazon.com/ecr/) to store the Docker images
+  * [EKS](https://aws.amazon.com/eks) for running application in scale
+  * [Helmfile](https://github.com/roboll/helmfile) as declarative deploy manifest
+
+# Contributors to this project
+contributors:

@@ -1,0 +1,187 @@
+repositories:
+# Cloud Posse incubator repo of helm charts
+- name: "cloudposse-incubator"
+  url: "https://charts.cloudposse.com/incubator/"
+- name: "bedag"
+  url: "https://bedag.github.io/helm-charts/"
+
+releases:
+#
+# References:
+#   - https://github.com/cloudposse/charts/tree/master/incubator/monochart
+#
+- name: '{{ .Values.deployment.app_name }}'
+  labels:
+    preview: "true"
+  chart: "cloudposse-incubator/monochart"
+  version: "0.26.0"
+  wait: true
+  force: true
+  recreatePods: false
+  values:
+    - fullnameOverride: '{{ .Values.deployment.app_name }}'
+      nameOverride: '{{ .Values.deployment.app_name }}'
+      serviceAccountName: '{{ .Values.deployment.app_name }}'
+      image:
+        repository: '{{ env "IMAGE_NAME" }}'
+        tag: '{{ env "IMAGE_TAG" }}'
+        pullPolicy: Always
+      replicaCount: 2
+
+      # Deployment configuration
+      deployment:
+        enabled: true
+        annotations:
+          reloader.stakater.com/auto: "true" # Reload pods for any modification of a ConfigMap or Secret
+        pod: 
+          labels:
+            tags.datadoghq.com/env: '{{ .Values.deployment.namespace }}'
+            tags.datadoghq.com/service: '{{ .Values.deployment.app_name }}'
+            tags.datadoghq.com/version: '{{ .Values.deployment.version }}'
+        labels: 
+          tags.datadoghq.com/env: '{{ .Values.deployment.namespace }}'
+          tags.datadoghq.com/service: '{{ .Values.deployment.app_name }}'
+          tags.datadoghq.com/version: '{{ .Values.deployment.version }}'
+        strategy:
+          type: "RollingUpdate"
+          rollingUpdate:
+            maxUnavailable: 1
+        revisionHistoryLimit: 10
+
+      # Configuration Settings
+      configMaps:
+        default:
+          enabled: true
+
+      # Datadog APM
+      env:
+        DD_LOGS_INJECTION: "true"
+        DD_RUNTIME_METRICS_ENABLED: "true"
+      envFromFieldRefFieldPath:
+        DD_AGENT_HOST: status.hostIP
+        DD_ENV: metadata.labels['tags.datadoghq.com/env']
+        DD_SERVICE: metadata.labels['tags.datadoghq.com/service']
+        DD_VERSION: metadata.labels['tags.datadoghq.com/version']
+
+      envFrom:
+        secrets:
+          - '{{ .Values.deployment.app_name }}'
+
+      # Service endpoint 
+      service:
+        enabled: true
+        type: ClusterIP
+        ports:
+          default:
+            internal: 8080
+            external: 80
+
+      ingress:
+        default:
+          enabled: true
+          port: default
+          annotations:
+            kubernetes.io/ingress.class: "gce"
+            kubernetes.io/ingress.global-static-ip-name: "{{ .Values.platform.default_gcp_static_ip }}"
+            networking.gke.io/managed-certificates: "{{ .Values.deployment.app_name }}-cert"
+            networking.gke.io/v1beta1.FrontendConfig: "{{ .Values.deployment.app_name }}-frontend-config"
+        {{- if eq .Environment.Name "preview" }}
+            external-dns.alpha.kubernetes.io/hostname: {{ .Values.deployment.app_name }}-{{ .Values.deployment.branch_or_tag_name }}.{{ .Values.platform.default_ingress_domain }}
+            outputs.platform.cloudposse.com/webapp-url: "https://{{ .Values.deployment.app_name }}-{{ .Values.deployment.branch_or_tag_name }}.{{ .Values.platform.default_ingress_domain }}/health_check"
+          hosts:
+            "{{ .Values.deployment.app_name }}-{{ .Values.deployment.branch_or_tag_name }}.{{ .Values.platform.default_ingress_domain }}": /*
+        {{- else }}
+            external-dns.alpha.kubernetes.io/hostname: {{ .Values.deployment.app_name }}.{{ .Values.platform.default_ingress_domain }} {{- if hasKey .Values.deployment "vanity_domain" }}, {{ .Values.deployment.vanity_domain }} {{- end }}
+            outputs.platform.cloudposse.com/webapp-url: "https://{{ .Values.deployment.app_name }}.{{ .Values.platform.default_ingress_domain }}/health_check"
+          hosts:
+            "{{ .Values.deployment.app_name }}.{{ .Values.platform.default_ingress_domain }}": /*
+          {{- if and (hasKey .Values.deployment "vanity_domain") (.Values.deployment.vanity_domain) }}
+            "{{ .Values.deployment.vanity_domain }}": /*
+          {{- end }}
+        {{- end }}
+
+      probes:
+        # Probe that ensures service is healthy
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: default
+            scheme: HTTP
+          periodSeconds: 3
+          initialDelaySeconds: 10
+          timeoutSeconds: 3
+          successThreshold: 1
+          failureThreshold: 5
+        
+        # Probe that ensures service has started
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: default
+            scheme: HTTP
+          periodSeconds: 3
+          initialDelaySeconds: 10
+          timeoutSeconds: 3
+          successThreshold: 1
+          failureThreshold: 5
+
+      resources:
+        requests:
+          memory: 10Mi
+          cpu: 100m
+        limits:
+          memory: 10Mi
+          cpu: 100m
+
+# For the secrets section, replace AWS Parameter Store with Google Secret Manager
+- name: '{{ .Values.deployment.app_name }}-secrets'
+  chart: "bedag/raw"
+  version: "2.0.0"
+  wait: true
+  force: true
+  recreatePods: false
+  values:
+   - resources:
+      - apiVersion: external-secrets.io/v1beta1
+        kind: ExternalSecret
+        metadata:
+          name: '{{ .Values.deployment.app_name }}'
+        spec:
+          refreshInterval: 60s
+          secretStoreRef:
+            name: secret-store-google
+            kind: ClusterSecretStore
+          target:
+            name: '{{ .Values.deployment.app_name }}'
+            creationPolicy: Owner
+        {{ if hasKey .Values.deployment "envar_keys" }}
+          data:
+          {{ $service_secret_path := .Values.deployment.service_secret_path }}
+          {{ range $i, $envar_key := .Values.deployment.envar_keys }}
+            - secretKey: '{{ $envar_key }}'
+              remoteRef:
+                key: 'projects/{{ .Values.platform.gcp_project_id }}/secrets/{{ $service_secret_path }}/versions/latest'
+          {{ end }}
+        {{- end }}
+
+# References https://github.com/bedag/helm-charts/tree/master/charts/raw
+- name: '{{ .Values.deployment.app_name }}-service-account'
+  chart: "bedag/raw"
+  version: "2.0.0"
+  wait: true
+  force: true
+  recreatePods: false
+  values:
+   - resources:
+      - apiVersion: v1
+        kind: ServiceAccount
+        metadata:
+          name: '{{ .Values.deployment.app_name }}'
+          annotations:
+          {{- if and (hasKey .Values.deployment "workload_identity_sa") (.Values.deployment.workload_identity_sa) }}
+            iam.gke.io/gcp-service-account: {{ .Values.deployment.workload_identity_sa }}
+          {{- else if hasKey .Values.service "workload_identity_sa" }}
+            iam.gke.io/gcp-service-account: {{ .Values.service.workload_identity_sa }}
+          {{- end }}
+          labels:
+            app: '{{ .Values.deployment.app_name }}'
