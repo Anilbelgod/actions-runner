@@ -67,12 +67,12 @@ jobs:
   setup:
     runs-on: ["gha-runner-scale-set"]
     steps:
-    #  - name: 'Set up Cloud SDK'
-    #    uses: 'google-github-actions/setup-gcloud@v2'
-    #    run: |
-    #      gcloud --version
-    #      docker --version
-    #      gcloud config list      
+      # - name: 'Set up Cloud SDK'
+      #   uses: 'google-github-actions/setup-gcloud@v2'
+      #   run: |
+      #     gcloud --version
+      #     docker --version
+      #     gcloud config list      
       - name: Determine the application name for configuration purposes
         id: config-app-name
         uses: cloudposse/github-action-yaml-config-query@0.1.2
