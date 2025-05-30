@@ -1,31 +1,20 @@
-FROM golang:alpine3.11 AS builder
+# Use the official Nginx image from Docker Hub as a parent image
+FROM nginx:alpine
 
-# Copy source into builder
-ADD . /src
+# Optional: Remove default Nginx welcome page
+# RUN rm /usr/share/nginx/html/index.html /usr/share/nginx/html/50x.html
 
-# Build the app
-RUN cd /src && \
-    go build -o example-app
+# Optional: Copy your custom static website files to the Nginx html directory
+# Ensure you have an 'html' folder in the same directory as this Dockerfile
+# with your index.html and other static assets.
+# COPY html/ /usr/share/nginx/html/
 
-# Build the final image
-FROM alpine:3.19 as final
+# Optional: Copy a custom Nginx configuration file
+# Ensure you have a 'nginx.conf' file in the same directory as this Dockerfile.
+# COPY nginx.conf /etc/nginx/nginx.conf
 
-# Install the cloudposse alpine repository
-ADD https://apk.cloudposse.com/ops@cloudposse.com.rsa.pub /etc/apk/keys/
-RUN echo "@cloudposse https://apk.cloudposse.com/3.11/vendor" >> /etc/apk/repositories
+# Expose port 80 to the Docker host, so we can access the Nginx server
+EXPOSE 80
 
-# Expose port of the app
-EXPOSE 8080
-
-# Set the runtime working directory
-WORKDIR /app
-
-# Copy the helmfile deployment configuration
-COPY deploy/ /deploy/
-COPY public/ /app/public/
-
-# Install the app
-COPY --from=builder /src/example-app /app/
-
-# Define the entrypoint
-ENTRYPOINT ["./example-app"]
+# Command to run Nginx in the foreground when the container starts
+CMD ["nginx", "-g", "daemon off;"]
