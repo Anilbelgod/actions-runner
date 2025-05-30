@@ -21,3 +21,7 @@ jobs:
       image: gcr.io/kaniko-project/executor:v1.20.0-debug # the kaniko image
     permissions:
       contents: read # read the repository for actions/checkout
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
