@@ -4,7 +4,7 @@ name: Build with kaniko (Build Only with Checkout)
 
 on:
   push:
-    branches: [ "*" ]
+    branches: [ "test-ci/cd" ]
 
 
   # Allows you to run this workflow manually from the Actions tab
