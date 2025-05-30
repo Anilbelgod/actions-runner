@@ -5,9 +5,7 @@ name: Build with kaniko (Build Only with Checkout)
 on:
   push:
     branches: [ "*" ]
-    paths:
-      - "app/**"
-      - ".github/workflows/build-with-kaniko.yml"
+
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
