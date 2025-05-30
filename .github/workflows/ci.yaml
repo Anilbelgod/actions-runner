@@ -67,12 +67,13 @@ jobs:
   setup:
     runs-on: ["gha-runner-scale-set"]
     steps:
+ 
       - name: Install Docker
         run: |
           sudo apt-get update
           sudo apt-get install -y docker.io
-          sudo systemctl start docker
-          sudo systemctl enable docker
+          sudo dockerd &  # Start Docker daemon in the background
+          sleep 5         # Wait for the daemon to initialize
           docker --version
 
       - name: Set up Docker
