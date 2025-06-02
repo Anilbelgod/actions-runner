@@ -112,10 +112,10 @@ jobs:
 
       #   id: github-sha
 
-      # - name: Checkout
-      #   uses: actions/checkout@v3
-      #   with:
-      #     ref: ${{ steps.github-sha.outputs.value }}
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ steps.github-sha.outputs.value }}
         
 
       - name: Change string case of the organization
