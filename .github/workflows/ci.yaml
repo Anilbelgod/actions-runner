@@ -70,16 +70,6 @@ jobs:
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v2'
  
-      # - name: Install Docker
-      #   run: |
-      #     sudo apt-get update
-      #     sudo apt-get install -y docker.io
-      #     sudo dockerd &  # Start Docker daemon in the background
-      #     sleep 5         # Wait for the daemon to initialize
-      #     docker --version
-
-      # - name: Set up Docker
-      #   uses: docker/setup-docker-action@v4  
 
       - name: Determine the application name for configuration purposes
         id: config-app-name
@@ -106,8 +96,8 @@ jobs:
       #     config-app-name: ${{ steps.config-app-name.outputs.value }}
       #     tenant: ${{ inputs.tenant }}
 
-    # outputs:
-    #   config-app-name: ${{ steps.config-app-name.outputs.value }}
+    outputs:
+      config-app-name: ${{ steps.config-app-name.outputs.value }}
     #   environment: ${{ inputs.environment }}
     #   # build-role: ${{ steps.environment.outputs.build-role }}
 
