@@ -116,10 +116,7 @@ jobs:
       #   uses: actions/checkout@v3
       #   with:
       #     ref: ${{ steps.github-sha.outputs.value }}
-          
-      - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v2'
-  
+        
 
       - name: Change string case of the organization
         id: change-string-case-organization
