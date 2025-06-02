@@ -65,7 +65,7 @@ permissions:
 
 jobs:
   setup:
-    runs-on: ["gha-runner-scale-set"]
+    runs-on: ["arc-runner-set"]
     steps:
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v2'
