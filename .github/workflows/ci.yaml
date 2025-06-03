@@ -151,6 +151,8 @@ jobs:
     needs: [ build-image ]
     # if: ${{ inputs.run-tests == true }}  
     steps:
+    - name: Checkout
+      uses: actions/checkout@v3
     - name: Tests
       id: test
       uses: cloudposse/github-action-docker-compose-test-run@0.1.2
