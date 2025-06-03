@@ -153,7 +153,7 @@ jobs:
     steps:
     - name: Tests
       id: test
-      uses: jayz-66/github-action-docker-compose-test-run
+      uses: cloudposse/github-action-docker-compose-test-run@0.1.2
       with:
         file: test/docker-compose.yaml
         service: app
