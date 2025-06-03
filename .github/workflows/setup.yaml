@@ -149,7 +149,7 @@ jobs:
         #   docker-password-medicomp: ${{ secrets.docker-password-medicomp }}
 
   # cd:
-  #   uses: .github/workflows/cd.yaml@main
+  #   uses: .github/workflows/cd.yaml@main   
   #   needs: [ setup, ci ]
   #   with:
   #     version: ${{ needs.ci.outputs.version }}
