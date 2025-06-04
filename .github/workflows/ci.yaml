@@ -107,10 +107,10 @@ jobs:
     needs: [ "setup" ]
     steps:
 
-      # - name: Determine the GitHub SHA to use
-      #   uses: 66degrees/cch-app-cicd-test/.github/actions/github-sha.yml@main
+      - name: Determine the GitHub SHA to use
+        uses: 66degrees/cch-app-cicd-test/.github/actions/github-sha.yml@main
 
-      #   id: github-sha
+        id: github-sha
 
       - name: Checkout
         uses: actions/checkout@v3
