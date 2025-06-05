@@ -108,7 +108,7 @@ jobs:
     steps:
 
       - name: Determine the GitHub SHA to use
-        uses: ./.github/workflows/github-sha.yml
+        uses: Anilbelgod/github-action-get-github-sha-for-deployment@main
 
         id: github-sha
 
