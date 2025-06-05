@@ -146,6 +146,7 @@ jobs:
   #     image-tag: ${{ steps.build.outputs.tag }}
   #     version: ${{ steps.github-sha.outputs.value }}
 
+
   test:
     runs-on: ["self-hosted"]
     needs: [ build-image ]
