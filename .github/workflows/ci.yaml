@@ -108,7 +108,7 @@ jobs:
     steps:
 
       - name: Determine the GitHub SHA to use
-        uses: .github/workflows/github-sha.yml
+        uses: ./.github/workflows/github-sha.yml
 
         id: github-sha
 
