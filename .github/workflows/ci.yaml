@@ -107,15 +107,15 @@ jobs:
     needs: [ "setup" ]
     steps:
 
-      # - name: Determine the GitHub SHA to use
-      #   uses: 66degrees/cch-app-cicd-test/.github/actions/github-sha.yml@main
+      - name: Determine the GitHub SHA to use
+        uses: .github/workflows/github-sha.yml
 
-      #   id: github-sha
+        id: github-sha
 
-      # - name: Checkout
-      #   uses: actions/checkout@v3
-      #   with:
-      #     ref: ${{ steps.github-sha.outputs.value }}
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ steps.github-sha.outputs.value }}
         
 
       - name: Change string case of the organization
