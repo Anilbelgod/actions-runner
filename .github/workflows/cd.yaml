@@ -104,7 +104,7 @@ on:
         required: true
       github-private-actions-pat:
         description: "Github PAT allow to pull private repos"
-        required: true
+        required: false
       one-password-service-account-token:
         description: "The 1Password service acount token"
         required: true
