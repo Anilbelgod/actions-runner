@@ -57,7 +57,7 @@ runs:
       with:
         export-env: true 
       env:
-        OP_SERVICE_ACCOUNT_TOKEN: ${{ inputs.one-password-service-account-token }} 
+        # OP_SERVICE_ACCOUNT_TOKEN: ${{ inputs.one-password-service-account-token }} 
         SERVICE_SECRETS: op://${{ inputs.one-password-primary-vault }}/${{ inputs.one-password-primary-item }}/${{ inputs.one-password-primary-field }}
 
     - name: Define secrets temp files

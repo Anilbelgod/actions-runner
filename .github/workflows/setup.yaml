@@ -99,7 +99,10 @@ on:
       #   type: string
       #   description: 'The Github App Instance ID used for authentication when checking for deployment status'
       #   required: true
-    # secrets:
+    secrets:
+      one-password-service-account-token:
+        description: "The 1Password service acount token"
+        required: true
     #   github-private-actions-pat: #! TBD 
     #     description: "Github PAT allow to pull private repos"
     #     required: true
@@ -171,5 +174,5 @@ jobs:
       # deployment-check-app-id: ${{ inputs.deployment-check-app-id }}
       # deployment-check-app-installation-id: ${{ inputs.deployment-check-app-installation-id }}
     secrets: 
-      one-password-service-account-token: ${{ secrets.ONE_PASSWORD_SERVICE_ACCOUNT_TOKEN }}
+      one-password-service-account-token: ${{ secrets.one-password-service-account-token }}
       # deployment-check-app-private-key: ${{ secrets.deployment-check-app-private-key }}
