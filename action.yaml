@@ -36,6 +36,10 @@ outputs:
 runs: 
   using: "composite"
   steps:
+
+    - name: Setup gcloud CLI
+      uses: google-github-actions/setup-gcloud@v2
+      
     - name: Setup yq
       uses: dcarbone/install-yq-action@v1.1.0
       with:
