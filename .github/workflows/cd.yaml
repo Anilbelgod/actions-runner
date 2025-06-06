@@ -165,7 +165,7 @@ jobs:
           one-password-service-account-token: ${{ secrets.one-password-service-account-token }}
           one-password-primary-vault: cch-cicd-test 
           one-password-primary-item: server  
-          one-password-primary-field: ENV
+          one-password-primary-field: env
           import-secrets: true 
 
 
