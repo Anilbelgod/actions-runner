@@ -55,7 +55,7 @@ runs:
       uses: 1Password/load-secrets-action@main
       continue-on-error: true
       with:
-        export-env: false 
+        export-env: true 
       env:
         # OP_SERVICE_ACCOUNT_TOKEN: ${{ inputs.one-password-service-account-token }} 
         SERVICE_SECRETS: op://${{ inputs.one-password-primary-vault }}/${{ inputs.one-password-primary-item }}/${{ inputs.one-password-primary-field }}
