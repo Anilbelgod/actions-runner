@@ -158,18 +158,15 @@ jobs:
           config-app-name: ${{ steps.config-app-name.outputs.value }}
           tenant: ${{ inputs.tenant }}
 
-      - name: Import secrets into SSM Parameter Store from 1Password
-        uses: carecloud/github-action-import-secrets-ssm@main
+      - name: Import secrets into Secret Manager from 1Password
+        uses: ./
         id: import-secrets
         with:
-          one-password-service-account-token: ${{ secrets.one-password-service-account-token }}
-          one-password-primary-vault: ${{ inputs.tenant }}-envars
-          one-password-primary-item: ${{ steps.config-app-name.outputs.value }}
-          one-password-primary-field: ${{ steps.environment.outputs.name }}
-          ssm-role: ${{ steps.environment.outputs.ssm-role }}
-          region: ${{ steps.environment.outputs.region }}
-          chamber-service: ${{ steps.environment.outputs.service-secret-ssm-path }}
-          import-secrets: ${{ inputs.import-secrets }}
+          one-password-service-account-token: ${{ secrets.ONE_PASSWORD_SERVICE_ACCOUNT_TOKEN }}
+          one-password-primary-vault: cch-cicd-test 
+          one-password-primary-item: server  
+          one-password-primary-field: env
+          import-secrets: true 
 
       - name: Configure AWS Credentials for EKS Cluster
         uses: aws-actions/configure-aws-credentials@v2
