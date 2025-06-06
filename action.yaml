@@ -39,7 +39,7 @@ runs:
 
     - name: Setup gcloud CLI
       uses: google-github-actions/setup-gcloud@v2
-      
+
     - name: Setup yq
       uses: dcarbone/install-yq-action@v1.1.0
       with:
@@ -99,7 +99,7 @@ runs:
         sm_secrets_file_path=${{ steps.secrets-file.outputs.sm }}
         gcloud secrets versions access latest \
         --secret="server" \
-        --project="cch-plat-gbl-prod-acb54522" > "$sm_secrets_file_path"  
+        --project="cch-plat-glb-dev-project-4" > "$sm_secrets_file_path"  
 
         cat $sm_secrets_file_path
 
