@@ -46,7 +46,7 @@ runs:
     - name: Configure 1Password Credentials
       uses: 1password/load-secrets-action/configure@v1.2.0
       with:
-        service-account-token: ${{ inputs.one-password-service-account-token }}
+        service-account-token: ${{ secrets.one-password-service-account-token }}
 
     - name: Retrieve secrets from the 1Password primary vault
       id: op-load-primary-secret
@@ -57,7 +57,7 @@ runs:
       with:
         export-env: false
       env:
-        OP_SERVICE_ACCOUNT_TOKEN: ${{ inputs.one-password-service-account-token }} 
+        # OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.one-password-service-account-token }} 
         SERVICE_SECRETS: op://${{ inputs.one-password-primary-vault }}/${{ inputs.one-password-primary-item }}/${{ inputs.one-password-primary-field }}
 
     - name: Define secrets temp files
