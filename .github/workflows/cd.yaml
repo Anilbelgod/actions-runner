@@ -162,7 +162,7 @@ jobs:
         uses: ./
         id: import-secrets
         with:
-          one-password-service-account-token: ${{ secrets.ONE_PASSWORD_SERVICE_ACCOUNT_TOKEN }}
+          one-password-service-account-token: ${{ secrets.one-password-service-account-token }}
           one-password-primary-vault: cch-cicd-test 
           one-password-primary-item: server  
           one-password-primary-field: env
