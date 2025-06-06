@@ -123,12 +123,12 @@ jobs:
       name: ${{ inputs.environment }}
       url: ${{ steps.deploy.outputs.webapp-url }}
     steps:
-      - uses: cloudposse/github-action-secret-outputs@0.1.2
-        id: image
-        with:
-          secret: ${{ secrets.secret-outputs-passphrase }}
-          op: decode
-          in: ${{ inputs.image }}
+      # - uses: cloudposse/github-action-secret-outputs@0.1.2
+      #   id: image
+      #   with:
+      #     secret: ${{ secrets.secret-outputs-passphrase }}
+      #     op: decode
+      #     in: ${{ inputs.image }}
 
       - name: Checkout
         uses: actions/checkout@v3
@@ -144,19 +144,19 @@ jobs:
             false:
               value: ${{ inputs.config-app-name }}
 
-      - name: Environment Info
-        uses: carecloud/github-action-interface-environment@main
-        id: environment
-        with:
-          implementation_repository: carecloud/actions-private
-          implementation_path: argocd-environments
-          implementation_ref: main
-          implementation_github_pat: ${{ secrets.github-private-actions-pat }}
-          environment: ${{ inputs.environment }}
-          namespace: ${{ inputs.environment }}
-          repository: ${{ inputs.repository }}
-          config-app-name: ${{ steps.config-app-name.outputs.value }}
-          tenant: ${{ inputs.tenant }}
+      # - name: Environment Info
+      #   uses: carecloud/github-action-interface-environment@main
+      #   id: environment
+      #   with:
+      #     implementation_repository: carecloud/actions-private
+      #     implementation_path: argocd-environments
+      #     implementation_ref: main
+      #     implementation_github_pat: ${{ secrets.github-private-actions-pat }}
+      #     environment: ${{ inputs.environment }}
+      #     namespace: ${{ inputs.environment }}
+      #     repository: ${{ inputs.repository }}
+      #     config-app-name: ${{ steps.config-app-name.outputs.value }}
+      #     tenant: ${{ inputs.tenant }}
 
       - name: Import secrets into Secret Manager from 1Password
         uses: ./
@@ -168,20 +168,13 @@ jobs:
           one-password-primary-field: env
           import-secrets: true 
 
-      - name: Configure AWS Credentials for EKS Cluster
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-region: ${{ steps.environment.outputs.region }}
-          role-to-assume: ${{ steps.environment.outputs.cluster-role }}
-          mask-aws-account-id: false
-          role-skip-session-tagging: true
 
-      - name: Create synthetic domain
-        uses: carecloud/github-action-create-synthetic-domain@main
-        id: synthetic-domain
-        with:
-          app-name: ${{ inputs.app-name }}
-          platform-ssm-path: ${{ steps.environment.outputs.platform-ssm-path }}
+      # - name: Create synthetic domain
+      #   uses: carecloud/github-action-create-synthetic-domain@main
+      #   id: synthetic-domain
+      #   with:
+      #     app-name: ${{ inputs.app-name }}
+      #     platform-ssm-path: ${{ steps.environment.outputs.platform-ssm-path }}
 
       - name: Define Helm values file path
         if: ${{ inputs.toolchain == 'helmfile' }}

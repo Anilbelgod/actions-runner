@@ -134,17 +134,17 @@ jobs:
           secrets: ${{ secrets.docker-build-push-secrets }}
           docker-metadata-pr-head-sha: true
 
-  #     # - uses: cloudposse/github-action-secret-outputs@0.1.2
-  #     #   id: image
-  #     #   with:
-  #     #     secret: ${{ secrets.secret-outputs-passphrase }}
-  #     #     op: encode
-  #     #     in: ${{ steps.build.outputs.image }}
+      # - uses: cloudposse/github-action-secret-outputs@0.1.2
+      #   id: image
+      #   with:
+      #     # secret: ${{ secrets.secret-outputs-passphrase }}
+      #     # op: encode
+      #     in: ${{ steps.build.outputs.image }}
 
-  #   outputs:
-  #     image: ${{ steps.image.outputs.out }}
-  #     image-tag: ${{ steps.build.outputs.tag }}
-  #     version: ${{ steps.github-sha.outputs.value }}
+    outputs:
+      image: ${{ steps.build.outputs.image }}
+      image-tag: ${{ steps.build.outputs.tag }}
+      version: ${{ steps.github-sha.outputs.value }}
 
 
   test:
