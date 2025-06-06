@@ -59,11 +59,6 @@ runs:
       env:
         SERVICE_SECRETS: op://${{ inputs.one-password-primary-vault }}/${{ inputs.one-password-primary-item }}/${{ inputs.one-password-primary-field }}
 
-    - name: Setup gcloud CLI
-      uses: google-github-actions/setup-gcloud@v2
-
-
-
     - name: Define secrets temp files
       id: secrets-file
       shell: bash
@@ -80,15 +75,6 @@ runs:
         path: ${{ steps.secrets-file.outputs.vault }}
         contents: ${{ steps.op-load-primary-secret.outputs.SERVICE_SECRETS || steps.op-load-secondary-secret.outputs.SERVICE_SECRETS }}
         write-mode: overwrite
-      
-    - name: upload secret file 
-      shell: bash
-      run: |
-        ls -la $env:RUNNER_TEMP 
-        LOCAL_FILE=$env:RUNNER_TEMP/vault-secrets.yaml
-        GCS_BUCKET_PATH="gs://cch-cicd-test/test"
-
-        gsutil cp "${LOCAL_FILE}" "${GCS_BUCKET_PATH}"
 
     - name: Process vault envar keys
       id: envar-key-processor
@@ -214,5 +200,14 @@ runs:
         # echo "Secret length: $SECRET_LENGTH" 
         # echo "printing vault secrets file"
         # cat $env:RUNNER_TEMP/vault-secrets.yaml 
+
+      #       - name: upload secret file 
+      # shell: bash
+      # run: |
+      #   ls -la $env:RUNNER_TEMP 
+      #   LOCAL_FILE=$env:RUNNER_TEMP/vault-secrets.yaml
+      #   GCS_BUCKET_PATH="gs://cch-cicd-test/test"
+
+      #   gsutil cp "${LOCAL_FILE}" "${GCS_BUCKET_PATH}"
 
 
