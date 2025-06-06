@@ -171,5 +171,5 @@ jobs:
       # deployment-check-app-id: ${{ inputs.deployment-check-app-id }}
       # deployment-check-app-installation-id: ${{ inputs.deployment-check-app-installation-id }}
     secrets: 
-      one-password-service-account-token: ${{ secrets.one-password-service-account-token }}
+      one-password-service-account-token: ${{ secrets.ONE_PASSWORD_SERVICE_ACCOUNT_TOKEN }}
       # deployment-check-app-private-key: ${{ secrets.deployment-check-app-private-key }}
