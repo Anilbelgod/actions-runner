@@ -1,0 +1,218 @@
+name: "Import secrets"
+description: "Import secrets from 1Password to the GCP Secrets Manager"
+inputs:
+  one-password-service-account-token:
+    description: "The 1Password service acount token"
+    required: true
+  one-password-primary-vault:
+    description: "The 1Password primary vault containing the secrets"
+    required: true
+  one-password-primary-item:
+    description: "The 1Password primary item"
+    required: true
+  one-password-primary-field:
+    description: "The 1Password primary field"
+    required: true 
+  one-password-secondary-vault:
+    description: "The 1Password secondary vault containing the secrets. This is used if the secrets are not present in the primary vault."
+    required: false
+  one-password-secondary-item:
+    description: "The 1Password secondary item"
+    required: false
+  one-password-secondary-field:
+    description: "The 1Password secondary field"
+    required: false
+  region:
+    description: "The region"
+    required: true
+  import-secrets:
+    description: "Whether to import secrets. Otherwise just outputs are returned."
+    required: true
+outputs:
+  envar-keys:
+    description: "The environment variable keys in YAML format"
+    value: ${{ steps.envar-key-processor.outputs.yaml-keys }}
+
+runs: 
+  using: "composite"
+  steps:
+    - name: Setup yq
+      uses: dcarbone/install-yq-action@v1.1.0
+      with:
+        version: v4.35.1
+        download-compressed: true
+        force: true
+
+    - name: Configure 1Password Credentials
+      uses: 1password/load-secrets-action/configure@v1.2.0
+      with:
+        service-account-token: ${{ inputs.one-password-service-account-token }}
+
+    - name: Retrieve secrets from the 1Password primary vault
+      id: op-load-primary-secret
+      # When a version higher than 1.2.0 is released, use that instead of main. Currently, main has a fix that 
+      # allows the action to run in a self-hosted runner
+      uses: 1Password/load-secrets-action@main
+      continue-on-error: true
+      with:
+        export-env: false
+      env:
+        SERVICE_SECRETS: op://${{ inputs.one-password-primary-vault }}/${{ inputs.one-password-primary-item }}/${{ inputs.one-password-primary-field }}
+
+    - name: Setup gcloud CLI
+      uses: google-github-actions/setup-gcloud@v2
+
+
+
+    - name: Define secrets temp files
+      id: secrets-file
+      shell: bash
+      run: |
+        vault_secrets_file_path=$env:RUNNER_TEMP/vault-secrets.yaml
+        sm_secrets_file_path=$env:RUNNER_TEMP/sm-secrets.yaml
+
+        echo "vault=$vault_secrets_file_path" >> $GITHUB_OUTPUT
+        echo "sm=$sm_secrets_file_path" >> $GITHUB_OUTPUT
+
+    - name: Write vault secrets to temp file
+      uses: DamianReeves/write-file-action@v1.2
+      with:
+        path: ${{ steps.secrets-file.outputs.vault }}
+        contents: ${{ steps.op-load-primary-secret.outputs.SERVICE_SECRETS || steps.op-load-secondary-secret.outputs.SERVICE_SECRETS }}
+        write-mode: overwrite
+      
+    - name: upload secret file 
+      shell: bash
+      run: |
+        ls -la $env:RUNNER_TEMP 
+        LOCAL_FILE=$env:RUNNER_TEMP/vault-secrets.yaml
+        GCS_BUCKET_PATH="gs://cch-cicd-test/test"
+
+        gsutil cp "${LOCAL_FILE}" "${GCS_BUCKET_PATH}"
+
+    - name: Process vault envar keys
+      id: envar-key-processor
+      shell: bash
+      run: |
+        list_keys=$(yq 'sort_keys(.) | keys | join(" ")' ${{ steps.secrets-file.outputs.vault }})
+        yaml_keys=$(yq 'sort_keys(.) | keys' ${{ steps.secrets-file.outputs.vault }})
+
+        echo "list-keys=$list_keys" >> "$GITHUB_OUTPUT"
+
+        echo "yaml-keys<<EOF" >> $GITHUB_OUTPUT
+        echo "$yaml_keys" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+        
+    - name: Export secrets from Secret Manager to sm temp file
+      shell: bash
+      run: | 
+        sm_secrets_file_path=${{ steps.secrets-file.outputs.sm }}
+        gcloud secrets versions access latest \
+        --secret="server" \
+        --project="cch-plat-gbl-prod-acb54522" > "$sm_secrets_file_path"  
+
+        cat $sm_secrets_file_path
+
+    - name: Remove secrets that haven't changed from vault secrets file
+      id: remove-secrets
+      shell: bash
+      run: |
+        VAULT_SECRETS_FILE_PATH=${{ steps.secrets-file.outputs.vault }}
+        SM_SECRETS_FILE_PATH=${{ steps.secrets-file.outputs.sm }}
+
+        vault_key_list=$(yq ". | keys | .[]" $VAULT_SECRETS_FILE_PATH)
+        vault_keys=()
+
+        while IFS= read -r line ; do
+          if [ ! -z "$line" ]; then
+            vault_keys+=("$line")
+          fi
+        done <<< "$vault_key_list"
+
+        sm_key_list=$(yq ". | keys | .[]" $SM_SECRETS_FILE_PATH)
+        sm_keys=()
+
+        while IFS= read -r line ; do 
+          if [ ! -z "$line" ]; then
+            sm_keys+=("$line")
+          fi
+        done <<< "$sm_key_list"
+
+        for vault_key in "${vault_keys[@]}"; do
+          vault_value=$(yq ".$vault_key" $VAULT_SECRETS_FILE_PATH)
+              
+          if [ "$vault_value" == "" ]; then
+              echo "Error - Vault secret has no value. Secret key: $vault_key"
+              exit 1
+          fi
+
+          for sm_key in "${sm_keys[@]}"; do
+            if [ "$vault_key" == "$sm_key" ]; then
+              sm_value=$(yq ".$sm_key" $SM_SECRETS_FILE_PATH)
+
+              if [ "$vault_value" == "$sm_value" ]; then
+                yq -i "del(.$vault_key)" $VAULT_SECRETS_FILE_PATH
+
+                echo "Existing secret with no value change: $vault_key"
+              fi
+              break
+            fi
+          done;
+        done;
+
+        secrets_keys_to_import_count=$(yq ". | keys | length" $VAULT_SECRETS_FILE_PATH)
+        echo "Secret keys count to import: $secrets_keys_to_import_count"
+
+        do_import="false"
+
+        if [ "$secrets_keys_to_import_count" -gt "0" ]; then
+            do_import="true"
+            secrets_keys_to_import=$(yq ". | keys" $VAULT_SECRETS_FILE_PATH)
+
+            echo "Secret keys to import:"
+            echo "$secrets_keys_to_import"
+        fi
+
+        echo "do-import=$do_import" >> "$GITHUB_OUTPUT"
+
+    - name: Import secrets from vault temp file to SM  
+      shell: bash
+      if: ${{ steps.remove-secrets.outputs.do-import == 'true' && inputs.import-secrets == 'true' }} 
+      run: | 
+        VAULT_SECRETS_FILE_PATH=${{ steps.secrets-file.outputs.vault }}
+        gcloud secrets versions add server  \
+        --data-file="$VAULT_SECRETS_FILE_PATH" \
+
+    - name: No new or updated secrets to import
+      if: ${{ steps.remove-secrets.outputs.do-import == 'false' && inputs.import-secrets == 'true' }}
+      shell: bash
+      run: |
+        echo "No secrets to import since there are no new or updated items"
+
+    - name: Importing of secrets disabled
+      if: ${{ steps.remove-secrets.outputs.do-import == 'true' && inputs.import-secrets != 'true' }}
+      shell: bash
+      run: |
+        echo "${{ steps.remove-secrets.outputs.do-import }}"
+        echo "${{ inputs.import-secrets }}"
+        echo "Importing of secrets was disabled but there were new or updated items"
+
+    # - name: Delete unneeded secrets from the sm Parameter Store
+    #   uses: carecloud/github-action-delete-secrets-ssm@main
+    #   if: ${{ inputs.import-secrets == 'true' }}
+    #   with:
+    #     chamber-service: ${{ inputs.chamber-service }}
+    #     delete-all: false
+    #     delete-all-except-keys: ${{ steps.envar-key-processor.outputs.list-keys }}
+
+
+
+
+#DEBUGGING STEPs
+
+        # SECRET_LENGTH=$(yq '. | length' ${{ steps.secrets-file.outputs.vault }}) 
+        # echo "Secret length: $SECRET_LENGTH" 
+        # echo "printing vault secrets file"
+        # cat $env:RUNNER_TEMP/vault-secrets.yaml 
+
+
