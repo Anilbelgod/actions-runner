@@ -101,7 +101,7 @@ on:
     secrets:
       secret-outputs-passphrase:
         description: "Passphrase to encrypt/decrypt secret outputs with gpg. For more information [read](https://github.com/cloudposse/github-action-secret-outputs)"
-        required: true
+        required: false
       github-private-actions-pat:
         description: "Github PAT allow to pull private repos"
         required: false
