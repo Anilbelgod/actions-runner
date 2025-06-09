@@ -101,7 +101,6 @@ runs:
         --secret="server" \
         --project="cch-plat-glb-dev-project-4" > "$sm_secrets_file_path"  
 
-        cat $sm_secrets_file_path
 
     - name: Remove secrets that haven't changed from vault secrets file
       id: remove-secrets
