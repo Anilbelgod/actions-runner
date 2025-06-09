@@ -1,6 +1,9 @@
 name: "Import secrets"
 description: "Import secrets from 1Password to the GCP Secrets Manager"
 inputs:
+  app-name:
+    description: "The name of the application"
+    required: true
   one-password-service-account-token:
     description: "The 1Password service acount token"
     required: true
@@ -165,12 +168,12 @@ runs:
         echo "do-import=$do_import" >> "$GITHUB_OUTPUT"
 
     - name: Import secrets from vault temp file to SM  
-      shell: bash
+      uses: ./actions/update-secrets
       if: ${{ steps.remove-secrets.outputs.do-import == 'true' && inputs.import-secrets == 'true' }} 
-      run: | 
-        VAULT_SECRETS_FILE_PATH=${{ steps.secrets-file.outputs.vault }}
-        gcloud secrets versions add server  \
-        --data-file="$VAULT_SECRETS_FILE_PATH" \
+      with:
+        app-name: ${{ inputs.one-password-primary-vault }} 
+        service-name: ${{ inputs.one-password-primary-item }}
+        secrets-file: ${{ steps.secrets-file.outputs.vault }}
 
     - name: No new or updated secrets to import
       if: ${{ steps.remove-secrets.outputs.do-import == 'false' && inputs.import-secrets == 'true' }}

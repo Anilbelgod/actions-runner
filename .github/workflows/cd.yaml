@@ -167,6 +167,7 @@ jobs:
           one-password-primary-item: documents-api   
           one-password-primary-field: dev 
           import-secrets: true 
+          app-name: ${{ inputs.app-name }} 
 
 
       # - name: Create synthetic domain
