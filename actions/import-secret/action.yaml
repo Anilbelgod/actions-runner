@@ -167,10 +167,6 @@ runs:
 
         echo "do-import=$do_import" >> "$GITHUB_OUTPUT"
       
-    - name: Making update secret file executable
-      shell: bash
-      run: |
-        chmod +x ${{ github.action_path }}/actions/update-secrets/main.sh
 
     - name: Import secrets from vault temp file to SM  
       uses: ./actions/update-secrets
