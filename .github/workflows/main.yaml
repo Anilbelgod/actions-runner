@@ -30,5 +30,3 @@ jobs:
     #   deployment-check-app-private-key: ${{ secrets.CCH_DEPLOYMENT_STATUS_APP_PRIVATE_KEY }}
     #   docker-build-push-secrets: |
     #     bundle_config=BUNDLE_RUBYGEMS__PKG__GITHUB__COM: "${{ secrets.CCH_GITHUB_BOT_USERNAME }}:${{ secrets.CCH_GITHUB_BOT_TOKEN }}
-
-    
