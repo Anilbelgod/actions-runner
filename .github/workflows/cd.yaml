@@ -159,13 +159,13 @@ jobs:
       #     tenant: ${{ inputs.tenant }}
 
       - name: Import secrets into Secret Manager from 1Password
-        uses: ./
+        uses: ./actions/import-secret 
         id: import-secrets
         with:
           one-password-service-account-token: ${{ secrets.one-password-service-account-token }}
-          one-password-primary-vault: cch-cicd-test 
-          one-password-primary-item: example-app   
-          one-password-primary-field: dev
+          one-password-primary-vault: example-app 
+          one-password-primary-item: documents-api   
+          one-password-primary-field: dev 
           import-secrets: true 
 
 
