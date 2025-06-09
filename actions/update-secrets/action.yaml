@@ -16,8 +16,13 @@ inputs:
 runs:
   using: "composite"
   steps:
+
+    - name: Make file executable
+      run: chmod +x ${{ github.action_path }}/main.sh
+      shell: bash
+      
     - name: Run main script
       shell: bash
-      run: |
-       chmod +x ./actions/update-secrets/main.sh
+      run: | 
+       chmod +x ${{ github.action_path }}/main.sh 
        ${{ github.action_path }}/main.sh ${{ inputs.secrets-file }} ${{ inputs.app-name }} ${{ inputs.service-name }} 
