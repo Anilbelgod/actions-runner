@@ -96,13 +96,13 @@ runs:
         echo "$yaml_keys" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
         
-    - name: Export secrets from Secret Manager to sm temp file
-      uses: ./actions/export-secrets 
-      with:
-        app-name: ${{ inputs.one-password-primary-vault }} 
-        service-name: ${{ inputs.one-password-primary-item }}
-        secrets-file: ${{ steps.secrets-file.outputs.sm }}
-        vault-env-keys: ${{ steps.envar-key-processor.outputs.yaml-keys }}
+    # - name: Export secrets from Secret Manager to sm temp file
+    #   uses: ./actions/export-secrets 
+    #   with:
+    #     app-name: ${{ inputs.one-password-primary-vault }} 
+    #     service-name: ${{ inputs.one-password-primary-item }}
+    #     secrets-file: ${{ steps.secrets-file.outputs.sm }}
+    #     vault-env-keys: ${{ steps.envar-key-processor.outputs.yaml-keys }}
     
     - name: upload secret file 
       shell: bash
