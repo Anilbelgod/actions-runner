@@ -100,20 +100,14 @@ runs:
         echo "yaml-keys-array<<EOF" >> $GITHUB_OUTPUT
         echo "$yaml_keys_array" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT 
-      
-    - name: Print yaml keys 
-      shell: bash
-      run: |
-        echo "YAML keys:"
-        echo "${{ steps.envar-key-processor.outputs.yaml-keys-array }}"
         
-    # - name: Export secrets from Secret Manager to sm temp file
-    #   uses: ./actions/export-secrets 
-    #   with:
-    #     app-name: ${{ inputs.one-password-primary-vault }} 
-    #     service-name: ${{ inputs.one-password-primary-item }}
-    #     secrets-file: ${{ steps.secrets-file.outputs.sm }}
-    #     vault-env-keys: ${{ steps.envar-key-processor.outputs.yaml-keys }}
+    - name: Export secrets from Secret Manager to sm temp file
+      uses: ./actions/export-secrets 
+      with:
+        app-name: ${{ inputs.one-password-primary-vault }} 
+        service-name: ${{ inputs.one-password-primary-item }}
+        secrets-file: ${{ steps.secrets-file.outputs.sm }}
+        vault-env-keys: ${{ steps.envar-key-processor.outputs.yaml-keys-array }} 
     
     - name: upload secret file 
       shell: bash
