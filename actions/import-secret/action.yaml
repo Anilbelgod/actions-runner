@@ -76,7 +76,7 @@ runs:
         echo "vault=$vault_secrets_file_path" >> $GITHUB_OUTPUT
         echo "sm=$sm_secrets_file_path" >> $GITHUB_OUTPUT
 
-    - name: Write vault secrets to temp file
+    - name: Write vault secrets to temp files
       uses: DamianReeves/write-file-action@v1.2
       with:
         path: ${{ steps.secrets-file.outputs.vault }}
