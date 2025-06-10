@@ -83,7 +83,7 @@ runs:
         contents: ${{ steps.op-load-primary-secret.outputs.SERVICE_SECRETS || steps.op-load-secondary-secret.outputs.SERVICE_SECRETS }}
         write-mode: overwrite
 
-    - name: Process vault envar keys
+    - name: Process vault envar key
       id: envar-key-processor
       shell: bash
       run: |
@@ -96,7 +96,7 @@ runs:
         echo "$yaml_keys" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
       
-    - name: Print yamk keys
+    - name: Print yaml keys
       shell: bash
       run: |
         echo "YAML keys:"
