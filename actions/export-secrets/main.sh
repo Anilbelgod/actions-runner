@@ -9,8 +9,8 @@ VAULT_ENV_KEYS="$4"
 while IFS=: read -r key; do
  
   SECRET_NAME="${APP_NAME}-${SERVICE_NAME}-${key}"
-  secret_value=$(gcloud secrets versions access latest --secret="$SECRET_NAME") 
+  secret_value=$(gcloud secrets versions access latest --secret="${SECRET_NAME}") 
 
   echo "${key}: ${secret_value}" >> "$SECRETS_FILE"
-  
+
 done < "$VAULT_ENV_KEYS"
