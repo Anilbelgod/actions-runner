@@ -89,18 +89,23 @@ runs:
       run: |
         list_keys=$(yq 'sort_keys(.) | keys | join(" ")' ${{ steps.secrets-file.outputs.vault }})
         yaml_keys=$(yq 'sort_keys(.) | keys' ${{ steps.secrets-file.outputs.vault }})
+        yaml_keys_array=$(yq -r 'sort_keys(.) | keys | .[]' ${{ steps.secrets-file.outputs.vault }})
 
         echo "list-keys=$list_keys" >> "$GITHUB_OUTPUT"
-
+        
         echo "yaml-keys<<EOF" >> $GITHUB_OUTPUT
         echo "$yaml_keys" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
+
+        echo "yaml-keys-array<<EOF" >> $GITHUB_OUTPUT
+        echo "$yaml_keys_array" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT 
       
     - name: Print yaml keys 
       shell: bash
       run: |
         echo "YAML keys:"
-        echo "${{ steps.envar-key-processor.outputs.yaml_keys }}"
+        echo "${{ steps.envar-key-processor.outputs.yaml-keys-array }}"
         
     # - name: Export secrets from Secret Manager to sm temp file
     #   uses: ./actions/export-secrets 
