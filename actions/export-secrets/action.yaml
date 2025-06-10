@@ -27,4 +27,4 @@ runs:
     - name: Run main script
       shell: bash
       run: | 
-       ${{ github.action_path }}/main.sh ${{ inputs.secrets-file }} ${{ inputs.app-name }} ${{ inputs.service-name }} 
+       ${{ github.action_path }}/main.sh ${{ inputs.secrets-file }} ${{ inputs.app-name }} ${{ inputs.service-name }} ${{ inputs.vault-env-keys }}
