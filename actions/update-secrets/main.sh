@@ -3,21 +3,14 @@
 SECRETS_FILE="$1"
 APP_NAME="$2"
 SERVICE_NAME="$3" 
+VAULT_ENV_KEYS="$4"
 
 
 while IFS=: read -r key value; do
  
   SECRET_NAME="${APP_NAME}-${SERVICE_NAME}-${key}"
-  echo "$value" > /tmp/secret
+  secret_value=$(gcloud secrets versions access latest --secret="$SECRET_NAME" 2>/dev/null)
+
+  echo "${key}: ${secret_value} >> "$SECRETS_FILE"
   
-
-  if ! gcloud secrets describe "$SECRET_NAME" >/dev/null 2>&1; then
-    echo "Creating secret: $SECRET_NAME"
-    gcloud secrets create "$SECRET_NAME"  
-  fi 
-
-  echo "Adding version to secret: $SECRET_NAME"
-  gcloud secrets versions add "$SECRET_NAME" --data-file=/tmp/secret
-
-
-done < "$SECRETS_FILE" 
+done < "$VAULT_ENV_KEYS"  
