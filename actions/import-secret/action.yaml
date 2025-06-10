@@ -100,7 +100,7 @@ runs:
       shell: bash
       run: |
         echo "YAML keys:"
-        echo "${{ steps.envar-key-processor.outputs.yaml-keys }}"
+        echo "${{ steps.envar-key-processor.outputs.yaml_keys }}"
         
     # - name: Export secrets from Secret Manager to sm temp file
     #   uses: ./actions/export-secrets 
