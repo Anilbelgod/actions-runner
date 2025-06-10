@@ -24,5 +24,4 @@ runs:
     - name: Run main script
       shell: bash
       run: | 
-       chmod +x ${{ github.action_path }}/main.sh 
        ${{ github.action_path }}/main.sh ${{ inputs.secrets-file }} ${{ inputs.app-name }} ${{ inputs.service-name }} 
