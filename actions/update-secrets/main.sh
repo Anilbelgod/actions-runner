@@ -11,7 +11,7 @@ while IFS=: read -r key value; do
   echo "$value" > /tmp/secret
   
 
-  if ! gcloud secrets describe "$" >/dev/null 2>&1; then
+  if ! gcloud secrets describe "$SECRET_NAME" >/dev/null 2>&1; then
     echo "Creating secret: $SECRET_NAME"
     gcloud secrets create "$SECRET_NAME"  
   fi 
