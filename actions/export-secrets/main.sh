@@ -13,4 +13,5 @@ while IFS=: read -r key value; do
 
   echo "${key}: ${secret_value}" >> "$SECRETS_FILE"
   
-done < "$VAULT_ENV_KEYS"  
+done < "$VAULT_ENV_KEYS"
+
