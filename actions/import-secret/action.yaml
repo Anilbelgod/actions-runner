@@ -96,7 +96,7 @@ runs:
         echo "$yaml_keys" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
       
-    - name: Print yaml keys
+    - name: Print yaml keys 
       shell: bash
       run: |
         echo "YAML keys:"
