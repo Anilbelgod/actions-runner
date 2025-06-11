@@ -141,8 +141,9 @@ jobs:
         uses: docker/login-action@v2
         with:
           username: jayz66d
-          token: ${{ secrets.DOCKET_TOKEN}}
+          password: ${{ secrets.DOCKET_TOKEN}}
   ci:
+    needs: [ setup ] 
     uses: ./.github/workflows/ci.yaml
     with:
           organization: ${{ inputs.organization }}
