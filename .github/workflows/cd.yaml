@@ -133,16 +133,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Determine the application name for configuration purposes
-        id: config-app-name
-        uses: cloudposse/github-action-yaml-config-query@0.1.2
-        with:
-          query: .${{ inputs.config-app-name == '' }}
-          config: |
-            true:
-              value: ${{ inputs.app-name }}
-            false:
-              value: ${{ inputs.config-app-name }}
+      # - name: Determine the application name for configuration purposes
+      #   id: config-app-name
+      #   uses: cloudposse/github-action-yaml-config-query@0.1.2
+      #   with:
+      #     query: .${{ inputs.config-app-name == '' }}
+      #     config: |
+      #       true:
+      #         value: ${{ inputs.app-name }}
+      #       false:
+      #         value: ${{ inputs.config-app-name }}
 
       # - name: Environment Info
       #   uses: carecloud/github-action-interface-environment@main
