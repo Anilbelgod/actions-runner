@@ -21,8 +21,9 @@ runs:
       id: temp-secrets-file
       shell: bash
       run: | 
-        temp_secrets_file_path=$env:RUNNER_TEMP/temp_secrets.yaml
-        echo "temp_sm=$temp_secrets_file_path" >> $GITHUB_OUTPUT 
+        temp_secrets_file_path="$RUNNER_TEMP/temp_secrets.yaml"
+        touch "$temp_secrets_file_path"
+        echo "temp_sm=$temp_secrets_file_path" >> "$GITHUB_OUTPUT"
 
     - name: Make file executable & writeable 
       shell: bash
