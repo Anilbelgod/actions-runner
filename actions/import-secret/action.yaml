@@ -72,9 +72,11 @@ runs:
       run: |
         vault_secrets_file_path=$env:RUNNER_TEMP/vault-secrets.yaml
         sm_secrets_file_path=$env:RUNNER_TEMP/sm-secrets.yaml
+        vault_keys_file_path=$env:RUNNER_TEMP/vault-keys.yaml 
 
         echo "vault=$vault_secrets_file_path" >> $GITHUB_OUTPUT
         echo "sm=$sm_secrets_file_path" >> $GITHUB_OUTPUT
+        echo "vault-keys=$vault_keys_file_path" >> $GITHUB_OUTPUT 
 
     - name: Write vault secrets to temp files
       uses: DamianReeves/write-file-action@v1.2
@@ -89,7 +91,7 @@ runs:
       run: |
         list_keys=$(yq 'sort_keys(.) | keys | join(" ")' ${{ steps.secrets-file.outputs.vault }})
         yaml_keys=$(yq 'sort_keys(.) | keys' ${{ steps.secrets-file.outputs.vault }})
-        yaml_keys_array=$(yq -r 'sort_keys(.) | keys | .[]' ${{ steps.secrets-file.outputs.vault }})
+        
 
         echo "list-keys=$list_keys" >> "$GITHUB_OUTPUT"
         
@@ -97,9 +99,8 @@ runs:
         echo "$yaml_keys" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
 
-        echo "yaml-keys-array<<EOF" >> $GITHUB_OUTPUT
-        echo "$yaml_keys_array" >> $GITHUB_OUTPUT
-        echo "EOF" >> $GITHUB_OUTPUT 
+        echo "$yaml_keys" > "${{ steps.secrets-file.outputs.vault-keys }}"
+
         
     - name: Export secrets from Secret Manager to sm temp file
       uses: ./actions/export-secrets 
@@ -107,7 +108,7 @@ runs:
         app-name: ${{ inputs.one-password-primary-vault }} 
         service-name: ${{ inputs.one-password-primary-item }}
         secrets-file: ${{ steps.secrets-file.outputs.sm }}
-        vault-env-keys: ${{ steps.envar-key-processor.outputs.yaml-keys-array }} 
+        vault-env-keys: ${{ steps.secrets-file.outputs.vault-keys }}
     
     - name: upload secret file 
       shell: bash
