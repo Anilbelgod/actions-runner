@@ -115,7 +115,7 @@ runs:
       run: |
         ls -la $env:RUNNER_TEMP 
         VAULT_LOCAL_FILE=$env:RUNNER_TEMP/vault-secrets.yaml
-        SM_LOCAL_FILE=$env:RUNNER_TEMP/sm-secrets.yaml 
+        SM_LOCAL_FILE=${{ steps.secrets-file.outputs.sm }} 
         GCS_BUCKET_PATH="gs://cch-cicd-test-bucket/test"
 
         gsutil cp "${VAULT_LOCAL_FILE}" "${GCS_BUCKET_PATH}"
