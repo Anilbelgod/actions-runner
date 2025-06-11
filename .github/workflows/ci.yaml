@@ -96,15 +96,15 @@ jobs:
       #     config-app-name: ${{ steps.config-app-name.outputs.value }}
       #     tenant: ${{ inputs.tenant }}
 
-    outputs:
-      config-app-name: ${{ steps.config-app-name.outputs.value }}
+    # outputs:
+      # config-app-name: ${{ steps.config-app-name.outputs.value }}
     #   environment: ${{ inputs.environment }}
     #   # build-role: ${{ steps.environment.outputs.build-role }}
 
 
   build-image:
     runs-on: ["self-hosted"]
-    # needs: [ "setup" ]
+    needs: [ "setup" ]
     steps:
 
       - name: Determine the GitHub SHA to use
