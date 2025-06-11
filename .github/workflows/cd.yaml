@@ -158,16 +158,16 @@ jobs:
       #     config-app-name: ${{ steps.config-app-name.outputs.value }}
       #     tenant: ${{ inputs.tenant }}
 
-      - name: Import secrets into Secret Manager from 1Password
-        uses: ./actions/import-secret 
-        id: import-secrets
-        with:
-          one-password-service-account-token: ${{ secrets.one-password-service-account-token }}
-          one-password-primary-vault: example-app 
-          one-password-primary-item: documents-api   
-          one-password-primary-field: dev 
-          import-secrets: true 
-          app-name: ${{ inputs.app-name }} 
+      # - name: Import secrets into Secret Manager from 1Password
+      #   uses: ./actions/import-secret 
+      #   id: import-secrets
+      #   with:
+      #     one-password-service-account-token: ${{ secrets.one-password-service-account-token }}
+      #     one-password-primary-vault: example-app 
+      #     one-password-primary-item: documents-api   
+      #     one-password-primary-field: dev 
+      #     import-secrets: true 
+      #     app-name: ${{ inputs.app-name }} 
 
 
       # - name: Create synthetic domain
@@ -192,12 +192,20 @@ jobs:
           download-compressed: true
           force: true
 
+      # - name: Create deploy Helm values file
+      #   if: ${{ inputs.toolchain == 'helmfile' }}
+      #   uses: DamianReeves/write-file-action@master
+      #   with:
+      #     path: ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+      #     contents: ${{ steps.import-secrets.outputs.envar-keys }}
+      #     write-mode: overwrite
+      
       - name: Create deploy Helm values file
         if: ${{ inputs.toolchain == 'helmfile' }}
         uses: DamianReeves/write-file-action@master
         with:
           path: ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-          contents: ${{ steps.import-secrets.outputs.envar-keys }}
+          contents: "./envars.yaml"
           write-mode: overwrite
 
       - name: Update deploy Helm values file
@@ -269,4 +277,3 @@ jobs:
 
           
 
-          
