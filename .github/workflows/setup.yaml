@@ -156,8 +156,9 @@ jobs:
           app-name: ${{ inputs.app-name }}
           ar-region: ${{ inputs.ar-region }}
           registry: ${{ inputs.registry }}
-          run-tests: ${{ inputs.run-tests }}
-        # secrets:
+          run-tests: ${{ inputs.run-tests }} 
+    secrets:
+          docker-token: ${{ secrets.docker-token }} 
         #   github-private-actions-pat: ${{ secrets.github-private-actions-pat }}
         #   docker-build-push-secrets: ${{ secrets.docker-build-push-secrets }}
         #   docker-login-medicomp: ${{ secrets.docker-login-medicomp }}
