@@ -11,3 +11,4 @@ while IFS=: read -r line; do
     secret_value=$(gcloud secrets versions access latest --secret="$SECRET_NAME")
     echo "${key}: ${secret_value}" >> "$SECRETS_FILE"
 done < "$VAULT_ENV_KEYS" 
+
