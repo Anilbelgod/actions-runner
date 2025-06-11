@@ -26,6 +26,7 @@ jobs:
       run-tests: false #!CI 
     secrets:
       one-password-service-account-token: "${{ secrets.ONE_PASSWORD_SERVICE_ACCOUNT_TOKEN }}"
+      docker-token: "${{ secrets.DOCKER_TOKEN }}" 
       #   github-private-actions-pat: "${{ secrets.CCH_GITHUB_BOT_TOKEN }}" #! Check this out 
     #   deployment-check-app-private-key: ${{ secrets.CCH_DEPLOYMENT_STATUS_APP_PRIVATE_KEY }}
     #   docker-build-push-secrets: |

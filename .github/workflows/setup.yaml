@@ -103,6 +103,9 @@ on:
       one-password-service-account-token:
         description: "The 1Password service acount token"
         required: true
+      docker-token:
+        description: "The Docker token for authentication to the Docker registry"
+        required: true 
     #   github-private-actions-pat: #! TBD 
     #     description: "Github PAT allow to pull private repos"
     #     required: true
@@ -141,7 +144,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           username: jayz66d
-          password: ${{ secrets.DOCKER_TOKEN }}
+          password: ${{ secrets.docker-token }} 
   ci:
     needs: [ setup ] 
     uses: ./.github/workflows/ci.yaml
