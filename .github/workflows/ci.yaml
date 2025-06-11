@@ -42,8 +42,9 @@ on:
         required: true
         type: string
     secrets:
-      docker-tocken:
+      docker-token:
         description: "Docker token"
+        required: true
     # secrets:
     #   github-private-actions-pat:
     #     description: "Github PAT allow to pull private repos"
