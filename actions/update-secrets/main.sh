@@ -16,7 +16,7 @@ while IFS=: read -r key value; do
     gcloud secrets create "$SECRET_NAME"  
   fi 
 
-  echo "$value" > /tmp/secret 
+  echo "$value" > $TEMP_SECRET_FILE  
   echo "Adding version to secret: $SECRET_NAME"
   gcloud secrets versions add "$SECRET_NAME" --data-file=$TEMP_SECRET_FILE 
 
