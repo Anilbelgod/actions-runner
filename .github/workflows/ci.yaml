@@ -107,10 +107,10 @@ jobs:
     needs: [ "setup" ]
     steps:
 
-      - name: Determine the GitHub SHA to use
-        uses: Anilbelgod/github-action-get-github-sha-for-deployment@main
+      # - name: Determine the GitHub SHA to use
+      #   uses: Anilbelgod/github-action-get-github-sha-for-deployment@main
 
-        id: github-sha
+      #   id: github-sha
 
       - name: Checkout
         uses: actions/checkout@v3
