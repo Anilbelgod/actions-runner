@@ -18,7 +18,7 @@ while IFS=: read -r key value; do
 
   echo "$value" > /tmp/secret 
   echo "Adding version to secret: $SECRET_NAME"
-  gcloud secrets versions add "$SECRET_NAME" --data-file=/tmp/secret
+  gcloud secrets versions add "$SECRET_NAME" --data-file=$TEMP_SECRET_FILE 
 
 
 done < "$SECRETS_FILE" 
