@@ -3,6 +3,7 @@
 SECRETS_FILE="$1"
 APP_NAME="$2"
 SERVICE_NAME="$3" 
+TEMP_SECRET_FILE="$4"  
 
 
 while IFS=: read -r key value; do
@@ -15,6 +16,7 @@ while IFS=: read -r key value; do
     gcloud secrets create "$SECRET_NAME"  
   fi 
 
+  echo "$value" > /tmp/secret 
   echo "Adding version to secret: $SECRET_NAME"
   gcloud secrets versions add "$SECRET_NAME" --data-file=/tmp/secret
 

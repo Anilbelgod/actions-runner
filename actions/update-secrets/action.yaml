@@ -17,11 +17,20 @@ runs:
   using: "composite"
   steps:
 
-    - name: Make file executable
-      run: chmod +x ${{ github.action_path }}/main.sh
+    - name: Creating temporary secret file
+      id: temp-secrets-file
       shell: bash
-      
+      run: | 
+        temp_secrets_file_path=$env:RUNNER_TEMP/temp_secrets.yaml
+        echo "temp_sm=$temp_secrets_file_path" >> $GITHUB_OUTPUT 
+
+    - name: Make file executable & writeable 
+      shell: bash
+      run: | 
+        chmod +x ${{ github.action_path }}/main.sh
+        chmod +w ${{ steps.temp-secrets-file.outputs.temp_sm }}/main.sh 
+
     - name: Run main script
       shell: bash
       run: | 
-       ${{ github.action_path }}/main.sh ${{ inputs.secrets-file }} ${{ inputs.app-name }} ${{ inputs.service-name }} 
+       ${{ github.action_path }}/main.sh ${{ inputs.secrets-file }} ${{ inputs.app-name }} ${{ inputs.service-name }} ${{ steps.temp-secrets-file.outputs.temp_sm }} 
