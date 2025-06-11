@@ -66,6 +66,15 @@ runs:
       env:
         SERVICE_SECRETS: op://${{ inputs.one-password-primary-vault }}/${{ inputs.one-password-primary-item }}/${{ inputs.one-password-primary-field }}
 
+ 
+
+    - name: Write vault secrets to temp files
+      uses: DamianReeves/write-file-action@v1.2
+      with:
+        path: ${{ steps.secrets-file.outputs.vault }}
+        contents: ${{ steps.op-load-primary-secret.outputs.SERVICE_SECRETS || steps.op-load-secondary-secret.outputs.SERVICE_SECRETS }}
+        write-mode: overwrite
+
     - name: Define secrets temp files
       id: secrets-file
       shell: bash
@@ -76,14 +85,7 @@ runs:
 
         echo "vault=$vault_secrets_file_path" >> $GITHUB_OUTPUT
         echo "sm=$sm_secrets_file_path" >> $GITHUB_OUTPUT
-        echo "vault-keys=$vault_keys_file_path" >> $GITHUB_OUTPUT 
-
-    - name: Write vault secrets to temp files
-      uses: DamianReeves/write-file-action@v1.2
-      with:
-        path: ${{ steps.secrets-file.outputs.vault }}
-        contents: ${{ steps.op-load-primary-secret.outputs.SERVICE_SECRETS || steps.op-load-secondary-secret.outputs.SERVICE_SECRETS }}
-        write-mode: overwrite
+        echo "vault-keys=$vault_keys_file_path" >> $GITHUB_OUTPUT
 
     - name: Process vault envar key
       id: envar-key-processor
@@ -109,6 +111,18 @@ runs:
         service-name: ${{ inputs.one-password-primary-item }}
         secrets-file: ${{ steps.secrets-file.outputs.sm }}
         vault-env-keys: ${{ steps.secrets-file.outputs.vault-keys }}
+    
+    - name: Define secrets temp files
+      id: secrets-file
+      shell: bash
+      run: |
+        vault_secrets_file_path=$env:RUNNER_TEMP/vault-secrets.yaml
+        sm_secrets_file_path=$env:RUNNER_TEMP/sm-secrets.yaml
+        vault_keys_file_path=$env:RUNNER_TEMP/vault-keys.yaml 
+
+        echo "vault=$vault_secrets_file_path" >> $GITHUB_OUTPUT
+        echo "sm=$sm_secrets_file_path" >> $GITHUB_OUTPUT
+        echo "vault-keys=$vault_keys_file_path" >> $GITHUB_OUTPUT
     
     
     - name: Remove secrets that haven't changed from vault secrets file
