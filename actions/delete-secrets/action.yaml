@@ -1,0 +1,34 @@
+name: "Export secrets from GCP Secrets Manager" 
+
+description: "Export secrets from GCP Secrets Manager to temporary secrets file" 
+
+inputs:
+  app-name:
+    description: "The name of the application"
+    required: true 
+  service-name:
+    description: "The name of the service to update secrets for"
+    required: true
+  delete-all:
+    description: "Delete all secrets from Secrets Manager"
+    required: true
+  delete-all-except-keys:
+    description: "Delete all secrets except the specified keys"
+    required: false 
+
+runs:
+  using: "composite"
+  steps:
+    - name: Create temporary secrets file
+      shell: bash
+      run: |
+        touch ${{ github.action_path }}/temp_secrets.txt && chmod +w ${{ github.action_path }}/temp_secrets.txt 
+
+    - name: Make file executable
+      run: chmod +x ${{ github.action_path }}/main.sh 
+      shell: bash
+    
+    - name: Run main script
+      shell: bash
+      run: | 
+        ${{ github.action_path }}/main.sh ${{ inputs.app-name }} ${{ inputs.service-name }} ${{ inputs.delete-all }} ${{ inputs.delete-all-except-keys }} ${{ github.action_path }}/temp_secrets.txt 

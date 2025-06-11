@@ -203,7 +203,7 @@ runs:
         app-name: ${{ inputs.one-password-primary-vault }} 
         service-name: ${{ inputs.one-password-primary-item }}
         delete-all: false
-        delete-all-except-keys: ${{ steps.envar-key-processor.outputs.list-keys }}
+        delete-all-except-keys: ${{ steps.secrets-file.outputs.vault-keys }} 
 
 
 
