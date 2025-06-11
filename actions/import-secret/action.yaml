@@ -182,27 +182,28 @@ runs:
         service-name: ${{ inputs.one-password-primary-item }}
         secrets-file: ${{ steps.secrets-file.outputs.vault }}
 
-    # - name: No new or updated secrets to import
-    #   if: ${{ steps.remove-secrets.outputs.do-import == 'false' && inputs.import-secrets == 'true' }}
-    #   shell: bash
-    #   run: |
-    #     echo "No secrets to import since there are no new or updated items"
+    - name: No new or updated secrets to import
+      if: ${{ steps.remove-secrets.outputs.do-import == 'false' && inputs.import-secrets == 'true' }}
+      shell: bash
+      run: |
+        echo "No secrets to import since there are no new or updated items"
 
-    # - name: Importing of secrets disabled
-    #   if: ${{ steps.remove-secrets.outputs.do-import == 'true' && inputs.import-secrets != 'true' }}
-    #   shell: bash
-    #   run: |
-    #     echo "${{ steps.remove-secrets.outputs.do-import }}"
-    #     echo "${{ inputs.import-secrets }}"
-    #     echo "Importing of secrets was disabled but there were new or updated items"
+    - name: Importing of secrets disabled
+      if: ${{ steps.remove-secrets.outputs.do-import == 'true' && inputs.import-secrets != 'true' }}
+      shell: bash
+      run: |
+        echo "${{ steps.remove-secrets.outputs.do-import }}"
+        echo "${{ inputs.import-secrets }}"
+        echo "Importing of secrets was disabled but there were new or updated items"
 
-    # - name: Delete unneeded secrets from the sm Parameter Store
-    #   uses: carecloud/github-action-delete-secrets-ssm@main
-    #   if: ${{ inputs.import-secrets == 'true' }}
-    #   with:
-    #     chamber-service: ${{ inputs.chamber-service }}
-    #     delete-all: false
-    #     delete-all-except-keys: ${{ steps.envar-key-processor.outputs.list-keys }}
+    - name: Delete unneeded secrets from the Secret Manager 
+      uses: ./actions/delete-secrets 
+      if: ${{ inputs.import-secrets == 'true' }}
+      with:
+        app-name: ${{ inputs.one-password-primary-vault }} 
+        service-name: ${{ inputs.one-password-primary-item }}
+        delete-all: false
+        delete-all-except-keys: ${{ steps.envar-key-processor.outputs.list-keys }}
 
 
 
