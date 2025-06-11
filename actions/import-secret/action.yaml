@@ -110,87 +110,77 @@ runs:
         secrets-file: ${{ steps.secrets-file.outputs.sm }}
         vault-env-keys: ${{ steps.secrets-file.outputs.vault-keys }}
     
-    - name: upload secret file 
+    
+    - name: Remove secrets that haven't changed from vault secrets file
+      id: remove-secrets
       shell: bash
       run: |
-        ls -la $env:RUNNER_TEMP 
-        VAULT_LOCAL_FILE=$env:RUNNER_TEMP/vault-secrets.yaml
-        SM_LOCAL_FILE=${{ steps.secrets-file.outputs.sm }} 
-        GCS_BUCKET_PATH="gs://cch-cicd-test-bucket/test"
+        VAULT_SECRETS_FILE_PATH=${{ steps.secrets-file.outputs.vault }}
+        SM_SECRETS_FILE_PATH=${{ steps.secrets-file.outputs.sm }}
 
-        gsutil cp "${VAULT_LOCAL_FILE}" "${GCS_BUCKET_PATH}"
-        gsutil cp "${SM_LOCAL_FILE}" "${GCS_BUCKET_PATH}"
+        vault_key_list=$(yq ". | keys | .[]" $VAULT_SECRETS_FILE_PATH)
+        vault_keys=()
 
-    # - name: Remove secrets that haven't changed from vault secrets file
-    #   id: remove-secrets
-    #   shell: bash
-    #   run: |
-    #     VAULT_SECRETS_FILE_PATH=${{ steps.secrets-file.outputs.vault }}
-    #     SM_SECRETS_FILE_PATH=${{ steps.secrets-file.outputs.sm }}
+        while IFS= read -r line ; do
+          if [ ! -z "$line" ]; then
+            vault_keys+=("$line")
+          fi
+        done <<< "$vault_key_list"
 
-    #     vault_key_list=$(yq ". | keys | .[]" $VAULT_SECRETS_FILE_PATH)
-    #     vault_keys=()
+        sm_key_list=$(yq ". | keys | .[]" $SM_SECRETS_FILE_PATH)
+        sm_keys=()
 
-    #     while IFS= read -r line ; do
-    #       if [ ! -z "$line" ]; then
-    #         vault_keys+=("$line")
-    #       fi
-    #     done <<< "$vault_key_list"
+        while IFS= read -r line ; do 
+          if [ ! -z "$line" ]; then
+            sm_keys+=("$line")
+          fi
+        done <<< "$sm_key_list"
 
-    #     sm_key_list=$(yq ". | keys | .[]" $SM_SECRETS_FILE_PATH)
-    #     sm_keys=()
-
-    #     while IFS= read -r line ; do 
-    #       if [ ! -z "$line" ]; then
-    #         sm_keys+=("$line")
-    #       fi
-    #     done <<< "$sm_key_list"
-
-    #     for vault_key in "${vault_keys[@]}"; do
-    #       vault_value=$(yq ".$vault_key" $VAULT_SECRETS_FILE_PATH)
+        for vault_key in "${vault_keys[@]}"; do
+          vault_value=$(yq ".$vault_key" $VAULT_SECRETS_FILE_PATH)
               
-    #       if [ "$vault_value" == "" ]; then
-    #           echo "Error - Vault secret has no value. Secret key: $vault_key"
-    #           exit 1
-    #       fi
+          if [ "$vault_value" == "" ]; then
+              echo "Error - Vault secret has no value. Secret key: $vault_key"
+              exit 1
+          fi
 
-    #       for sm_key in "${sm_keys[@]}"; do
-    #         if [ "$vault_key" == "$sm_key" ]; then
-    #           sm_value=$(yq ".$sm_key" $SM_SECRETS_FILE_PATH)
+          for sm_key in "${sm_keys[@]}"; do
+            if [ "$vault_key" == "$sm_key" ]; then
+              sm_value=$(yq ".$sm_key" $SM_SECRETS_FILE_PATH)
 
-    #           if [ "$vault_value" == "$sm_value" ]; then
-    #             yq -i "del(.$vault_key)" $VAULT_SECRETS_FILE_PATH
+              if [ "$vault_value" == "$sm_value" ]; then
+                yq -i "del(.$vault_key)" $VAULT_SECRETS_FILE_PATH
 
-    #             echo "Existing secret with no value change: $vault_key"
-    #           fi
-    #           break
-    #         fi
-    #       done;
-    #     done;
+                echo "Existing secret with no value change: $vault_key"
+              fi
+              break
+            fi
+          done;
+        done;
 
-    #     secrets_keys_to_import_count=$(yq ". | keys | length" $VAULT_SECRETS_FILE_PATH)
-    #     echo "Secret keys count to import: $secrets_keys_to_import_count"
+        secrets_keys_to_import_count=$(yq ". | keys | length" $VAULT_SECRETS_FILE_PATH)
+        echo "Secret keys count to import: $secrets_keys_to_import_count"
 
-    #     do_import="false"
+        do_import="false"
 
-    #     if [ "$secrets_keys_to_import_count" -gt "0" ]; then
-    #         do_import="true"
-    #         secrets_keys_to_import=$(yq ". | keys" $VAULT_SECRETS_FILE_PATH)
+        if [ "$secrets_keys_to_import_count" -gt "0" ]; then
+            do_import="true"
+            secrets_keys_to_import=$(yq ". | keys" $VAULT_SECRETS_FILE_PATH)
 
-    #         echo "Secret keys to import:"
-    #         echo "$secrets_keys_to_import"
-    #     fi
+            echo "Secret keys to import:"
+            echo "$secrets_keys_to_import"
+        fi
 
-    #     echo "do-import=$do_import" >> "$GITHUB_OUTPUT"
+        echo "do-import=$do_import" >> "$GITHUB_OUTPUT"
       
 
-    # - name: Import secrets from vault temp file to SM  
-    #   uses: ./actions/update-secrets
-    #   if: ${{ steps.remove-secrets.outputs.do-import == 'true' && inputs.import-secrets == 'true' }} 
-    #   with:
-    #     app-name: ${{ inputs.one-password-primary-vault }} 
-    #     service-name: ${{ inputs.one-password-primary-item }}
-    #     secrets-file: ${{ steps.secrets-file.outputs.vault }}
+    - name: Import secrets from vault temp file to SM  
+      uses: ./actions/update-secrets
+      if: ${{ steps.remove-secrets.outputs.do-import == 'true' && inputs.import-secrets == 'true' }} 
+      with:
+        app-name: ${{ inputs.one-password-primary-vault }} 
+        service-name: ${{ inputs.one-password-primary-item }}
+        secrets-file: ${{ steps.secrets-file.outputs.vault }}
 
     # - name: No new or updated secrets to import
     #   if: ${{ steps.remove-secrets.outputs.do-import == 'false' && inputs.import-secrets == 'true' }}
@@ -224,18 +214,14 @@ runs:
         # echo "printing vault secrets file"
         # cat $env:RUNNER_TEMP/vault-secrets.yaml 
 
-      #       - name: upload secret file 
-      # shell: bash
-      # run: |
-      #   ls -la $env:RUNNER_TEMP 
-      #   LOCAL_FILE=$env:RUNNER_TEMP/vault-secrets.yaml
-      #   GCS_BUCKET_PATH="gs://cch-cicd-test/test"
 
-      #   gsutil cp "${LOCAL_FILE}" "${GCS_BUCKET_PATH}"
+# - name: upload secret file 
+#       shell: bash
+#       run: |
+#         ls -la $env:RUNNER_TEMP 
+#         VAULT_LOCAL_FILE=$env:RUNNER_TEMP/vault-secrets.yaml
+#         SM_LOCAL_FILE=${{ steps.secrets-file.outputs.sm }} 
+#         GCS_BUCKET_PATH="gs://cch-cicd-test-bucket/test"
 
-
-
-
-
-
-
+#         gsutil cp "${VAULT_LOCAL_FILE}" "${GCS_BUCKET_PATH}"
+#         gsutil cp "${SM_LOCAL_FILE}" "${GCS_BUCKET_PATH}"
