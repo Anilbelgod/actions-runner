@@ -28,7 +28,7 @@ runs:
       shell: bash
       run: | 
         chmod +x ${{ github.action_path }}/main.sh
-        chmod +w ${{ steps.temp-secrets-file.outputs.temp_sm }}/main.sh 
+        chmod +w ${{ steps.temp-secrets-file.outputs.temp_sm }} 
 
     - name: Run main script
       shell: bash
