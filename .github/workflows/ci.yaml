@@ -104,7 +104,7 @@ jobs:
 
   build-image:
     runs-on: ["self-hosted"]
-    needs: [ "setup" ]
+    # needs: [ "setup" ]
     steps:
 
       - name: Determine the GitHub SHA to use
@@ -167,7 +167,7 @@ jobs:
 
 
 
-        
+
 
 
 
