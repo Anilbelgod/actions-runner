@@ -5,7 +5,7 @@ APP_NAME="$2"
 SERVICE_NAME="$3" 
 TEMP_SECRET_FILE="$4"  
 
-# echo "Printing secrets file: $SECRETS_FILE" 
+echo >> "$SECRETS_FILE" 
 
 GCS_BUCKET_PATH="gs://cch-cicd-test-bucket/temp"
 
@@ -16,8 +16,6 @@ while IFS=: read -r key value; do
  
   SECRET_NAME="${APP_NAME}-${SERVICE_NAME}-${key}"
   
-
-
 
   if ! gcloud secrets describe "$SECRET_NAME" >/dev/null 2>&1; then
     echo "Creating secret: $SECRET_NAME"

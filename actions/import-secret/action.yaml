@@ -172,17 +172,7 @@ runs:
         fi
 
         echo "do-import=$do_import" >> "$GITHUB_OUTPUT"
-    
-    - name: upload secret file 
-      shell: bash
-      run: |
-            ls -la $env:RUNNER_TEMP 
-            VAULT_LOCAL_FILE=$env:RUNNER_TEMP/vault-secrets.yaml
-            SM_LOCAL_FILE=${{ steps.secrets-file.outputs.sm }} 
-            GCS_BUCKET_PATH="gs://cch-cicd-test-bucket/test"
 
-            gsutil cp "${VAULT_LOCAL_FILE}" "${GCS_BUCKET_PATH}"
-            gsutil cp "${SM_LOCAL_FILE}" "${GCS_BUCKET_PATH}"
 
     - name: Import secrets from vault temp file to SM  
       uses: ./actions/update-secrets
