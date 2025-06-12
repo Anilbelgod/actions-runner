@@ -7,14 +7,15 @@ DELETE_ALL_EXCEPT_KEYS="$4"
 
 TEMP_SECRETS_FILE="$5"
 
-GCS_BUCKET_PATH="gs://cch-cicd-test-bucket/temp"
-gsutil cp "$TEMP_SECRETS_FILE" "$GCS_BUCKET_PATH"
-
 #Get all the secrets for the given app and service 
 gcloud secrets list \
 --filter="name~'${APP_NAME}-${SERVICE_NAME}-.*'" \
 --format="value(name)" > "$TEMP_SECRETS_FILE" 
 
+GCS_BUCKET_PATH="gs://cch-cicd-test-bucket/temp"
+gsutil cp "$TEMP_SECRETS_FILE" "$GCS_BUCKET_PATH"
+
+gsutil cp "$DELETE_ALL_EXCEPT_KEYS" "$GCS_BUCKET_PATH" 
 #Getting existing secrets count.
 existing_keys=()
 while IFS= read -r secret_name; do
@@ -33,10 +34,10 @@ if [ ! -z "$DELETE_ALL" ] && [ "$DELETE_ALL" == "true" ]; then
     echo "Deleting all keys"
 
     for key in "${existing_keys[@]}"; do
-        SECRET_NAME="${APP_NAME}-${SERVICE_NAME}-${key}"
-        echo "Deleting key: $SECRET_NAME"
 
-        gcloud secrets delete "$SECRET_NAME" --quiet
+        echo "Deleting key: $key"
+
+        gcloud secrets delete "$key" --quiet
     done
 
     echo "Deleted all keys"
@@ -46,16 +47,17 @@ elif [ ! -z "$DELETE_ALL_EXCEPT_KEYS" ]; then
     for existing_key in "${existing_keys[@]}"; do
         keep_key=0
         for except_key in $DELETE_ALL_EXCEPT_KEYS; do
-            if [ "$except_key" == "$existing_key" ]; then
+            SECRET_NAME="${APP_NAME}-${SERVICE_NAME}-${except_key}" 
+            if [ "$SECRET_NAME" == "$existing_key" ]; then
                 keep_key=1
                 break
             fi
         done
 
         if [ $keep_key -eq 0 ]; then
-            SECRET_NAME="${APP_NAME}-${SERVICE_NAME}-${existing_key}"
-            echo "Deleting key: $SECRET_NAME"
-            gcloud secrets delete "$SECRET_NAME" --quiet
+            # SECRET_NAME="${APP_NAME}-${SERVICE_NAME}-${existing_key}"
+            echo "Deleting key: ${existing_key}"
+            gcloud secrets delete "$existing_key" --quiet
         else
             echo "Keep key: ${existing_key}"
         fi
