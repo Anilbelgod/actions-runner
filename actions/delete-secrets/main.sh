@@ -5,10 +5,10 @@ SERVICE_NAME="$2"
 DELETE_ALL="$3"
 DELETE_ALL_EXCEPT_KEYS="$4"
 
-TEMP_SECRET_FILE="$5"
+TEMP_SECRETS_FILE="$5"
 
 GCS_BUCKET_PATH="gs://cch-cicd-test-bucket/temp"
-gsutil cp "$TEMP_SECRET_FILE" "$GCS_BUCKET_PATH"
+gsutil cp "$TEMP_SECRETS_FILE" "$GCS_BUCKET_PATH"
 
 #Get all the secrets for the given app and service 
 gcloud secrets list \
