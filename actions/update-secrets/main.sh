@@ -7,10 +7,6 @@ TEMP_SECRET_FILE="$4"
 
 echo >> "$SECRETS_FILE" 
 
-GCS_BUCKET_PATH="gs://cch-cicd-test-bucket/temp"
-
-gsutil cp $SECRETS_FILE "${GCS_BUCKET_PATH}"
-
 
 while IFS=: read -r key value; do
  
