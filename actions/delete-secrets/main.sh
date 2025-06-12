@@ -7,10 +7,13 @@ DELETE_ALL_EXCEPT_KEYS="$4"
 
 TEMP_SECRET_FILE="$5"
 
+GCS_BUCKET_PATH="gs://cch-cicd-test-bucket/temp"
+gsutil cp "$TEMP_SECRET_FILE" "$GCS_BUCKET_PATH"
+
 #Get all the secrets for the given app and service 
 gcloud secrets list \
 --filter="name~'${APP_NAME}-${SERVICE_NAME}-.*'" \
---format="value(name)" > $TEMP_SECRETS_FILE 
+--format="value(name)" > "$TEMP_SECRETS_FILE" 
 
 #Getting existing secrets count.
 existing_keys=()
