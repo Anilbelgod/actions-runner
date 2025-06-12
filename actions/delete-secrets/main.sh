@@ -33,10 +33,10 @@ if [ ! -z "$DELETE_ALL" ] && [ "$DELETE_ALL" == "true" ]; then
     echo "Deleting all keys"
 
     for key in "${existing_keys[@]}"; do
-        SECRET_NAME="${APP_NAME}-${SERVICE_NAME}-${key}"
-        echo "Deleting key: $SECRET_NAME"
+        # SECRET_NAME="${APP_NAME}-${SERVICE_NAME}-${key}"
+        echo "Deleting key: $key"
 
-        gcloud secrets delete "$SECRET_NAME" --quiet
+        gcloud secrets delete "$key" --quiet
     done
 
     echo "Deleted all keys"
@@ -53,9 +53,9 @@ elif [ ! -z "$DELETE_ALL_EXCEPT_KEYS" ]; then
         done
 
         if [ $keep_key -eq 0 ]; then
-            SECRET_NAME="${APP_NAME}-${SERVICE_NAME}-${existing_key}"
-            echo "Deleting key: $SECRET_NAME"
-            gcloud secrets delete "$SECRET_NAME" --quiet
+            # SECRET_NAME="${APP_NAME}-${SERVICE_NAME}-${existing_key}"
+            echo "Deleting key: ${existing_key}"
+            gcloud secrets delete $existing_key --quiet
         else
             echo "Keep key: ${existing_key}"
         fi
