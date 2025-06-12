@@ -1,0 +1,34 @@
+name: Deploy to GKE using Workload Identity Federation
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - ft-atmos-pipeline
+jobs:
+  deploy-atmos:
+    runs-on: ["self-hosted"]
+    steps:
+        - name: Checkout code
+          uses: actions/checkout@v3
+        - name: Setup Google Cloud SDK
+
+          uses: google-github-actions/setup-gcloud@v2
+        - name: Setup Terraform
+          uses: hashicorp/setup-terraform@v2
+        
+        - name: Setup Atmos
+          uses: cloudposse/github-action-setup-atmos@v2
+          with:
+            atmos-version: 1.179.0 
+            install-wrapper: false    
+
+        - name: Setup Helm
+          uses: azure/setup-helm@v4.1.0
+          with:
+              version: "3.14.2"
+              
+        - name: Atmos Terraform Plan
+          id: atmos-val-plan
+          run: |
+                atmos terraform plan folder --stack cch
