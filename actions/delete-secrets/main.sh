@@ -8,6 +8,10 @@ TEMP_SECRETS_FILE="$5"        # Path to file with full secret names
 
 GCS_BUCKET_PATH="gs://cch-cicd-test-bucket/temp"
 
+gcloud secrets list \
+--filter="name~'${APP_NAME}-${SERVICE_NAME}-.*'" \
+--format="value(name)" > "$TEMP_SECRETS_FILE" 
+
 # Backup input files to GCS (optional but useful for debugging)
 gsutil cp "$TEMP_SECRETS_FILE" "$GCS_BUCKET_PATH"
 gsutil cp "$DELETE_ALL_EXCEPT_KEYS" "$GCS_BUCKET_PATH"
