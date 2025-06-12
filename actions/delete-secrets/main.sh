@@ -3,73 +3,59 @@
 APP_NAME="$1"
 SERVICE_NAME="$2"
 DELETE_ALL="$3"
-DELETE_ALL_EXCEPT_KEYS="$4"
-
-TEMP_SECRETS_FILE="$5"
-
-#Get all the secrets for the given app and service 
-gcloud secrets list \
---filter="name~'${APP_NAME}-${SERVICE_NAME}-.*'" \
---format="value(name)" > "$TEMP_SECRETS_FILE" 
+DELETE_ALL_EXCEPT_KEYS="$4"   # Path to file with keys like: - region
+TEMP_SECRETS_FILE="$5"        # Path to file with full secret names
 
 GCS_BUCKET_PATH="gs://cch-cicd-test-bucket/temp"
+
+# Backup input files to GCS (optional but useful for debugging)
 gsutil cp "$TEMP_SECRETS_FILE" "$GCS_BUCKET_PATH"
+gsutil cp "$DELETE_ALL_EXCEPT_KEYS" "$GCS_BUCKET_PATH"
 
-gsutil cp "$DELETE_ALL_EXCEPT_KEYS" "$GCS_BUCKET_PATH" 
-#Getting existing secrets count.
-existing_keys=()
-while IFS= read -r secret_name; do
-    if [ -n "$secret_name" ]; then
-        existing_keys+=("$secret_name")
-    fi
-done < "$TEMP_SECRETS_FILE"
-
-existing_key_count=${#existing_keys[@]}
-
-echo "$existing_key_count existing key(s) found"
-
-echo "Existing keys:" 
-cat $existing_keys
-#Deleting process
-
+# Deletion Logic
 if [ ! -z "$DELETE_ALL" ] && [ "$DELETE_ALL" == "true" ]; then
     echo "Deleting all keys"
 
-    for key in "${existing_keys[@]}"; do
-
-        echo "Deleting key: $key"
-
-        gcloud secrets delete "$key" --quiet
-    done
+    while IFS= read -r secret_name; do
+        if [ -n "$secret_name" ]; then
+            echo "Deleting key: $secret_name"
+            gcloud secrets delete "$secret_name" --quiet
+        fi
+    done < "$TEMP_SECRETS_FILE"
 
     echo "Deleted all keys"
-elif [ ! -z "$DELETE_ALL_EXCEPT_KEYS" ]; then
+
+elif [ -f "$DELETE_ALL_EXCEPT_KEYS" ]; then
     echo "Deleting all except specific keys"
 
-    for existing_key in "${existing_keys[@]}"; do
+    while IFS= read -r existing_key; do
+        if [ -z "$existing_key" ]; then
+            continue
+        fi
+
         keep_key=0
-        for except_key in $DELETE_ALL_EXCEPT_KEYS; do
-            key=$(echo "$except_key" | sed 's/^[[:space:]]*-[[:space:]]*//') 
-            echo "Printing key: ${key}" 
+
+        while IFS= read -r line; do
+            key=$(echo "$line" | sed 's/^[[:space:]]*-[[:space:]]*//')
             SECRET_NAME="${APP_NAME}-${SERVICE_NAME}-${key}"
-            echo "Printing Secret Name: ${SECRET_NAME}"
-            echo "Printing existing key: ${existing_key}" 
+
+            echo "Comparing: $SECRET_NAME with $existing_key"
             if [ "$SECRET_NAME" == "$existing_key" ]; then
                 keep_key=1
                 break
             fi
-        done
+        done < "$DELETE_ALL_EXCEPT_KEYS"
 
-        if [ $keep_key -eq 0 ]; then
-            # SECRET_NAME="${APP_NAME}-${SERVICE_NAME}-${existing_key}"
-            echo "Deleting key: ${existing_key}"
+        if [ "$keep_key" -eq 0 ]; then
+            echo "Deleting key: $existing_key"
             gcloud secrets delete "$existing_key" --quiet
         else
-            echo "Keep key: ${existing_key}"
+            echo "Keep key: $existing_key"
         fi
-    done
+    done < "$TEMP_SECRETS_FILE"
 
     echo "Deleted all except specific keys"
+
 else
     echo "No deletes requested because DELETE_ALL is not 'true' and no keys were specified in DELETE_ALL_EXCEPT_KEYS"
 fi
