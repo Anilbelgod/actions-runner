@@ -5,7 +5,7 @@ SERVICE_NAME="$2"
 DELETE_ALL="$3"
 DELETE_ALL_EXCEPT_KEYS="$4"
 
-TEMP_SECRET_FILE=$(mktemp)
+TEMP_SECRET_FILE="$5"
 
 #Get all the secrets for the given app and service 
 gcloud secrets list \

@@ -19,10 +19,10 @@ inputs:
 runs:
   using: "composite"
   steps:
-    # - name: Create temporary secrets file
-    #   shell: bash
-    #   run: |
-    #     touch ${{ github.action_path }}/temp_secrets.txt && chmod +w ${{ github.action_path }}/temp_secrets.yaml 
+    - name: Create temporary secrets file
+      shell: bash
+      run: |
+        touch ${{ github.action_path }}/temp_secrets.txt && chmod +w ${{ github.action_path }}/temp_secrets.yaml 
 
     - name: Make file executable
       run: chmod +x ${{ github.action_path }}/main.sh 
@@ -31,4 +31,4 @@ runs:
     - name: Run main script
       shell: bash
       run: | 
-        ${{ github.action_path }}/main.sh ${{ inputs.app-name }} ${{ inputs.service-name }} ${{ inputs.delete-all }} ${{ inputs.delete-all-except-keys }}     # ${{ github.action_path }}/temp_secrets.yaml 
+        ${{ github.action_path }}/main.sh ${{ inputs.app-name }} ${{ inputs.service-name }} ${{ inputs.delete-all }} ${{ inputs.delete-all-except-keys }} ${{ github.action_path }}/temp_secrets.yaml 
