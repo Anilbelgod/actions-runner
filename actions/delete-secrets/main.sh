@@ -53,6 +53,7 @@ elif [ ! -z "$DELETE_ALL_EXCEPT_KEYS" ]; then
             echo "Printing key: ${key}" 
             SECRET_NAME="${APP_NAME}-${SERVICE_NAME}-${key}"
             echo "Printing Secret Name: ${SECRET_NAME}"
+            echo "Printing existing key: ${existing_key}" 
             if [ "$SECRET_NAME" == "$existing_key" ]; then
                 keep_key=1
                 break
