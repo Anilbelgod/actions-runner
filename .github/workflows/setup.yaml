@@ -137,16 +137,8 @@ jobs:
   #         json: '${{ inputs.dynamic-helm-values-json }}'
   #   outputs:
   #     dynamic-helm-values-yaml: ${{ steps.convert-dynamic-helm-values.outputs.yaml }}
-  setup:
-    runs-on: ["self-hosted"]
-    steps:
-      - name: DOCKER LOGIN
-        uses: docker/login-action@v3
-        with:
-          username: jayz66d
-          password: ${{ secrets.docker-token }} 
-  ci:
-    needs: [ setup ] 
+
+  ci: 
     uses: ./.github/workflows/ci.yaml
     with:
           organization: ${{ inputs.organization }}
