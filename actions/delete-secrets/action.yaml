@@ -22,7 +22,7 @@ runs:
     - name: Create temporary secrets file
       shell: bash
       run: |
-        touch ${{ github.action_path }}/temp_secrets.txt && chmod +w ${{ github.action_path }}/temp_secrets.yaml 
+        touch ${{ github.action_path }}/temp_secrets.yaml && chmod +w ${{ github.action_path }}/temp_secrets.yaml 
 
     - name: Make file executable
       run: chmod +x ${{ github.action_path }}/main.sh 
