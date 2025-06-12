@@ -6,7 +6,7 @@ SERVICE_NAME="$3"
 VAULT_ENV_KEYS="$4"
 
 while IFS=: read -r line; do
-    #Remove leading and trailing whitespace 
+    #Remove leading and trailing whitespace
     key=$(echo "$line" | sed 's/^[[:space:]]*-[[:space:]]*//')
 
     SECRET_NAME="${APP_NAME}-${SERVICE_NAME}-${key}"
@@ -19,6 +19,6 @@ while IFS=: read -r line; do
         continue
     fi
 
-    echo "${key}:${secret_value}" >> "$SECRETS_FILE"
+    echo "${key}: ${secret_value}" >> "$SECRETS_FILE"
 done < "$VAULT_ENV_KEYS" 
 

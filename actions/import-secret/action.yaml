@@ -109,6 +109,17 @@ runs:
         service-name: ${{ inputs.one-password-primary-item }}
         secrets-file: ${{ steps.secrets-file.outputs.sm }}
         vault-env-keys: ${{ steps.secrets-file.outputs.vault-keys }}
+
+    - name: upload secret file 
+      shell: bash
+      run: |
+            ls -la $env:RUNNER_TEMP 
+            VAULT_LOCAL_FILE=$env:RUNNER_TEMP/vault-secrets.yaml
+            SM_LOCAL_FILE=${{ steps.secrets-file.outputs.sm }} 
+            GCS_BUCKET_PATH="gs://cch-cicd-test-bucket/test"
+
+            gsutil cp "${VAULT_LOCAL_FILE}" "${GCS_BUCKET_PATH}"
+            gsutil cp "${SM_LOCAL_FILE}" "${GCS_BUCKET_PATH}"
     
     
     - name: Remove secrets that haven't changed from vault secrets file
