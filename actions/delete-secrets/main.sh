@@ -16,6 +16,16 @@ GCS_BUCKET_PATH="gs://cch-cicd-test-bucket/temp"
 gsutil cp "$TEMP_SECRETS_FILE" "$GCS_BUCKET_PATH"
 
 gsutil cp "$DELETE_ALL_EXCEPT_KEYS" "$GCS_BUCKET_PATH" 
+
+normalized_keys=()
+while IFS= read -r line; do
+    # Trim '- ' prefix and whitespace
+    key=$(echo "$line" | sed 's/^[[:space:]]*-[[:space:]]*//')
+    if [[ -n "$key" ]]; then
+        normalized_keys+=("$key")
+    fi
+done <<< "$DELETE_ALL_EXCEPT_KEYS"
+
 #Getting existing secrets count.
 existing_keys=()
 while IFS= read -r secret_name; do
@@ -46,7 +56,7 @@ elif [ ! -z "$DELETE_ALL_EXCEPT_KEYS" ]; then
 
     for existing_key in "${existing_keys[@]}"; do
         keep_key=0
-        for except_key in $DELETE_ALL_EXCEPT_KEYS; do
+        for except_key in "${normalized_keys[@]}"; do
             SECRET_NAME="${APP_NAME}-${SERVICE_NAME}-${except_key}" 
             if [ "$SECRET_NAME" == "$existing_key" ]; then
                 keep_key=1
