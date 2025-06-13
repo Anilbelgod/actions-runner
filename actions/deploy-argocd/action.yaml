@@ -252,10 +252,10 @@ runs:
           --file ${{ inputs.helm-file-path}} \
           --state-values-file "${{ inputs.helm-values-file }}" \
           template \
-          > ${{ runner.tmp }}/resources.yaml
-      env:
-        IMAGE_NAME: "us-east4-docker.pkg.dev/cch-plat-glb-dev-project-4/cch-cicd-test/anilbelgod/example-app"
-        IMAGE_TAG: "latest"
+          > ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+      # env:
+      #   IMAGE_NAME: "us-east4-docker.pkg.dev/cch-plat-glb-dev-project-4/cch-cicd-test/anilbelgod/example-app"
+      #   IMAGE_TAG: "latest"
 
     - name: Display Deploy Helm Values File
       shell: bash
