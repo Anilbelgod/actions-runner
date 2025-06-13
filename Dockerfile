@@ -1,31 +1,68 @@
-FROM golang:alpine3.11 AS builder
+# https://github.com/cloudposse/geodesic/
+ARG GEODESIC_VERSION=3.1.0
+ARG GEODESIC_OS=debian
+# https://github.com/cloudposse/atmos
+ARG ATMOS_VERSION=1.86.2
 
-# Copy source into builder
-ADD . /src
+# This should match the version set in .github/workflows/pre-commit.yaml
+ARG TF_1_VERSION=1.7.4
+# Install the version of Kubectl that matches (within 1) the version of the EKS cluster.
+# See stacks/catalog/eks.yaml
+ARG KUBECTL_VERSION=1.29
 
-# Build the app
-RUN cd /src && \
-    go build -o example-app
+FROM cloudposse/geodesic:${GEODESIC_VERSION}-${GEODESIC_OS}
 
-# Build the final image
-FROM alpine:3.19 as final
+# Geodesic message of the Day
+ENV MOTD_URL="https://geodesic.sh/motd"
 
-# Install the cloudposse alpine repository
-ADD https://apk.cloudposse.com/ops@cloudposse.com.rsa.pub /etc/apk/keys/
-RUN echo "@cloudposse https://apk.cloudposse.com/3.11/vendor" >> /etc/apk/repositories
+# Some configuration options for Geodesic
+ENV GEODESIC_TF_PROMPT_ACTIVE=false
+ENV DIRENV_ENABLED=false
 
-# Expose port of the app
-EXPOSE 8080
 
-# Set the runtime working directory
-WORKDIR /app
+# Install the version of Kubectl that matches the version of the EKS cluster
+ARG KUBECTL_VERSION
+RUN apt-get update && apt-get install -y -u --allow-downgrades \
+    kubectl-${KUBECTL_VERSION}
 
-# Copy the helmfile deployment configuration
-COPY deploy/ /deploy/
-COPY public/ /app/public/
 
-# Install the app
-COPY --from=builder /src/example-app /app/
+# Install Terraform
 
-# Define the entrypoint
-ENTRYPOINT ["./example-app"]
+ARG TF_1_VERSION
+RUN wget "https://releases.hashicorp.com/terraform/${TF_1_VERSION}/terraform_${TF_1_VERSION}_linux_amd64.zip" && \
+    unzip "terraform_${TF_1_VERSION}_linux_amd64.zip" -d /usr/local/bin && \
+    rm "terraform_${TF_1_VERSION}_linux_amd64.zip"
+
+# https://github.com/Versent/saml2aws#linux
+ARG ATMOS_VERSION
+RUN apt-get update && apt-get install -y --allow-downgrades \
+    atmos="${ATMOS_VERSION}-*" \
+    google-cloud-sdk \
+    google-cloud-cli-gke-gcloud-auth-plugin
+
+# Install NumPy which is used to increase the performance of the SSH tunnel to a bastion host
+RUN $(gcloud info --format="value(basic.python_location)") -m pip install numpy  
+
+#COPY rootfs/ /
+
+
+ARG DOCKER_REPO
+ARG TENANT="core"
+ENV NAMESPACE=cch
+# Format of Geodesic banner prompt
+ENV BANNER="CareCloud Health GCP"
+ENV DOCKER_IMAGE="${NAMESPACE}/infra"
+ENV DOCKER_TAG="latest"
+
+# Install TFLint
+ENV TFLINT_VERSION="0.50.3"
+
+RUN wget https://github.com/terraform-linters/tflint/releases/download/v${TFLINT_VERSION}/tflint_linux_amd64.zip && \
+    unzip tflint_linux_amd64.zip -d /usr/local/bin && \
+    rm tflint_linux_amd64.zip
+
+# Install Checkov
+RUN pip install checkov
+
+
+WORKDIR /
