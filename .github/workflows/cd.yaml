@@ -158,16 +158,16 @@ jobs:
       #     config-app-name: ${{ steps.config-app-name.outputs.value }}
       #     tenant: ${{ inputs.tenant }}
 
-      - name: Import secrets into Secret Manager from 1Password
-        uses: ./actions/import-secret 
-        id: import-secrets
-        with:
-          one-password-service-account-token: ${{ secrets.one-password-service-account-token }}
-          one-password-primary-vault: example-app 
-          one-password-primary-item: documents-api   
-          one-password-primary-field: dev 
-          import-secrets: true 
-          app-name: ${{ inputs.app-name }} 
+      # - name: Import secrets into Secret Manager from 1Password
+      #   uses: ./actions/import-secret 
+      #   id: import-secrets
+      #   with:
+      #     one-password-service-account-token: ${{ secrets.one-password-service-account-token }}
+      #     one-password-primary-vault: example-app 
+      #     one-password-primary-item: documents-api   
+      #     one-password-primary-field: dev 
+      #     import-secrets: true 
+      #     app-name: ${{ inputs.app-name }} 
 
 
       # - name: Create synthetic domain
@@ -197,39 +197,39 @@ jobs:
         uses: DamianReeves/write-file-action@master
         with:
           path: ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-          contents: ${{ steps.import-secrets.outputs.envar-keys }}
+          contents: ./deploy/values/dev.yaml
           write-mode: overwrite
 
-      - name: Update deploy Helm values file
-        if: ${{ inputs.toolchain == 'helmfile' }}
-        shell: bash
-        run: |
-          yq -i eval '{"envar_keys": .}' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-          yq -i eval '{"deployment": .}' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-          yq -i '.deployment.region = "${{ steps.environment.outputs.region }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-          yq -i '.deployment.app_name = "${{ inputs.app-name }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-          yq -i '.deployment.config_app_name = "${{ steps.config-app-name.outputs.value }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-          yq -i '.deployment.branch_or_tag_name = "${{ inputs.ref }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-          yq -i '.deployment.service_secret_ssm_path = "${{ steps.environment.outputs.service-secret-ssm-path }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-          yq -i '.deployment.service_account_role_arn = "${{ inputs.service-account-role-arn }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-          yq -i '.deployment.namespace = "${{ steps.environment.outputs.namespace }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-          yq -i '.deployment.version = "${{ inputs.version }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-          yq -i '.deployment.repo_values = {}' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-          yq -i '.deployment.dynamic_values = {}' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+      # - name: Update deploy Helm values file
+      #   if: ${{ inputs.toolchain == 'helmfile' }}
+      #   shell: bash
+      #   run: |
+      #     yq -i eval '{"envar_keys": .}' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+      #     yq -i eval '{"deployment": .}' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+      #     yq -i '.deployment.region = "${{ steps.environment.outputs.region }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+      #     yq -i '.deployment.app_name = "${{ inputs.app-name }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+      #     yq -i '.deployment.config_app_name = "${{ steps.config-app-name.outputs.value }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+      #     yq -i '.deployment.branch_or_tag_name = "${{ inputs.ref }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+      #     yq -i '.deployment.service_secret_ssm_path = "${{ steps.environment.outputs.service-secret-ssm-path }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+      #     yq -i '.deployment.service_account_role_arn = "${{ inputs.service-account-role-arn }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+      #     yq -i '.deployment.namespace = "${{ steps.environment.outputs.namespace }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+      #     yq -i '.deployment.version = "${{ inputs.version }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+      #     yq -i '.deployment.repo_values = {}' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+      #     yq -i '.deployment.dynamic_values = {}' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
 
-      - name: Merge input Helm values file with deploy Helm values file
-        if: ${{ inputs.toolchain == 'helmfile' && inputs.helm-values-file != '' }}
-        shell: bash
-        run: |
-          yq -i '.deployment.repo_values |= load("${{ format(inputs.helm-values-file, steps.environment.outputs.name) }}")' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+      # - name: Merge input Helm values file with deploy Helm values file
+      #   if: ${{ inputs.toolchain == 'helmfile' && inputs.helm-values-file != '' }}
+      #   shell: bash
+      #   run: |
+      #     yq -i '.deployment.repo_values |= load("${{ format(inputs.helm-values-file, steps.environment.outputs.name) }}")' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
 
-      - name: Merge dynamic Helm values with deploy Helm values file
-        if: ${{ inputs.toolchain == 'helmfile' && inputs.dynamic-helm-values != '' }}
-        shell: bash
-        run: |
-          export dynamic_values="${{ inputs.dynamic-helm-values }}"
+      # - name: Merge dynamic Helm values with deploy Helm values file
+      #   if: ${{ inputs.toolchain == 'helmfile' && inputs.dynamic-helm-values != '' }}
+      #   shell: bash
+      #   run: |
+      #     export dynamic_values="${{ inputs.dynamic-helm-values }}"
 
-          yq -i '.deployment.dynamic_values |= env(dynamic_values)' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+      #     yq -i '.deployment.dynamic_values |= env(dynamic_values)' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
       - name: Display Deploy Helm Values File
         if: ${{ inputs.toolchain == 'helmfile' }}
         run: |
@@ -249,7 +249,7 @@ jobs:
           app-name: ${{ inputs.app-name }}
           service-config-ssm-path: ${{ steps.environment.outputs.service-config-ssm-path }}
           platform-ssm-path: ${{ steps.environment.outputs.platform-ssm-path }}
-          aws-region: ${{ steps.environment.outputs.region }}
+          region: ${{ steps.environment.outputs.region }}
           cluster: ${{ steps.environment.outputs.cluster }}
           environment: ${{ steps.environment.outputs.name }}
           namespace: ${{ steps.environment.outputs.namespace }}

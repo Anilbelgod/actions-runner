@@ -1,14 +1,18 @@
-deploy:
-  rolling_update:
-    max_surge: 25%
-    max_unavailable: 0
-auto_scaler:
-  min_replicas: 1
-  max_replicas: 3
-resources:
-  requests:
-    cpu: 200m
-    memory: 800Mi
-  limits:
-    cpu: 250m
-    memory: 1000Mi
+# values.yaml
+
+# Number of pod replicas to run.
+replicaCount: 1
+
+# Deployment-specific configurations.
+deployment:
+  appName: "example-app"
+
+# Image settings for your application's container.
+image:
+  repository: "us-east4-docker.pkg.dev/cch-plat-glb-dev-project-4/cch-cicd-test/anilbelgod/example-app"
+  tag: 'sha-b113bd3e011c8bcba64bd56f8ba5a6db713b7b14'
+
+# Ingress settings for exposing your application.
+ingress:
+  # Replace with the domain you want to use for your application.
+  host: ""
