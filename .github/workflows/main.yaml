@@ -98,9 +98,10 @@ jobs:
           git config --global user.name "cloudpossebot"
 
           # Set the remote URL with the token
-          git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/Anilbelgod/actions-runner-controller-test.git
+          git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/${{ github.repository }}.git
+
           # Checkout the branch
-          git checkout -b main || git checkout main
+          git checkout -b dev || git checkout main
           git pull --rebase || true
 
           # Ensure the files are added
@@ -115,7 +116,3 @@ jobs:
 
           # Output the latest commit SHA
           echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-
-
-
-
