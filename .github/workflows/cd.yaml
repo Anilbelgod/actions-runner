@@ -70,7 +70,7 @@ on:
       helm-values-file:
         type: string
         description: Helm values file
-        default: ''
+        default: './actions/deploy/values/dev.yaml'
         required: false
       dynamic-helm-values:
         type: string
@@ -177,28 +177,28 @@ jobs:
       #     app-name: ${{ inputs.app-name }}
       #     platform-ssm-path: ${{ steps.environment.outputs.platform-ssm-path }}
 
-      - name: Define Helm values file path
-        if: ${{ inputs.toolchain == 'helmfile' }}
-        id: deploy-helm-values-file-path
-        shell: bash
-        run: |
-          echo '::set-output name=deploy::${{ runner.temp }}/deploy-helm-values.yaml'
+      # - name: Define Helm values file path
+      #   if: ${{ inputs.toolchain == 'helmfile' }}
+      #   id: deploy-helm-values-file-path
+      #   shell: bash
+      #   run: |
+      #     echo '::set-output name=deploy::${{ runner.temp }}/deploy-helm-values.yaml'
 
-      - name: Setup yq
-        if: ${{ inputs.toolchain == 'helmfile' }}
-        uses: dcarbone/install-yq-action@v1.1.0
-        with:
-          version: v4.35.1
-          download-compressed: true
-          force: true
+      # - name: Setup yq
+      #   if: ${{ inputs.toolchain == 'helmfile' }}
+      #   uses: dcarbone/install-yq-action@v1.1.0
+      #   with:
+      #     version: v4.35.1
+      #     download-compressed: true
+      #     force: true
 
-      - name: Create deploy Helm values file
-        if: ${{ inputs.toolchain == 'helmfile' }}
-        uses: DamianReeves/write-file-action@master
-        with:
-          path: ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-          contents: ./deploy/values/dev.yaml
-          write-mode: overwrite
+      # - name: Create deploy Helm values file
+      #   if: ${{ inputs.toolchain == 'helmfile' }}
+      #   uses: DamianReeves/write-file-action@master
+      #   with:
+      #     path: ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+      #     contents: ./deploy/values/dev.yaml
+      #     write-mode: overwrite
 
       # - name: Update deploy Helm values file
       #   if: ${{ inputs.toolchain == 'helmfile' }}
@@ -230,10 +230,10 @@ jobs:
       #     export dynamic_values="${{ inputs.dynamic-helm-values }}"
 
       #     yq -i '.deployment.dynamic_values |= env(dynamic_values)' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-      - name: Display Deploy Helm Values File
-        if: ${{ inputs.toolchain == 'helmfile' }}
-        run: |
-          cat ${{ runner.temp }}/deploy-helm-values.yaml
+      # - name: Display Deploy Helm Values File
+      #   if: ${{ inputs.toolchain == 'helmfile' }}
+      #   run: |
+      #     cat ${{ runner.temp }}/deploy-helm-values.yaml
       
       - name: Deploy
         uses: ./actions/deploy-argocd
