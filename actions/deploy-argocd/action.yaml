@@ -223,16 +223,24 @@ runs:
     #   run: echo "HELM_DEBUG_FLAG=--debug" >> $GITHUB_ENV
     - name: Define Helm values file path
       if: ${{ inputs.toolchain == 'helmfile' }}
-      id: create-manifest
+      id: deploy-helm-values-file-path
       shell: bash
       run: |
-          echo '::set-output name=deploy::${{ runner.tmp }}/manifests/resources.yaml'
+          echo '::set-output name=deploy::${{ runner.temp }}/resources.yaml'
 
-    - name: Create manifests directory
+    - name: Setup yq
       if: ${{ inputs.toolchain == 'helmfile' }}
-      shell: bash
-      run: |
-          mkdir -p ${{ runner.tmp }}/manifests
+      uses: dcarbone/install-yq-action@v1.1.0
+      with:
+          version: v4.35.1
+          download-compressed: true
+          force: true
+
+    - name: Create deploy Helm values file
+      if: ${{ inputs.toolchain == 'helmfile' }}
+      uses: DamianReeves/write-file-action@master
+      with:
+          path: ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
 
     - name: Helmfile render
       if: ${{ inputs.toolchain == 'helmfile' && inputs.operation == 'deploy' }}
@@ -243,7 +251,7 @@ runs:
           --file ${{ inputs.helm-file-path}} \
           --state-values-file "${{ inputs.helm-values-file }}" \
           template \
-          > ${{ runner.tmp }}/manifests/resources.yaml
+          > ${{ runner.tmp }}/resources.yaml
       env:
         IMAGE_NAME: "us-east4-docker.pkg.dev/cch-plat-glb-dev-project-4/cch-cicd-test/anilbelgod/example-app"
         IMAGE_TAG: "latest"
@@ -252,7 +260,7 @@ runs:
       shell: bash
       if: ${{ inputs.toolchain == 'helmfile' }}
       run: |
-          cat ${{ runner.tmp }}/manifests/resources.yaml
+          cat ${{ runner.tmp }}/resources.yaml
           
 
     # - name: Helm raw render
@@ -378,4 +386,3 @@ runs:
 
 
 
-        
