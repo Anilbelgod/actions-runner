@@ -33,7 +33,13 @@ jobs:
         - name: List all files in current path
           run: ls 
 
-        - name: Atmos Terraform Plan
-          id: atmos-val-plan
+        - name: Atmos Terraform init
+        
+          id: atmos-init
+          run: |
+            atmos terraform init google-storage-bucket --stack plat-gbl-dev
+        - name: Atmos Terraform plan
+          # This step runs the Atmos Terraform plan command for the specified stack
+          id: atmos-plan
           run: |
             atmos terraform plan google-storage-bucket --stack plat-gbl-dev
