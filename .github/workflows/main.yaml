@@ -99,7 +99,6 @@ jobs:
 
           # Set the remote URL with the token
           git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/Anilbelgod/actions-runner-controller-test.git
-
           # Checkout the branch
           git checkout -b main || git checkout main
           git pull --rebase || true
@@ -120,4 +119,3 @@ jobs:
 
 
 
-          
