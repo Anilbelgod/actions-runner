@@ -62,7 +62,6 @@ jobs:
 
       - name: Display Deploy Helm Values File
         shell: bash
-        if: ${{ inputs.toolchain == 'helmfile' }}
         run: |
             cat ${{ runner.tmp }}/resources.yaml
             
