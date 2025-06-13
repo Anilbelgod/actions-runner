@@ -84,4 +84,8 @@ jobs:
            name:"yes"
            namespace: "yes"
            manifests: "yes"
+      - name: Display Config.yaml
+        shell: bash
+        run: |
+          cat actions/runner/config.yaml
             
