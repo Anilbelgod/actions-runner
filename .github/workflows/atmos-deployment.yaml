@@ -19,17 +19,17 @@ jobs:
           uses: google-github-actions/setup-gcloud@v2
         - name: Setup Terraform
           uses: hashicorp/setup-terraform@v2
-        
-        - name: Setup Atmos
-          uses: cloudposse/github-action-setup-atmos@v2
-          with:
-            atmos-version: 1.179.0 
-            install-wrapper: false    
 
         - name: Setup Helm
           uses: azure/setup-helm@v4.1.0
           with:
               version: "3.14.2"
+        - name: Setup Atmos
+          uses: cloudposse/github-action-setup-atmos@v2
+          with:
+            atmos-version: 1.179.0 
+            install-wrapper: false    
+            
         - name: List all files in current path
           run: ls -alR 
 
