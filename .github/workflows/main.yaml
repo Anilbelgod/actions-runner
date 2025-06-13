@@ -63,5 +63,5 @@ jobs:
       - name: Display Deploy Helm Values File
         shell: bash
         run: |
-            cat ${{ runner.tmp }}/resources.yaml
+            cat ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
             
