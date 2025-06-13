@@ -91,25 +91,28 @@ jobs:
 
       - name: Push to GitHub
         run: |
-            set -e
+          set -e
 
-            git config --global user.email "bot@example.com"
-            git config --global user.name "cloudpossebot"
+          # Configure Git
+          git config --global user.email "bot@example.com"
+          git config --global user.name "cloudpossebot"
 
-            git remote set-url origin https://x-access-token:{{ secrets.PAT }}@github.com/https://github.com/Anilbelgod/actions-runner-controller-test.git
-            # Checkout the branch
-            git checkout -b main || git checkout main
-            git pull --rebase || true
+          # Set the remote URL with the token
+          git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/Anilbelgod/actions-runner-controller-test.git
 
-            # Ensure the files are added
-            mkdir -p actions/runner
-            cp ${{ steps.deploy-helm-values-file-path.outputs.deploy }} actions/runner/deploy-helm-values.yaml
-            git add actions/runner/config.yaml actions/runner/deploy-helm-values.yaml
+          # Checkout the branch
+          git checkout -b main || git checkout main
+          git pull --rebase || true
 
-            # Commit and push changes
-            git status
-            git diff-index --quiet HEAD || git commit -m "Add config.yaml and deploy-helm-values.yaml"
-            git push origin main
+          # Ensure the files are added
+          mkdir -p actions/runner
+          cp /runner/_work/_temp/resources.yaml actions/runner/deploy-helm-values.yaml
+          git add actions/runner/config.yaml actions/runner/deploy-helm-values.yaml
 
-            # Output the latest commit SHA
-            echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+          # Commit and push changes
+          git status
+          git diff-index --quiet HEAD || git commit -m "Add config.yaml and deploy-helm-values.yaml"
+          git push origin main
+
+          # Output the latest commit SHA
+          echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
