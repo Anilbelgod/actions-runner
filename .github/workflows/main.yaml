@@ -3,31 +3,70 @@ on:
   push:
     branches: [ dev ]
 
-permissions:
-  contents: write
-  id-token: write
-
 jobs:
-  do:
-    uses: ./.github/workflows/setup.yaml 
-    with:
-      organization: "${{ github.event.repository.owner.login }}"
-      repository: "${{ github.event.repository.name }}"
-      app-name: "${{ vars.APP_NAME }}"
-      # service-account-role: "roles/example-app"
-      # vanity-domain: "documents.development.carecloud.com"
-      tenant: "${{ vars.TENANT }}"
-      ar-region: "${{ vars.AR_REGION }}" #!CI
-      registry: "${{ vars.AR_REGISTRY }}" #!CI 
-      # helm-values-file: "./deploy/values/dev.yaml" #!CD 
-      # deployment-check-retry-count: "30" #!CD
-      # deployment-check-app-id: ${{ vars.CCH_DEPLOYMENT_STATUS_APP_ID }} #!CD 
-      # deployment-check-app-installation-id: ${{ vars.CCH_DEPLOYMENT_STATUS_APP_INSTALLATION_ID }} #!CD
-      run-tests: false #!CI 
-    secrets:
-      one-password-service-account-token: "${{ secrets.ONE_PASSWORD_SERVICE_ACCOUNT_TOKEN }}"
-      docker-token: "${{ secrets.DOCKER_TOKEN }}" 
-      #   github-private-actions-pat: "${{ secrets.CCH_GITHUB_BOT_TOKEN }}" #! Check this out 
-    #   deployment-check-app-private-key: ${{ secrets.CCH_DEPLOYMENT_STATUS_APP_PRIVATE_KEY }}
-    #   docker-build-push-secrets: |
-    #     bundle_config=BUNDLE_RUBYGEMS__PKG__GITHUB__COM: "${{ secrets.CCH_GITHUB_BOT_USERNAME }}:${{ secrets.CCH_GITHUB_BOT_TOKEN }}
+  release:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup yq
+        uses: dcarbone/install-yq-action@v1.1.0
+        with:
+          version: v4.28.1
+          download-compressed: true
+          force: true
+
+      - name: Setup helmfile
+        uses: helmfile/helmfile-action@v2.0.2
+        with:
+          helmfile-version: v0.157.0 # https://github.com/helmfile/helmfile/releases
+          helm-version: v3.13.0
+      - name: Define Helm values file path
+        if: ${{ inputs.toolchain == 'helmfile' }}
+        id: deploy-helm-values-file-path
+        shell: bash
+        run: |
+          echo '::set-output name=deploy::${{ runner.temp }}/resources.yaml'
+
+      - name: Setup yq
+        if: ${{ inputs.toolchain == 'helmfile' }}
+        uses: dcarbone/install-yq-action@v1.1.0
+        with:
+            version: v4.35.1
+            download-compressed: true
+            force: true
+
+      - name: Create deploy Helm values file
+        if: ${{ inputs.toolchain == 'helmfile' }}
+        uses: DamianReeves/write-file-action@master
+        with:
+            path: ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+            contents: "# Empty file"
+
+      - name: Check Current Working Directory
+        shell: bash
+        run: |
+          pwd
+          ls -la
+
+      - name: Helmfile render
+        if: ${{ inputs.toolchain == 'helmfile' && inputs.operation == 'deploy' }}
+        shell: bash
+        run: |
+          helmfile --namespace gh-namespace \
+            --environment dev \
+            --file "actions/deploy-argocd/app.yaml" \
+            --state-values-file "actions/deploy-argocd/dev.yaml" \
+            template \
+            > ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+      # env:
+      #   IMAGE_NAME: "us-east4-docker.pkg.dev/cch-plat-glb-dev-project-4/cch-cicd-test/anilbelgod/example-app"
+      #   IMAGE_TAG: "latest"
+
+      - name: Display Deploy Helm Values File
+        shell: bash
+        if: ${{ inputs.toolchain == 'helmfile' }}
+        run: |
+            cat ${{ runner.tmp }}/resources.yaml
+            

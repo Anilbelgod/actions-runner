@@ -1,0 +1,33 @@
+name: 2 - Dev Branch
+on:
+  push:
+    branches: [ dev ]
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  do:
+    uses: ./.github/workflows/setup.yaml 
+    with:
+      organization: "${{ github.event.repository.owner.login }}"
+      repository: "${{ github.event.repository.name }}"
+      app-name: "${{ vars.APP_NAME }}"
+      # service-account-role: "roles/example-app"
+      # vanity-domain: "documents.development.carecloud.com"
+      tenant: "${{ vars.TENANT }}"
+      ar-region: "${{ vars.AR_REGION }}" #!CI
+      registry: "${{ vars.AR_REGISTRY }}" #!CI 
+      # helm-values-file: "./deploy/values/dev.yaml" #!CD 
+      # deployment-check-retry-count: "30" #!CD
+      # deployment-check-app-id: ${{ vars.CCH_DEPLOYMENT_STATUS_APP_ID }} #!CD 
+      # deployment-check-app-installation-id: ${{ vars.CCH_DEPLOYMENT_STATUS_APP_INSTALLATION_ID }} #!CD
+      run-tests: false #!CI 
+    secrets:
+      one-password-service-account-token: "${{ secrets.ONE_PASSWORD_SERVICE_ACCOUNT_TOKEN }}"
+      docker-token: "${{ secrets.DOCKER_TOKEN }}" 
+      #   github-private-actions-pat: "${{ secrets.CCH_GITHUB_BOT_TOKEN }}" #! Check this out 
+    #   deployment-check-app-private-key: ${{ secrets.CCH_DEPLOYMENT_STATUS_APP_PRIVATE_KEY }}
+    #   docker-build-push-secrets: |
+    #     bundle_config=BUNDLE_RUBYGEMS__PKG__GITHUB__COM: "${{ secrets.CCH_GITHUB_BOT_USERNAME }}:${{ secrets.CCH_GITHUB_BOT_TOKEN }}
