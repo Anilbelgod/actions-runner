@@ -1,0 +1,14 @@
+deploy:
+  rolling_update:
+    max_surge: 25%
+    max_unavailable: 0
+auto_scaler:
+  min_replicas: 1
+  max_replicas: 3
+resources:
+  requests:
+    cpu: 200m
+    memory: 800Mi
+  limits:
+    cpu: 250m
+    memory: 1000Mi

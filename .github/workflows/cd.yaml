@@ -192,20 +192,12 @@ jobs:
           download-compressed: true
           force: true
 
-      # - name: Create deploy Helm values file
-      #   if: ${{ inputs.toolchain == 'helmfile' }}
-      #   uses: DamianReeves/write-file-action@master
-      #   with:
-      #     path: ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-      #     contents: ${{ steps.import-secrets.outputs.envar-keys }}
-      #     write-mode: overwrite
-      
       - name: Create deploy Helm values file
         if: ${{ inputs.toolchain == 'helmfile' }}
         uses: DamianReeves/write-file-action@master
         with:
           path: ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-          contents: "./envars.yaml"
+          contents: ${{ steps.import-secrets.outputs.envar-keys }}
           write-mode: overwrite
 
       - name: Update deploy Helm values file
@@ -214,12 +206,9 @@ jobs:
         run: |
           yq -i eval '{"envar_keys": .}' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
           yq -i eval '{"deployment": .}' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-          yq -i '.deployment.aws_region = "${{ steps.environment.outputs.region }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+          yq -i '.deployment.region = "${{ steps.environment.outputs.region }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
           yq -i '.deployment.app_name = "${{ inputs.app-name }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
           yq -i '.deployment.config_app_name = "${{ steps.config-app-name.outputs.value }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-          yq -i '.deployment.synthetic_domain = "${{ steps.synthetic-domain.outputs.service-domain }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-          yq -i '.deployment.vanity_domain = "${{ inputs.vanity-domain }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-          yq -i '.deployment.secondary_vanity_domain = "${{ inputs.secondary-vanity-domain }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
           yq -i '.deployment.branch_or_tag_name = "${{ inputs.ref }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
           yq -i '.deployment.service_secret_ssm_path = "${{ steps.environment.outputs.service-secret-ssm-path }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
           yq -i '.deployment.service_account_role_arn = "${{ inputs.service-account-role-arn }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
@@ -241,9 +230,13 @@ jobs:
           export dynamic_values="${{ inputs.dynamic-helm-values }}"
 
           yq -i '.deployment.dynamic_values |= env(dynamic_values)' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+      - name: Display Deploy Helm Values File
+        if: ${{ inputs.toolchain == 'helmfile' }}
+        run: |
+          cat ${{ runner.temp }}/deploy-helm-values.yaml
       
       - name: Deploy
-        uses: carecloud/github-action-deploy-argocd@main
+        uses: ./actions/deploy-argocd
         id: deploy
         with:
           toolchain: ${{ inputs.toolchain }}

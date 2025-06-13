@@ -81,10 +81,13 @@ releases:
           enabled: true
           port: default
           annotations:
-            kubernetes.io/ingress.class: "gce"
-            kubernetes.io/ingress.global-static-ip-name: "{{ .Values.platform.default_gcp_static_ip }}"
-            networking.gke.io/managed-certificates: "{{ .Values.deployment.app_name }}-cert"
-            networking.gke.io/v1beta1.FrontendConfig: "{{ .Values.deployment.app_name }}-frontend-config"
+            alb.ingress.kubernetes.io/group.name: {{ .Values.platform.default_alb_ingress_group_name_internal }}
+            kubernetes.io/ingress.class: {{ .Values.platform.default_alb_ingress_class_internal }}
+            alb.ingress.kubernetes.io/scheme: {{ .Values.platform.default_alb_ingress_scheme_internal }}
+            alb.ingress.kubernetes.io/actions.ssl-redirect: '{"RedirectConfig":{"Port":"443","Protocol":"HTTPS","StatusCode":"HTTP_301"},"Type":"redirect"}'
+            alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+            alb.ingress.kubernetes.io/ssl-redirect: "443"
+            alb.ingress.kubernetes.io/target-type: ip
         {{- if eq .Environment.Name "preview" }}
             external-dns.alpha.kubernetes.io/hostname: {{ .Values.deployment.app_name }}-{{ .Values.deployment.branch_or_tag_name }}.{{ .Values.platform.default_ingress_domain }}
             outputs.platform.cloudposse.com/webapp-url: "https://{{ .Values.deployment.app_name }}-{{ .Values.deployment.branch_or_tag_name }}.{{ .Values.platform.default_ingress_domain }}/health_check"
@@ -133,7 +136,7 @@ releases:
           memory: 10Mi
           cpu: 100m
 
-# For the secrets section, replace AWS Parameter Store with Google Secret Manager
+# References https://github.com/bedag/helm-charts/tree/master/charts/raw
 - name: '{{ .Values.deployment.app_name }}-secrets'
   chart: "bedag/raw"
   version: "2.0.0"
@@ -141,26 +144,27 @@ releases:
   force: true
   recreatePods: false
   values:
+   # References https://external-secrets.io/v0.9.3
    - resources:
       - apiVersion: external-secrets.io/v1beta1
         kind: ExternalSecret
         metadata:
           name: '{{ .Values.deployment.app_name }}'
         spec:
-          refreshInterval: 60s
+          refreshInterval: 60s # Rate SecretManager pulls the AWS SSM Parameter Store
           secretStoreRef:
-            name: secret-store-google
+            name: secret-store-parameter-store
             kind: ClusterSecretStore
           target:
-            name: '{{ .Values.deployment.app_name }}'
+            name: '{{ .Values.deployment.app_name }}' # Name of the k8s Secret to be created
             creationPolicy: Owner
         {{ if hasKey .Values.deployment "envar_keys" }}
           data:
-          {{ $service_secret_path := .Values.deployment.service_secret_path }}
+          {{ $service_secret_ssm_path := .Values.deployment.service_secret_ssm_path }}
           {{ range $i, $envar_key := .Values.deployment.envar_keys }}
             - secretKey: '{{ $envar_key }}'
               remoteRef:
-                key: 'projects/{{ .Values.platform.gcp_project_id }}/secrets/{{ $service_secret_path }}/versions/latest'
+                key: '/{{ $service_secret_ssm_path }}/{{ $envar_key }}'
           {{ end }}
         {{- end }}
 
@@ -178,10 +182,10 @@ releases:
         metadata:
           name: '{{ .Values.deployment.app_name }}'
           annotations:
-          {{- if and (hasKey .Values.deployment "workload_identity_sa") (.Values.deployment.workload_identity_sa) }}
-            iam.gke.io/gcp-service-account: {{ .Values.deployment.workload_identity_sa }}
-          {{- else if hasKey .Values.service "workload_identity_sa" }}
-            iam.gke.io/gcp-service-account: {{ .Values.service.workload_identity_sa }}
+          {{- if and (hasKey .Values.deployment "service_account_role_arn") (.Values.deployment.service_account_role_arn) }}
+            eks.amazonaws.com/role-arn: {{ .Values.deployment.service_account_role_arn }}
+          {{- else if hasKey .Values.service "service_account_role_arn" }}
+            eks.amazonaws.com/role-arn: {{ .Values.service.service_account_role_arn }}
           {{- end }}
           labels:
             app: '{{ .Values.deployment.app_name }}'
