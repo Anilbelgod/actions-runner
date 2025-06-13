@@ -1,6 +1,6 @@
 name: Deploy Atmos Pipeline
 # This workflow is triggered on push to the ft-atmos-pipeline branch or manually via workflow_dispatch
-# It sets up the environment for Atmos, Terraform, and Helm, and runs an Atmos Terraform plan command
+# It sets up the environment for Atmos, Terraform, Helm, and Node.js, and runs an Atmos Terraform plan command
 # It uses a self-hosted runner and checks out the code from the repository
 
 on:
@@ -8,38 +8,45 @@ on:
   push:
     branches:
       - ft-atmos-pipeline
+
 jobs:
   deploy-atmos:
     runs-on: ["self-hosted"]
     steps:
-        - name: Checkout code
-          uses: actions/checkout@v3
-        - name: Setup Google Cloud SDK
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-          uses: google-github-actions/setup-gcloud@v2
-        - name: Setup Terraform
-          uses: hashicorp/setup-terraform@v2
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
 
-        - name: Setup Helm
-          uses: azure/setup-helm@v4.1.0
-          with:
-              version: "3.14.2"
-        - name: Setup Atmos
-          uses: cloudposse/github-action-setup-atmos@v2
-          with:
-            atmos-version: 1.179.0 
-            install-wrapper: false    
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
 
-        - name: List all files in current path
-          run: ls 
+      - name: Setup Helm
+        uses: azure/setup-helm@v4.1.0
+        with:
+          version: "3.14.2"
 
-        - name: Atmos Terraform init
-        
-          id: atmos-init
-          run: |
-            atmos terraform init google-storage-bucket --stack plat-gbl-dev
-        - name: Atmos Terraform plan
-          # This step runs the Atmos Terraform plan command for the specified stack
-          id: atmos-plan
-          run: |
-            atmos terraform plan google-storage-bucket --stack plat-gbl-dev
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Atmos
+        uses: cloudposse/github-action-setup-atmos@v2
+        with:
+          atmos-version: 1.179.0
+          install-wrapper: false    
+
+      - name: List all files in current path
+        run: ls
+
+      - name: Atmos Terraform init
+        id: atmos-init
+        run: |
+          atmos terraform init google-storage-bucket --stack plat-gbl-dev
+
+      - name: Atmos Terraform plan
+        id: atmos-plan
+        run: |
+          atmos terraform plan google-storage-bucket --stack plat-gbl-dev
