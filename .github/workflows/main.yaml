@@ -101,7 +101,11 @@ jobs:
           git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/${{ github.repository }}.git
 
           # Checkout the branch
-          git checkout -b dev || git checkout main
+          if git rev-parse --verify dev >/dev/null 2>&1; then
+            git checkout dev
+          else
+            git checkout -b dev
+          fi
           git pull --rebase || true
 
           # Ensure the files are added
@@ -112,7 +116,7 @@ jobs:
           # Commit and push changes
           git status
           git diff-index --quiet HEAD || git commit -m "Add config.yaml and deploy-helm-values.yaml"
-          git push origin main
+          git push origin dev
 
           # Output the latest commit SHA
           echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
