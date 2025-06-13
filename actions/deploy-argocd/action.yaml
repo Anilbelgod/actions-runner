@@ -255,8 +255,8 @@ runs:
       run: |
         helmfile --namespace gh-namespace \
           --environment dev \
-          --file "./app.yaml" \
-          --state-values-file "./dev.yaml" \
+          --file "actions/deploy-argocd/app.yaml" \
+          --state-values-file "actions/deploy-argocd/dev.yaml" \
           template \
           > ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
       # env:
