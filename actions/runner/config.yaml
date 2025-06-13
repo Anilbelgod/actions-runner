@@ -1,0 +1,6 @@
+app_repository: "yes"
+app_commit: "yes"
+app_hostname: "yes"
+name:"yes"
+namespace: "yes"
+manifests: "yes"
