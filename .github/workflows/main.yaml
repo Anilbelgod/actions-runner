@@ -23,14 +23,12 @@ jobs:
           helmfile-version: v0.157.0 # https://github.com/helmfile/helmfile/releases
           helm-version: v3.13.0
       - name: Define Helm values file path
-        if: ${{ inputs.toolchain == 'helmfile' }}
         id: deploy-helm-values-file-path
         shell: bash
         run: |
           echo '::set-output name=deploy::${{ runner.temp }}/resources.yaml'
 
       - name: Setup yq
-        if: ${{ inputs.toolchain == 'helmfile' }}
         uses: dcarbone/install-yq-action@v1.1.0
         with:
             version: v4.35.1
@@ -38,7 +36,6 @@ jobs:
             force: true
 
       - name: Create deploy Helm values file
-        if: ${{ inputs.toolchain == 'helmfile' }}
         uses: DamianReeves/write-file-action@master
         with:
             path: ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
@@ -51,7 +48,6 @@ jobs:
           ls -la
 
       - name: Helmfile render
-        if: ${{ inputs.toolchain == 'helmfile' && inputs.operation == 'deploy' }}
         shell: bash
         run: |
           helmfile --namespace gh-namespace \
