@@ -241,7 +241,8 @@ runs:
       uses: DamianReeves/write-file-action@master
       with:
           path: ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-
+          content: ""
+          
     - name: Helmfile render
       if: ${{ inputs.toolchain == 'helmfile' && inputs.operation == 'deploy' }}
       shell: bash
