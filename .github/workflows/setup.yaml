@@ -138,23 +138,23 @@ jobs:
   #   outputs:
   #     dynamic-helm-values-yaml: ${{ steps.convert-dynamic-helm-values.outputs.yaml }}
 
-  # ci: 
-  #   uses: ./.github/workflows/ci.yaml
-  #   with:
-  #         organization: ${{ inputs.organization }}
-  #         environment: dev
-  #         repository: ${{ inputs.repository }}
-  #         tenant: ${{ inputs.tenant }}
-  #         app-name: ${{ inputs.app-name }}
-  #         ar-region: ${{ inputs.ar-region }}
-  #         registry: ${{ inputs.registry }}
-  #         run-tests: ${{ inputs.run-tests }} 
-  #   secrets:
-  #         docker-token: ${{ secrets.docker-token }} 
-  #       #   github-private-actions-pat: ${{ secrets.github-private-actions-pat }}
-  #       #   docker-build-push-secrets: ${{ secrets.docker-build-push-secrets }}
-  #       #   docker-login-medicomp: ${{ secrets.docker-login-medicomp }}
-  #       #   docker-password-medicomp: ${{ secrets.docker-password-medicomp }}
+  ci: 
+    uses: ./.github/workflows/ci.yaml
+    with:
+          organization: ${{ inputs.organization }}
+          environment: dev
+          repository: ${{ inputs.repository }}
+          tenant: ${{ inputs.tenant }}
+          app-name: ${{ inputs.app-name }}
+          ar-region: ${{ inputs.ar-region }}
+          registry: ${{ inputs.registry }}
+          run-tests: ${{ inputs.run-tests }} 
+    secrets:
+          docker-token: ${{ secrets.docker-token }} 
+        #   github-private-actions-pat: ${{ secrets.github-private-actions-pat }}
+        #   docker-build-push-secrets: ${{ secrets.docker-build-push-secrets }}
+        #   docker-login-medicomp: ${{ secrets.docker-login-medicomp }}
+        #   docker-password-medicomp: ${{ secrets.docker-password-medicomp }}
 
   cd:
     uses: ./.github/workflows/cd.yaml   
