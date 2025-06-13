@@ -243,6 +243,12 @@ runs:
           path: ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
           contents: "# Empty file"
 
+    - name: Check Current Working Directory
+      shell: bash
+      run: |
+        pwd
+        ls -la
+
     - name: Helmfile render
       if: ${{ inputs.toolchain == 'helmfile' && inputs.operation == 'deploy' }}
       shell: bash
