@@ -221,6 +221,12 @@ runs:
     #   if: ${{ inputs.debug == 'true' }}
     #   shell: bash
     #   run: echo "HELM_DEBUG_FLAG=--debug" >> $GITHUB_ENV
+    - name: Define Helm values file path
+      if: ${{ inputs.toolchain == 'helmfile' }}
+      id: deploy-helm-values-file-path
+      shell: bash
+      run: |
+          echo '::set-output name=deploy::${{ runner.tmp }}/manifests/resources.yaml'
 
     - name: Helmfile render
       if: ${{ inputs.toolchain == 'helmfile' && inputs.operation == 'deploy' }}
@@ -233,8 +239,8 @@ runs:
           template \
           > ${{ runner.tmp }}/manifests/resources.yaml
       env:
-        IMAGE_NAME: ${{ inputs.image }}
-        IMAGE_TAG: ${{ inputs.image-tag }}
+        IMAGE_NAME: "us-east4-docker.pkg.dev/cch-plat-glb-dev-project-4/cch-cicd-test/anilbelgod/example-app"
+        IMAGE_TAG: "latest"
 
     - name: Display Deploy Helm Values File
       shell: bash
