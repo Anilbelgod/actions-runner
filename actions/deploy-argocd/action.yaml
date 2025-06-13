@@ -223,10 +223,16 @@ runs:
     #   run: echo "HELM_DEBUG_FLAG=--debug" >> $GITHUB_ENV
     - name: Define Helm values file path
       if: ${{ inputs.toolchain == 'helmfile' }}
-      id: deploy-helm-values-file-path
+      id: create-manifest
       shell: bash
       run: |
           echo '::set-output name=deploy::${{ runner.tmp }}/manifests/resources.yaml'
+
+    - name: Create manifests directory
+      if: ${{ inputs.toolchain == 'helmfile' }}
+      shell: bash
+      run: |
+          mkdir -p ${{ runner.tmp }}/manifests
 
     - name: Helmfile render
       if: ${{ inputs.toolchain == 'helmfile' && inputs.operation == 'deploy' }}
@@ -247,28 +253,28 @@ runs:
       if: ${{ inputs.toolchain == 'helmfile' }}
       run: |
           cat ${{ runner.tmp }}/manifests/resources.yaml
-      
+          
 
-    - name: Helm raw render
-      if: ${{ inputs.toolchain == 'helm' && inputs.operation == 'deploy' }}
-      shell: bash
-      run: |
-        helm template ${{ inputs.app-name }} ${{ inputs.helm-file-path }} \
-          --set image.repository=${{ inputs.image }} \
-          --set image.tag=${{ inputs.image-tag }} \
-          --set environment=${{ inputs.environment }} \
-          --create-namespace=true \
-          --namespace ${{ inputs.namespace }} \
-          ${{ env.HELM_DEBUG_FLAG }} \
-          --set ingress.default.hosts.example=test \
-          --values $(pwd)/service.yaml \
-          --values $(pwd)/platform.yaml \
-          --values "${{ inputs.helm-values-file }}" \
-          ${{ steps.arguments.outputs.kube_version }} \
-        > ${{ steps.config.outputs.tmp }}/manifests/resources.yaml
-      env:
-        IMAGE_NAME: ${{ inputs.image }}
-        IMAGE_TAG: ${{ inputs.image-tag }}
+    # - name: Helm raw render
+    #   if: ${{ inputs.toolchain == 'helm' && inputs.operation == 'deploy' }}
+    #   shell: bash
+    #   run: |
+    #     helm template ${{ inputs.app-name }} ${{ inputs.helm-file-path }} \
+    #       --set image.repository=${{ inputs.image }} \
+    #       --set image.tag=${{ inputs.image-tag }} \
+    #       --set environment=${{ inputs.environment }} \
+    #       --create-namespace=true \
+    #       --namespace ${{ inputs.namespace }} \
+    #       ${{ env.HELM_DEBUG_FLAG }} \
+    #       --set ingress.default.hosts.example=test \
+    #       --values $(pwd)/service.yaml \
+    #       --values $(pwd)/platform.yaml \
+    #       --values "${{ inputs.helm-values-file }}" \
+    #       ${{ steps.arguments.outputs.kube_version }} \
+    #     > ${{ steps.config.outputs.tmp }}/manifests/resources.yaml
+    #   env:
+    #     IMAGE_NAME: ${{ inputs.image }}
+    #     IMAGE_TAG: ${{ inputs.image-tag }}
 
     # - name: Get Webapp
     #   if: ${{ inputs.operation == 'deploy' }}
