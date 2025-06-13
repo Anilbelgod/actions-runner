@@ -249,8 +249,8 @@ runs:
       run: |
         helmfile --namespace gh-namespace \
           --environment dev \
-          --file "./deploy/helmfile.yaml" \
-          --state-values-file "./deploy/values/dev.yaml" \
+          --file "../deploy/helmfile.yaml" \
+          --state-values-file "../deploy/values/dev.yaml" \
           template \
           > ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
       # env:
