@@ -29,9 +29,9 @@ jobs:
           with:
             atmos-version: 1.179.0 
             install-wrapper: false    
-            
+
         - name: List all files in current path
-          run: ls -alR 
+          run: ls 
 
         - name: Atmos Terraform Plan
           id: atmos-val-plan
