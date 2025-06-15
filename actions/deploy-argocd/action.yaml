@@ -230,7 +230,7 @@ runs:
         helmfile --namespace ${{ inputs.namespace }} \
           ${{ env.HELM_DEBUG_FLAG }} \
           --environment ${{ inputs.environment }} \
-          --file "${{ github.workspace }}/deploy/helmfile.yaml" \
+          --file ${{ github.workspace }}/deploy/helmfile.yaml \
           # --state-values-file $(pwd)/service.yaml \
           # --state-values-file $(pwd)/platform.yaml \
           --state-values-file "${{ inputs.helm-values-file }}" \
