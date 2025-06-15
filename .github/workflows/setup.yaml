@@ -127,9 +127,9 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  setup:
-    runs-on: ["self-hosted"]
-    steps:
+  # setup:
+  #   runs-on: ["self-hosted"]
+  # steps:
   #     - name: Convert Dynamic Helm Values JSON to YAML
   #       uses: carecloud/github-action-convert-json-to-yaml@main
   #       id: convert-dynamic-helm-values
@@ -158,11 +158,11 @@ jobs:
 
   cd:
     uses: ./.github/workflows/cd.yaml   
-    needs: [ ci ]
+    # needs: [ ci ]
     with:
-      version: ${{ needs.ci.outputs.version }}
-      image: ${{ needs.ci.outputs.image }}
-      image-tag: ${{ needs.ci.outputs.image-tag }}
+      # version: ${{ needs.ci.outputs.version }}
+      # image: ${{ needs.ci.outputs.image }}
+      # image-tag: ${{ needs.ci.outputs.image-tag }}
       organization: ${{ inputs.organization }}
       repository: ${{ inputs.repository }}
       app-name: ${{ inputs.app-name }}
