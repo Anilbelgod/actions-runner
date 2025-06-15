@@ -1,0 +1,23 @@
+---
+# Source: monochart/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: example-app
+  labels:
+    app: example-app
+    chart: monochart-0.26.0
+    heritage: "Helm"
+    release: "example-app"
+spec:
+  type: ClusterIP
+  ports:
+  - targetPort: default
+    port: 80
+    protocol: TCP
+    name: default
+  selector:
+    app: example-app
+    release: example-app
+    serve: "true"
+
