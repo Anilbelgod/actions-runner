@@ -8,7 +8,6 @@ inputs:
   cluster:
     description: Cluster name
     required: true
-    default: 'cch-namespace'
   aws-region:
     description: AWS region
     required: false
@@ -51,7 +50,6 @@ inputs:
   namespace:
     description: Kubernetes namespace
     required: true
-    default: 'plat-dev'
   app-name:
     description: Application name
     required: true
@@ -93,9 +91,9 @@ inputs:
     description: 'The Github App private key used for authentication when checking for deployment status'
     required: false
 outputs:
-  # webapp-url:
-  #   description: "Web Application url"
-  #   value: ${{ steps.result.outputs.webapp_url }}
+  webapp-url:
+    description: "Web Application url"
+    value: ${{ steps.result.outputs.webapp_url }}
   sha:
     description: "Git commit SHA into argocd repo"
     value: ${{ steps.git.outputs.sha }}
@@ -121,31 +119,31 @@ runs:
       #   helm-version: v3.13.0 # https://github.com/helm/helm/releases
         # install-kubectl: false
 
-    - id: destination
-      uses: theowenyoung/git-url-parse@v1
-      with:
-        url: ${{ inputs.cluster }}
+    # - id: destination
+    #   uses: theowenyoung/git-url-parse@v1
+    #   with:
+    #     url: ${{ inputs.cluster }}
 
-    - id: destination_dir
-      shell: bash
-      run: |-
-        echo "name=$(echo $RANDOM | md5sum | head -c 20)" >> $GITHUB_OUTPUT
+    # - id: destination_dir
+    #   shell: bash
+    #   run: |-
+    #     echo "name=$(echo $RANDOM | md5sum | head -c 20)" >> $GITHUB_OUTPUT
 
-    - name: Config
-      id: config
-      uses: cloudposse/github-action-yaml-config-query@0.1.3
-      with:
-        config: |-
-          tmp: ./tmp/${{ steps.destination.outputs.filepath }}/${{ inputs.namespace }}/${{ inputs.app-name }}
-          path: ${{ steps.destination.outputs.filepath }}/${{ inputs.namespace }}/${{ inputs.app-name }}
+    # - name: Config
+    #   id: config
+    #   uses: cloudposse/github-action-yaml-config-query@0.1.3
+    #   with:
+    #     config: |-
+    #       tmp: ./tmp/${{ steps.destination.outputs.filepath }}/${{ inputs.namespace }}/${{ inputs.app-name }}
+    #       path: ${{ steps.destination.outputs.filepath }}/${{ inputs.namespace }}/${{ inputs.app-name }}
 
-    - name: Checkout Argo Configuration
-      uses: actions/checkout@v2
-      with:
-        repository: ${{ steps.destination.outputs.owner }}/${{ steps.destination.outputs.name }}
-        ref: ${{ steps.destination.outputs.ref }}
-        token: ${{ inputs.github-pat }}
-        path: ${{ steps.destination_dir.outputs.name }}
+    # - name: Checkout Argo Configuration
+    #   uses: actions/checkout@v2
+    #   with:
+    #     repository: ${{ steps.destination.outputs.owner }}/${{ steps.destination.outputs.name }}
+    #     ref: ${{ steps.destination.outputs.ref }}
+    #     token: ${{ inputs.github-pat }}
+    #     path: ${{ steps.destination_dir.outputs.name }}
 
     # - name: Read service context
     #   uses: docker://public.ecr.aws/u3q6g8t1/chamber:2.10.12
@@ -173,32 +171,32 @@ runs:
     #     sudo chmod 777 ./platform.yaml 
     #     yq --exit-status --no-colors --inplace eval '{"platform": .}' ./platform.yaml
 
-    # # - name: Read platform metadata
-    # #   uses: docker://public.ecr.aws/u3q6g8t1/chamber:2.10.12
-    # #   if: ${{ inputs.operation == 'deploy' }}
-    # #   with:
-    # #     args: --verbose export ${{ inputs.platform-ssm-path }}/_metadata --format yaml --output-file ./_metadata.yaml
-
-    # # - name: YQ Platform settings
-    # #   if: ${{ inputs.operation == 'deploy' }}
-    # #   shell: bash
-    # #   id: metadata
-    # #   run: |
-    # #     for output in $(yq --exit-status --no-colors eval-all '. | to_entries | map( .key + "=" + .value ) | join("\n")' ./_metadata.yaml); do
-    # #       echo "${output}" >> $GITHUB_OUTPUT ;
-    # #     done
-
-    # - name: Context
+    # - name: Read platform metadata
+    #   uses: docker://public.ecr.aws/u3q6g8t1/chamber:2.10.12
     #   if: ${{ inputs.operation == 'deploy' }}
-    #   id: arguments
-    #   uses: cloudposse/github-action-yaml-config-query@0.1.3
     #   with:
-    #     query: .${{ steps.metadata.outputs.kube_version == '' }}
-    #     config: |-
-    #       true: 
-    #         kube_version: ""
-    #       false:
-    #         kube_version: --kube-version=${{ steps.metadata.outputs.kube_version }}      
+    #     args: --verbose export ${{ inputs.platform-ssm-path }}/_metadata --format yaml --output-file ./_metadata.yaml
+
+    # - name: YQ Platform settings
+    #   if: ${{ inputs.operation == 'deploy' }}
+    #   shell: bash
+    #   id: metadata
+    #   run: |
+    #     for output in $(yq --exit-status --no-colors eval-all '. | to_entries | map( .key + "=" + .value ) | join("\n")' ./_metadata.yaml); do
+    #       echo "${output}" >> $GITHUB_OUTPUT ;
+    #     done
+
+    - name: Context
+      if: ${{ inputs.operation == 'deploy' }}
+      id: arguments
+      uses: cloudposse/github-action-yaml-config-query@0.1.3
+      with:
+        query: .${{ steps.metadata.outputs.kube_version == '' }}
+        config: |-
+          true: 
+            kube_version: ""
+          false:
+            kube_version: --kube-version=${{ steps.metadata.outputs.kube_version }}      
 
 
     - name: Ensure argocd repo structure
@@ -223,33 +221,6 @@ runs:
       if: ${{ inputs.debug == 'true' }}
       shell: bash
       run: echo "HELM_DEBUG_FLAG=--debug" >> $GITHUB_ENV
-    - name: Define Helm values file path
-      if: ${{ inputs.toolchain == 'helmfile' }}
-      id: deploy-helm-values-file-path
-      shell: bash
-      run: |
-          echo '::set-output name=deploy::${{ runner.temp }}/resources.yaml'
-
-    - name: Setup yq
-      if: ${{ inputs.toolchain == 'helmfile' }}
-      uses: dcarbone/install-yq-action@v1.1.0
-      with:
-          version: v4.35.1
-          download-compressed: true
-          force: true
-
-    - name: Create deploy Helm values file
-      if: ${{ inputs.toolchain == 'helmfile' }}
-      uses: DamianReeves/write-file-action@master
-      with:
-          path: ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-          contents: "# Empty file"
-
-    - name: Check Current Working Directory
-      shell: bash
-      run: |
-        pwd
-        ls -la
 
     - name: Helmfile render
       if: ${{ inputs.toolchain == 'helmfile' && inputs.operation == 'deploy' }}
@@ -259,67 +230,59 @@ runs:
           ${{ env.HELM_DEBUG_FLAG }} \
           --environment ${{ inputs.environment }} \
           --file ${{ inputs.helm-file-path}} \
-          --state-values-file $(pwd)/service.yaml \
-          --state-values-file $(pwd)/platform.yaml \
-          --state-values-file "${{ inputs.helm-values-file }}" \
+          # --state-values-file $(pwd)/service.yaml \
+          # --state-values-file $(pwd)/platform.yaml \
+          # --state-values-file "${{ inputs.helm-values-file }}" \
           template \
           --args="${{ steps.arguments.outputs.kube_version }}" \
           > ${{ steps.config.outputs.tmp }}/manifests/resources.yaml
-     
       # env:
-      #   IMAGE_NAME: "us-east4-docker.pkg.dev/cch-plat-glb-dev-project-4/cch-cicd-test/anilbelgod/example-app"
-      #   IMAGE_TAG: "latest"
+      #   IMAGE_NAME: ${{ inputs.image }}
+      #   IMAGE_TAG: ${{ inputs.image-tag }}
 
-    - name: Display Deploy Helm Values File
+    - name: Helm raw render
+      if: ${{ inputs.toolchain == 'helm' && inputs.operation == 'deploy' }}
       shell: bash
-      if: ${{ inputs.toolchain == 'helmfile' }}
       run: |
-          cat ${{ runner.tmp }}/resources.yaml
-          
+        helm template ${{ inputs.app-name }} ${{ inputs.helm-file-path }} \
+          --set image.repository=${{ inputs.image }} \
+          --set image.tag=${{ inputs.image-tag }} \
+          --set environment=${{ inputs.environment }} \
+          --create-namespace=true \
+          --namespace ${{ inputs.namespace }} \
+          ${{ env.HELM_DEBUG_FLAG }} \
+          --set ingress.default.hosts.example=test \
+          --values $(pwd)/service.yaml \
+          --values $(pwd)/platform.yaml \
+          --values "${{ inputs.helm-values-file }}" \
+          ${{ steps.arguments.outputs.kube_version }} \
+        > ${{ steps.config.outputs.tmp }}/manifests/resources.yaml
+      env:
+        IMAGE_NAME: ${{ inputs.image }}
+        IMAGE_TAG: ${{ inputs.image-tag }}
 
-    # - name: Helm raw render
-    #   if: ${{ inputs.toolchain == 'helm' && inputs.operation == 'deploy' }}
-    #   shell: bash
-    #   run: |
-    #     helm template ${{ inputs.app-name }} ${{ inputs.helm-file-path }} \
-    #       --set image.repository=${{ inputs.image }} \
-    #       --set image.tag=${{ inputs.image-tag }} \
-    #       --set environment=${{ inputs.environment }} \
-    #       --create-namespace=true \
-    #       --namespace ${{ inputs.namespace }} \
-    #       ${{ env.HELM_DEBUG_FLAG }} \
-    #       --set ingress.default.hosts.example=test \
-    #       --values $(pwd)/service.yaml \
-    #       --values $(pwd)/platform.yaml \
-    #       --values "${{ inputs.helm-values-file }}" \
-    #       ${{ steps.arguments.outputs.kube_version }} \
-    #     > ${{ steps.config.outputs.tmp }}/manifests/resources.yaml
-    #   env:
-    #     IMAGE_NAME: ${{ inputs.image }}
-    #     IMAGE_TAG: ${{ inputs.image-tag }}
+    - name: Get Webapp
+      if: ${{ inputs.operation == 'deploy' }}
+      id: result
+      shell: bash
+      run: |-
+        WEBAPP_URL=$( \
+          yq eval-all '.metadata.annotations["outputs.platform.cloudposse.com/webapp-url"] | select(. != null)' \
+            ${{ steps.config.outputs.tmp }}/manifests/resources.yaml \
+        )
+        echo "webapp_url=${WEBAPP_URL}" >> $GITHUB_OUTPUT
 
-    # - name: Get Webapp
-    #   if: ${{ inputs.operation == 'deploy' }}
-    #   id: result
-    #   shell: bash
-    #   run: |-
-    #     WEBAPP_URL=$( \
-    #       yq eval-all '.metadata.annotations["outputs.platform.cloudposse.com/webapp-url"] | select(. != null)' \
-    #         ${{ steps.config.outputs.tmp }}/manifests/resources.yaml \
-    #     )
-    #     echo "webapp_url=${WEBAPP_URL}" >> $GITHUB_OUTPUT
-
-    # - name: Deplicated Ref
-    #   if: ${{ inputs.operation == 'deploy' }}
-    #   id: ref
-    #   uses: cloudposse/github-action-yaml-config-query@0.1.3
-    #   with:
-    #     query: .${{ inputs.gitref-sha == '' }}
-    #     config: |-
-    #       true: 
-    #         value: ${{ inputs.ref }}
-    #       false:
-    #         value: ${{ inputs.gitref-sha }}      
+    - name: Deplicated Ref
+      if: ${{ inputs.operation == 'deploy' }}
+      id: ref
+      uses: cloudposse/github-action-yaml-config-query@0.1.3
+      with:
+        query: .${{ inputs.gitref-sha == '' }}
+        config: |-
+          true: 
+            value: ${{ inputs.ref }}
+          false:
+            value: ${{ inputs.gitref-sha }}      
 
     - name: Config render
       if: ${{ inputs.operation == 'deploy' }}
@@ -335,52 +298,52 @@ runs:
           namespace: ${{ inputs.namespace }}
           manifests: ${{ steps.config.outputs.path }}/manifests
 
-    # - name: Push to GitHub
-    #   uses: nick-fields/retry@v2
-    #   id: git
-    #   with:
-    #     timeout_minutes: 1
-    #     max_attempts: 100
-    #     shell: bash
-    #     command: |-
-    #       set -e
+    - name: Push to GitHub
+      uses: nick-fields/retry@v2
+      id: git
+      with:
+        timeout_minutes: 1
+        max_attempts: 100
+        shell: bash
+        command: |-
+          set -e
           
-    #       git config --global user.email "bot@example.com"
-    #       git config --global user.name "cloudpossebot"
+          git config --global user.email "bot@example.com"
+          git config --global user.name "cloudpossebot"
 
-    #       pushd ./${{ steps.destination_dir.outputs.name }}
+          pushd ./${{ steps.destination_dir.outputs.name }}
           
-    #       git reset --hard origin/${{ steps.destination.outputs.ref }}
-    #       git pull --rebase
+          git reset --hard origin/${{ steps.destination.outputs.ref }}
+          git pull --rebase
           
-    #       popd
+          popd
           
-    #       case '${{ inputs.operation }}' in
+          case '${{ inputs.operation }}' in
         
-    #         deploy)
-    #           cp -r ./tmp/* ./${{ steps.destination_dir.outputs.name }}/
-    #         ;;
+            deploy)
+              cp -r ./tmp/* ./${{ steps.destination_dir.outputs.name }}/
+            ;;
           
-    #         destroy)
-    #           rm -rf ./${{ steps.destination_dir.outputs.name }}/${{ steps.config.outputs.path }}
-    #         ;;
+            destroy)
+              rm -rf ./${{ steps.destination_dir.outputs.name }}/${{ steps.config.outputs.path }}
+            ;;
           
-    #         *)
-    #           echo "Operation should be `deploy` or `destroy`"
-    #           exit 1;
-    #         ;;
-    #       esac          
+            *)
+              echo "Operation should be `deploy` or `destroy`"
+              exit 1;
+            ;;
+          esac          
           
-    #       pushd ./${{ steps.destination_dir.outputs.name }}
+          pushd ./${{ steps.destination_dir.outputs.name }}
           
-    #       git add -A
-    #       git status
-    #       git diff-index --quiet HEAD || git commit -m "Deploy ${{ github.repository }} SHA ${{ github.sha }} RUN ${{ github.run_id }} ATEMPT ${{ github.run_attempt }}"
-    #       git push origin ${{ steps.destination.outputs.ref }}
+          git add -A
+          git status
+          git diff-index --quiet HEAD || git commit -m "Deploy ${{ github.repository }} SHA ${{ github.sha }} RUN ${{ github.run_id }} ATEMPT ${{ github.run_attempt }}"
+          git push origin ${{ steps.destination.outputs.ref }}
 
-    #       echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+          echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
           
-    #       popd
+          popd
 
     - uses: carecloud/github-action-wait-commit-status@main
       if: ${{ inputs.synchronously == 'true' && inputs.operation == 'deploy' }}
@@ -395,8 +358,3 @@ runs:
         token: ${{ inputs.github-pat }}
         check-retry-count: ${{ inputs.deployment-check-retry-count }}
         check-retry-interval: ${{ inputs.deployment-check-retry-interval }}     
-
-
-
-
-
