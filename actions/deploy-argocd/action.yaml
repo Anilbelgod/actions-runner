@@ -130,13 +130,13 @@ runs:
     #   run: |-
     #     echo "name=$(echo $RANDOM | md5sum | head -c 20)" >> $GITHUB_OUTPUT
 
-    # - name: Config
-    #   id: config
-    #   uses: cloudposse/github-action-yaml-config-query@0.1.3
-    #   with:
-    #     config: |-
-    #       tmp: ./tmp/${{ steps.destination.outputs.filepath }}/${{ inputs.namespace }}/${{ inputs.app-name }}
-    #       path: ${{ steps.destination.outputs.filepath }}/${{ inputs.namespace }}/${{ inputs.app-name }}
+    - name: Config
+      id: config
+      uses: cloudposse/github-action-yaml-config-query@0.1.3
+      with:
+        config: |-
+          tmp: ./tmp/${{ inputs.namespace }}/${{ inputs.app-name }}
+          path: ${{ inputs.namespace }}/${{ inputs.app-name }}
 
     # - name: Checkout Argo Configuration
     #   uses: actions/checkout@v2
