@@ -1,0 +1,124 @@
+name: 2 - Dev Branch
+on:
+  push:
+    branches: [ dev ]
+
+jobs:
+  release:
+    permissions:
+      contents: write
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup yq
+        uses: dcarbone/install-yq-action@v1.1.0
+        with:
+          version: v4.28.1
+          download-compressed: true
+          force: true
+
+      - name: Setup helmfile
+        uses: helmfile/helmfile-action@v2.0.2
+        with:
+          helmfile-version: v0.157.0 # https://github.com/helmfile/helmfile/releases
+          helm-version: v3.13.0
+      - name: Define Helm values file path
+        id: deploy-helm-values-file-path
+        shell: bash
+        run: |
+          echo '::set-output name=deploy::${{ runner.temp }}/resources.yaml'
+
+      - name: Setup yq
+        uses: dcarbone/install-yq-action@v1.1.0
+        with:
+            version: v4.35.1
+            download-compressed: true
+            force: true
+
+      - name: Create deploy Helm values file
+        uses: DamianReeves/write-file-action@master
+        with:
+            path: ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+            contents: "# Empty file"
+
+      - name: Check Current Working Directory
+        shell: bash
+        run: |
+          pwd
+          ls -la
+
+      - name: Helmfile render
+        shell: bash
+        run: |
+          helmfile --namespace gh-namespace \
+            --environment dev \
+            --file "${{ github.workspace }}/actions/deploy-argocd/app.yaml" \
+            --state-values-file "${{ github.workspace }}/actions/deploy-argocd/dev.yaml" \
+            template \
+            > ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+      # env:
+      #   IMAGE_NAME: "us-east4-docker.pkg.dev/cch-plat-glb-dev-project-4/cch-cicd-test/anilbelgod/example-app"
+      #   IMAGE_TAG: "latest"
+
+      - name: Display Deploy Helm Values File
+        shell: bash
+        run: |
+            cat ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+      - name: Config
+        id: config
+        uses: cloudposse/github-action-yaml-config-query@0.1.3
+        with:
+         config: |-
+          tmp: ./tmp/actions/runner
+          path: actions/runner
+
+      - name: Config render
+        uses: 1arp/create-a-file-action@0.2
+        with:
+          path: actions/runner
+          file: config.yaml
+          content: |-
+           app_repository: "yes"
+           app_commit: "yes"
+           app_hostname: "yes"
+           name:"yes"
+           namespace: "yes"
+           manifests: "yes"
+      - name: Display Config.yaml
+        shell: bash
+        run: |
+          cat actions/runner/config.yaml
+
+      - name: Push to GitHub
+        run: |
+          set -e
+
+          # Configure Git
+          git config --global user.email "bot@example.com"
+          git config --global user.name "cloudpossebot"
+
+          # Set the remote URL with the token
+          git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/${{ github.repository }}.git
+
+          # Checkout the branch
+          if git rev-parse --verify dev >/dev/null 2>&1; then
+            git checkout dev
+          else
+            git checkout -b dev
+          fi
+          git pull --rebase || true
+
+          # Ensure the files are added
+          mkdir -p actions/runner
+          cp /runner/_work/_temp/resources.yaml actions/runner/deploy-helm-values.yaml
+          git add actions/runner/config.yaml actions/runner/deploy-helm-values.yaml
+
+          # Commit and push changes
+          git status
+          git diff-index --quiet HEAD || git commit -m "Add config.yaml and deploy-helm-values.yaml"
+          git push origin dev
+
+          # Output the latest commit SHA
+          echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT

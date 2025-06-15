@@ -133,16 +133,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      # - name: Determine the application name for configuration purposes
-      #   id: config-app-name
-      #   uses: cloudposse/github-action-yaml-config-query@0.1.2
-      #   with:
-      #     query: .${{ inputs.config-app-name == '' }}
-      #     config: |
-      #       true:
-      #         value: ${{ inputs.app-name }}
-      #       false:
-      #         value: ${{ inputs.config-app-name }}
+      - name: Determine the application name for configuration purposes
+        id: config-app-name
+        uses: cloudposse/github-action-yaml-config-query@0.1.2
+        with:
+          query: .${{ inputs.config-app-name == '' }}
+          config: |
+            true:
+              value: ${{ inputs.app-name }}
+            false:
+              value: ${{ inputs.config-app-name }}
 
       # - name: Environment Info
       #   uses: carecloud/github-action-interface-environment@main
@@ -177,63 +177,63 @@ jobs:
       #     app-name: ${{ inputs.app-name }}
       #     platform-ssm-path: ${{ steps.environment.outputs.platform-ssm-path }}
 
-      # - name: Define Helm values file path
-      #   if: ${{ inputs.toolchain == 'helmfile' }}
-      #   id: deploy-helm-values-file-path
-      #   shell: bash
-      #   run: |
-      #     echo '::set-output name=deploy::${{ runner.temp }}/deploy-helm-values.yaml'
+      - name: Define Helm values file path
+        if: ${{ inputs.toolchain == 'helmfile' }}
+        id: deploy-helm-values-file-path
+        shell: bash
+        run: |
+          echo '::set-output name=deploy::${{ runner.temp }}/deploy-helm-values.yaml'
 
-      # - name: Setup yq
-      #   if: ${{ inputs.toolchain == 'helmfile' }}
-      #   uses: dcarbone/install-yq-action@v1.1.0
-      #   with:
-      #     version: v4.35.1
-      #     download-compressed: true
-      #     force: true
+      - name: Setup yq
+        if: ${{ inputs.toolchain == 'helmfile' }}
+        uses: dcarbone/install-yq-action@v1.1.0
+        with:
+          version: v4.35.1
+          download-compressed: true
+          force: true
 
-      # - name: Create deploy Helm values file
-      #   if: ${{ inputs.toolchain == 'helmfile' }}
-      #   uses: DamianReeves/write-file-action@master
-      #   with:
-      #     path: ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-      #     contents: ./deploy/values/dev.yaml
-      #     write-mode: overwrite
+      - name: Create deploy Helm values file
+        if: ${{ inputs.toolchain == 'helmfile' }}
+        uses: DamianReeves/write-file-action@master
+        with:
+          path: ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+          contents: ./deploy/values/dev.yaml
+          write-mode: overwrite
 
-      # - name: Update deploy Helm values file
-      #   if: ${{ inputs.toolchain == 'helmfile' }}
-      #   shell: bash
-      #   run: |
-      #     yq -i eval '{"envar_keys": .}' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-      #     yq -i eval '{"deployment": .}' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-      #     yq -i '.deployment.region = "${{ steps.environment.outputs.region }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-      #     yq -i '.deployment.app_name = "${{ inputs.app-name }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-      #     yq -i '.deployment.config_app_name = "${{ steps.config-app-name.outputs.value }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-      #     yq -i '.deployment.branch_or_tag_name = "${{ inputs.ref }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-      #     yq -i '.deployment.service_secret_ssm_path = "${{ steps.environment.outputs.service-secret-ssm-path }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-      #     yq -i '.deployment.service_account_role_arn = "${{ inputs.service-account-role-arn }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-      #     yq -i '.deployment.namespace = "${{ steps.environment.outputs.namespace }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-      #     yq -i '.deployment.version = "${{ inputs.version }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-      #     yq -i '.deployment.repo_values = {}' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-      #     yq -i '.deployment.dynamic_values = {}' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+      - name: Update deploy Helm values file
+        if: ${{ inputs.toolchain == 'helmfile' }}
+        shell: bash
+        run: |
+          yq -i eval '{"envar_keys": .}' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+          yq -i eval '{"deployment": .}' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+          yq -i '.deployment.region = "${{ steps.environment.outputs.region }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+          yq -i '.deployment.app_name = "${{ inputs.app-name }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+          yq -i '.deployment.config_app_name = "${{ steps.config-app-name.outputs.value }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+          yq -i '.deployment.branch_or_tag_name = "${{ inputs.ref }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+          yq -i '.deployment.service_secret_ssm_path = "${{ steps.environment.outputs.service-secret-ssm-path }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+          yq -i '.deployment.service_account_role_arn = "${{ inputs.service-account-role-arn }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+          yq -i '.deployment.namespace = "${{ steps.environment.outputs.namespace }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+          yq -i '.deployment.version = "${{ inputs.version }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+          yq -i '.deployment.repo_values = {}' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+          yq -i '.deployment.dynamic_values = {}' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
 
-      # - name: Merge input Helm values file with deploy Helm values file
-      #   if: ${{ inputs.toolchain == 'helmfile' && inputs.helm-values-file != '' }}
-      #   shell: bash
-      #   run: |
-      #     yq -i '.deployment.repo_values |= load("${{ format(inputs.helm-values-file, steps.environment.outputs.name) }}")' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+      - name: Merge input Helm values file with deploy Helm values file
+        if: ${{ inputs.toolchain == 'helmfile' && inputs.helm-values-file != '' }}
+        shell: bash
+        run: |
+          yq -i '.deployment.repo_values |= load("${{ format(inputs.helm-values-file, steps.environment.outputs.name) }}")' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
 
-      # - name: Merge dynamic Helm values with deploy Helm values file
-      #   if: ${{ inputs.toolchain == 'helmfile' && inputs.dynamic-helm-values != '' }}
-      #   shell: bash
-      #   run: |
-      #     export dynamic_values="${{ inputs.dynamic-helm-values }}"
+      - name: Merge dynamic Helm values with deploy Helm values file
+        if: ${{ inputs.toolchain == 'helmfile' && inputs.dynamic-helm-values != '' }}
+        shell: bash
+        run: |
+          export dynamic_values="${{ inputs.dynamic-helm-values }}"
 
-      #     yq -i '.deployment.dynamic_values |= env(dynamic_values)' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-      # - name: Display Deploy Helm Values File
-      #   if: ${{ inputs.toolchain == 'helmfile' }}
-      #   run: |
-      #     cat ${{ runner.temp }}/deploy-helm-values.yaml
+          yq -i '.deployment.dynamic_values |= env(dynamic_values)' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+      - name: Display Deploy Helm Values File
+        if: ${{ inputs.toolchain == 'helmfile' }}
+        run: |
+          cat ${{ runner.temp }}/deploy-helm-values.yaml
       
       - name: Deploy
         uses: ./actions/deploy-argocd
