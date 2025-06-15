@@ -65,7 +65,7 @@ on:
       helm-file-path:
         description: "The path where lives the helmfile or helm chart."
         required: false
-        default: "./deploy/helmfile.yaml"
+        default: './deploy/helmfile.yaml'
         type: string
       helm-values-file:
         type: string
