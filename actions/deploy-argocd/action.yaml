@@ -225,7 +225,7 @@ runs:
     - name: Ensure output directory exists
       shell: bash
       run: |
-       mkdir -p ${{ steps.config.outputs.tmp }}/manifests
+       mkdir -p $GITHUB_WORKSPACE/manifests
 
     - name: Helmfile render
       if: ${{ inputs.toolchain == 'helmfile' && inputs.operation == 'deploy' }}
