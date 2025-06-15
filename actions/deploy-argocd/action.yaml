@@ -203,7 +203,7 @@ runs:
       if: ${{ inputs.operation == 'deploy' }}
       shell: bash
       run: |
-        mkdir -p ${{ steps.config.outputs.tmp }}/manifests
+        mkdir -p $GITHUB_WORKSPACE/manifests
 
     - name: Read values file
       id: helm-values-file
