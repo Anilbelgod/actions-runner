@@ -197,7 +197,7 @@ jobs:
         uses: DamianReeves/write-file-action@master
         with:
           path: ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-          contents: ./deploy/values/dev.yaml
+          contents: "{{ github.workspace }}/deploy/values/dev.yaml"
           write-mode: overwrite
 
       - name: Update deploy Helm values file

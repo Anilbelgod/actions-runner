@@ -171,16 +171,4 @@ jobs:
         file: test/docker-compose.yaml
         service: app
         command: test/test.sh
-        registry: ${{ inputs.registry }}
-
-
-
-
-
-
-
-
-
-
-
-        
+        registry: ${{ inputs.registry }}      

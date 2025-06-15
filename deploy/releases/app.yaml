@@ -1,0 +1,76 @@
+repositories:
+  # Cloud Posse incubator repo of helm charts
+  - name: "cloudposse-incubator"
+    url: "https://charts.cloudposse.com/incubator/"
+  # The bedag/raw chart is no longer needed for this basic setup
+  # and has been removed to simplify the configuration.
+
+releases:
+  # Main application release using a general-purpose monochart.
+  # References:
+  #   - https://github.com/cloudposse/charts/tree/master/incubator/monochart
+  - name: '{{ .Values.deployment.appName }}'
+    chart: "cloudposse-incubator/monochart"
+    version: "0.26.0"
+    wait: true
+    force: true
+    values:
+      - fullnameOverride: '{{ .Values.deployment.appName }}'
+        nameOverride: '{{ .Values.deployment.appName }}'
+
+        image:
+          repository: '{{ .Values.image.repository }}'
+          tag: '{{ .Values.image.tag }}'
+          pullPolicy: Always
+
+        replicaCount: {{ .Values.replicaCount }}
+
+        # Simplified environment variables.
+        # Secrets should be managed via a GCP-native method,
+        # such as Google Secret Manager and the External Secrets Operator.
+        envFrom:
+        - secretRef:
+            name: '{{ .Values.deployment.appName }}-secrets'
+
+        # Standard Kubernetes service definition.
+        service:
+          enabled: true
+          type: ClusterIP
+          ports:
+            default:
+              internal: 8080
+              external: 80
+
+        # Ingress configuration for GCP.
+        # This uses the standard GKE Ingress controller.
+
+        # Health checks for the application.
+        probes:
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: default
+              scheme: HTTP
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: default
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+        # Resource requests and limits for the container.
+        # It's good practice to start with reasonable values and adjust as needed.
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
