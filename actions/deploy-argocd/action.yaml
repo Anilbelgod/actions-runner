@@ -230,9 +230,7 @@ runs:
         helmfile --namespace ${{ inputs.namespace }} \
           ${{ env.HELM_DEBUG_FLAG }} \
           --environment ${{ inputs.environment }} \
-          --file ${{ github.workspace }}/deploy/helmfile.yaml \
-          # --state-values-file $(pwd)/service.yaml \
-          # --state-values-file $(pwd)/platform.yaml \
+          --file "${{ github.workspace }}/deploy/releases/app.yaml" \
           --state-values-file "${{ inputs.helm-values-file }}" \
           template \
           --args="${{ steps.arguments.outputs.kube_version }}" \
