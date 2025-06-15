@@ -192,13 +192,24 @@ jobs:
           download-compressed: true
           force: true
 
+      # - name: Create deploy Helm values file
+      #   if: ${{ inputs.toolchain == 'helmfile' }}
+      #   uses: DamianReeves/write-file-action@master
+      #   with:
+      #     path: ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+      #     contents: {{ github.workspace }}/deploy/values/dev.yaml
+      #     write-mode: overwrite
+      - name: Read dev.yaml contents
+        id: read-dev-yaml
+        run: echo "CONTENT=$(cat $GITHUB_WORKSPACE/deploy/values/dev.yaml)" >> $GITHUB_ENV
+
       - name: Create deploy Helm values file
         if: ${{ inputs.toolchain == 'helmfile' }}
         uses: DamianReeves/write-file-action@master
         with:
-          path: ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-          contents: "{{ github.workspace }}/deploy/values/dev.yaml"
-          write-mode: overwrite
+         path: ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+         contents: ${{ env.CONTENT }}
+         write-mode: overwrite
 
       - name: Display Deploy Helm Values File
         if: ${{ inputs.toolchain == 'helmfile' }}
