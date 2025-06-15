@@ -50,6 +50,7 @@ inputs:
   namespace:
     description: Kubernetes namespace
     required: true
+    default: "gh-namespace"
   app-name:
     description: Application name
     required: true
@@ -229,10 +230,10 @@ runs:
         helmfile --namespace ${{ inputs.namespace }} \
           ${{ env.HELM_DEBUG_FLAG }} \
           --environment ${{ inputs.environment }} \
-          --file "${{ inputs.helm-file-path }}" \
+          --file "${{ github.workspace }}/deploy/helmfile.yaml" \
           # --state-values-file $(pwd)/service.yaml \
           # --state-values-file $(pwd)/platform.yaml \
-          # --state-values-file "${{ inputs.helm-values-file }}" \
+          --state-values-file "${{ inputs.helm-values-file }}" \
           template \
           --args="${{ steps.arguments.outputs.kube_version }}" \
           > ${{ steps.config.outputs.tmp }}/manifests/resources.yaml
