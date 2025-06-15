@@ -200,6 +200,10 @@ jobs:
           contents: "{{ github.workspace }}/deploy/values/dev.yaml"
           write-mode: overwrite
 
+      - name: Display Deploy Helm Values File
+        if: ${{ inputs.toolchain == 'helmfile' }}
+        run: |
+          cat ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
       - name: Update deploy Helm values file
         if: ${{ inputs.toolchain == 'helmfile' }}
         shell: bash
