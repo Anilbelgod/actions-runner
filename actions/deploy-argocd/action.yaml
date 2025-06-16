@@ -124,7 +124,7 @@ runs:
     - id: destination
       uses: theowenyoung/git-url-parse@v1
       with:
-        url: ${{ inputs.cluster }}
+        url: "https://github.com/srinivasan-rajagopal/argocd-repo"
 
     - id: destination_dir
       shell: bash
