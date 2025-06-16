@@ -41,17 +41,17 @@ on:
         description: "Artifact Registry region"
         required: true
         type: string
-    secrets:
       docker-token:
         description: "Docker token"
         required: true
-    # secrets:
-    #   github-private-actions-pat:
-    #     description: "Github PAT allow to pull private repos"
-    #     required: true
-    #   docker-build-push-secrets:
-    #     description: "The secrets for authorizing access to private repos for a docker build"
-    #     required: false      
+        type: string
+
+      #   github-private-actions-pat:
+      #     description: "Github PAT allow to pull private repos"
+      #     required: true
+      #   docker-build-push-secrets:
+      #   description: "The secrets for authorizing access to private repos for a docker build"
+      #   required: false      
     # outputs:
     #   image:
     #     description: "Docker Image"
@@ -139,7 +139,7 @@ jobs:
         uses: jayz-66/github-action-docker-build-push@main
         with:
           organization: ${{ steps.change-string-case-organization.outputs.lowercase }}
-          repository: example-app #${{ needs.setup.outputs.config-app-name }}
+          repository: ${{ needs.setup.outputs.config-app-name }}
           registry: ${{ inputs.registry }}
           secrets: ${{ secrets.docker-build-push-secrets }}
           docker-metadata-pr-head-sha: true
@@ -160,7 +160,7 @@ jobs:
   test:
     runs-on: ["self-hosted"]
     needs: [ build-image ]
-    # if: ${{ inputs.run-tests == true }}  
+    if: ${{ inputs.run-tests == true }}  
     steps:
     - name: Checkout
       uses: actions/checkout@v3

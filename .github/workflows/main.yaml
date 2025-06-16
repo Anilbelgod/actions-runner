@@ -23,7 +23,7 @@ jobs:
       # deployment-check-retry-count: "30" #!CD
       # deployment-check-app-id: ${{ vars.CCH_DEPLOYMENT_STATUS_APP_ID }} #!CD 
       # deployment-check-app-installation-id: ${{ vars.CCH_DEPLOYMENT_STATUS_APP_INSTALLATION_ID }} #!CD
-      run-tests: false #!CI 
+      run-tests: true #CI 
     secrets:
       one-password-service-account-token: "${{ secrets.ONE_PASSWORD_SERVICE_ACCOUNT_TOKEN }}"
       docker-token: "${{ secrets.DOCKER_TOKEN }}" 
