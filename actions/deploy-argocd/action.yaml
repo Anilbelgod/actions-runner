@@ -319,22 +319,33 @@ runs:
           # Set the remote URL with the token
           git remote set-url origin https://x-access-token:${{ inputs.GIT-PAT }}@github.com/srinivasan-rajagopal/argocd-repo.git
 
-          # Checkout the branch
+          # Check if the branch exists remotely
+          if git ls-remote --heads origin main | grep main >/dev/null; then
+            git checkout main
+          else
+            # Create the main branch if it doesn't exist
+            git checkout --orphan main
+            git reset --hard
+            git commit --allow-empty -m "Initial commit"
+            git push origin main
+          fi
 
-          git checkout main
           git pull --rebase || true
 
-          # Ensure the files are added to the correct directory
           # Ensure the files are added to the correct directory
           mkdir -p plat/use1-dev/apps/cch-dev
 
           # Copy the files from their respective locations
           cp $GITHUB_WORKSPACE/manifests/resources.yaml plat/use1-dev/apps/cch-dev/resources.yaml
           cp $GITHUB_WORKSPACE/tmp/config.yaml plat/use1-dev/apps/cch-dev/config.yaml
-              # Commit and push changes
+
+          # Add the files to Git
+          git add plat/use1-dev/apps/cch-dev/config.yaml plat/use1-dev/apps/cch-dev/resources.yaml
+
+          # Commit and push changes
           git status
           git diff-index --quiet HEAD || git commit -m "Add config.yaml and resources.yaml to plat/use1-dev/apps/cch-dev"
-          git push origin dev
+          git push origin main
 
           # Output the latest commit SHA
           echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
