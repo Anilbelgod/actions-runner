@@ -225,7 +225,7 @@ runs:
     - name: Ensure output directory exists
       shell: bash
       run: |
-       mkdir -p $GITHUB_WORKSPACE/manifests/resources.yaml
+       mkdir -p $GITHUB_WORKSPACE/manifests
        touch $GITHUB_WORKSPACE/manifests/resources.yaml
 
     - name: Helmfile render
@@ -368,4 +368,3 @@ runs:
 
 
 
-        
