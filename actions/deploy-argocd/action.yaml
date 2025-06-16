@@ -238,7 +238,7 @@ runs:
         helmfile --namespace gh-namespace \
           --environment dev \
           --file "${{ github.workspace }}/actions/deploy-argocd/app.yaml" \
-          --state-values-file "${{ inputs.helm-values-file }}" \
+          --state-values-file "${{ github.workspace }}/actions/deploy-argocd/dev.yaml" \
           template \
           --args="${{ steps.arguments.outputs.kube_version }}" \
           > $GITHUB_WORKSPACE/manifests/resources.yaml
