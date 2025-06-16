@@ -69,9 +69,7 @@ inputs:
     description: The name of the label used to describe the helm release
     default: "release"
     required: false
-  github-pat:
-    description: Github PAT to access argocd configuration repository
-    required: true
+   
   synchronously:
     description: "Wait until ArgoCD successfully apply the changes"
     default: 'false'
@@ -92,6 +90,7 @@ inputs:
   deployment-check-app-private-key:
     description: 'The Github App private key used for authentication when checking for deployment status'
     required: false
+
 outputs:
   webapp-url:
     description: "Web Application url"
@@ -144,7 +143,7 @@ runs:
       with:
         repository: ${{ steps.destination.outputs.owner }}/${{ steps.destination.outputs.name }}
         ref: ${{ steps.destination.outputs.ref }}
-        token: ${{ inputs.github-pat }}
+        token: ${{ secrets.git-pat }}
         path: ${{ steps.destination_dir.outputs.name }}
 
     # - name: Read service context
