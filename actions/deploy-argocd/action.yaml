@@ -320,20 +320,18 @@ runs:
           git remote set-url origin https://x-access-token:${{ inputs.GIT-PAT }}@github.com/srinivasan-rajagopal/argocd-repo.git
 
           # Checkout the branch
-          if git rev-parse --verify dev >/dev/null 2>&1; then
-            git checkout dev
-          else
-            git checkout -b dev
-          fi
+
+          git checkout main
           git pull --rebase || true
 
           # Ensure the files are added to the correct directory
+          # Ensure the files are added to the correct directory
           mkdir -p plat/use1-dev/apps/cch-dev
-          cp /runner/_work/_temp/resources.yaml plat/use1-dev/apps/cch-dev/resources.yaml
-          cp actions/runner/config.yaml plat/use1-dev/apps/cch-dev/config.yaml
-          git add plat/use1-dev/apps/cch-dev/config.yaml plat/use1-dev/apps/cch-dev/resources.yaml
 
-          # Commit and push changes
+          # Copy the files from their respective locations
+          cp $GITHUB_WORKSPACE/manifests/resources.yaml plat/use1-dev/apps/cch-dev/resources.yaml
+          cp $GITHUB_WORKSPACE/tmp/config.yaml plat/use1-dev/apps/cch-dev/config.yaml
+              # Commit and push changes
           git status
           git diff-index --quiet HEAD || git commit -m "Add config.yaml and resources.yaml to plat/use1-dev/apps/cch-dev"
           git push origin dev
