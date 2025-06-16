@@ -106,6 +106,10 @@ on:
       docker-token:
         description: "The Docker token for authentication to the Docker registry"
         required: true 
+      git-pat:
+        description: "GitHub Personal Access Token for private repositories"
+        required: true
+
     #   github-private-actions-pat: #! TBD 
     #     description: "Github PAT allow to pull private repos"
     #     required: true
