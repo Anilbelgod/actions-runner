@@ -226,6 +226,7 @@ runs:
       shell: bash
       run: |
        mkdir -p $GITHUB_WORKSPACE/manifests/resources.yaml
+       touch $GITHUB_WORKSPACE/manifests/resources.yaml
 
     - name: Helmfile render
       if: ${{ inputs.toolchain == 'helmfile' && inputs.operation == 'deploy' }}
