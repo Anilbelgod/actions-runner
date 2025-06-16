@@ -158,7 +158,7 @@ jobs:
 
   cd:
     uses: ./.github/workflows/cd.yaml   
-    # needs: [ ci ]
+    needs: [ ci ]
     with:
       version: ${{ needs.ci.outputs.version }}
       image: ${{ needs.ci.outputs.image }}
