@@ -307,51 +307,38 @@ runs:
           manifests: ${{ steps.config.outputs.path }}/manifests
 
     - name: Push to GitHub
-      uses: nick-fields/retry@v2
-      id: git
-      with:
-        timeout_minutes: 1
-        max_attempts: 100
-        shell: bash
-        command: |-
+      shell: bash
+      run: |
           set -e
-          
+
+          # Configure Git
           git config --global user.email "bot@example.com"
           git config --global user.name "cloudpossebot"
 
-          pushd ./${{ steps.destination_dir.outputs.name }}
-          
-          git reset --hard origin/${{ steps.destination.outputs.ref }}
-          git pull --rebase
-          
-          popd
-          
-          case '${{ inputs.operation }}' in
-        
-            deploy)
-              cp -r ./tmp/* ./${{ steps.destination_dir.outputs.name }}/
-            ;;
-          
-            destroy)
-              rm -rf ./${{ steps.destination_dir.outputs.name }}/${{ steps.config.outputs.path }}
-            ;;
-          
-            *)
-              echo "Operation should be `deploy` or `destroy`"
-              exit 1;
-            ;;
-          esac          
-          
-          pushd ./${{ steps.destination_dir.outputs.name }}
-          
-          git add -A
-          git status
-          git diff-index --quiet HEAD || git commit -m "Deploy ${{ github.repository }} SHA ${{ github.sha }} RUN ${{ github.run_id }} ATEMPT ${{ github.run_attempt }}"
-          git push origin ${{ steps.destination.outputs.ref }}
+          # Set the remote URL with the token
+          git remote set-url origin https://x-access-token:${{ secrets.GIT-PAT }}@github.com/srinivasan-rajagopal/argocd-repo.git
 
+          # Checkout the branch
+          if git rev-parse --verify dev >/dev/null 2>&1; then
+            git checkout dev
+          else
+            git checkout -b dev
+          fi
+          git pull --rebase || true
+
+          # Ensure the files are added to the correct directory
+          mkdir -p plat/use1-dev/apps/cch-dev
+          cp /runner/_work/_temp/resources.yaml plat/use1-dev/apps/cch-dev/resources.yaml
+          cp actions/runner/config.yaml plat/use1-dev/apps/cch-dev/config.yaml
+          git add plat/use1-dev/apps/cch-dev/config.yaml plat/use1-dev/apps/cch-dev/resources.yaml
+
+          # Commit and push changes
+          git status
+          git diff-index --quiet HEAD || git commit -m "Add config.yaml and resources.yaml to plat/use1-dev/apps/cch-dev"
+          git push origin dev
+
+          # Output the latest commit SHA
           echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-          
-          popd
 
     - uses: carecloud/github-action-wait-commit-status@main
       if: ${{ inputs.synchronously == 'true' && inputs.operation == 'deploy' }}
