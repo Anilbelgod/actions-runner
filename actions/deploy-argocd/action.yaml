@@ -90,6 +90,9 @@ inputs:
   deployment-check-app-private-key:
     description: 'The Github App private key used for authentication when checking for deployment status'
     required: false
+  git-pat:
+    description: "GitHub Personal Access Token for private repositories"
+    required: true
 
 outputs:
   webapp-url:
@@ -143,7 +146,7 @@ runs:
       with:
         repository: ${{ steps.destination.outputs.owner }}/${{ steps.destination.outputs.name }}
         ref: ${{ steps.destination.outputs.ref }}
-        token: ${{ secrets.git-pat }}
+        token: ${{ inputs.git-pat }}
         path: ${{ steps.destination_dir.outputs.name }}
 
     # - name: Read service context
