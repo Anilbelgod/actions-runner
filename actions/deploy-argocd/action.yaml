@@ -139,13 +139,13 @@ runs:
           tmp: ./tmp/${{ inputs.namespace }}/${{ inputs.app-name }}
           path: ${{ inputs.namespace }}/${{ inputs.app-name }}
 
-    # - name: Checkout Argo Configuration
-    #   uses: actions/checkout@v2
-    #   with:
-    #     repository: ${{ steps.destination.outputs.owner }}/${{ steps.destination.outputs.name }}
-    #     ref: ${{ steps.destination.outputs.ref }}
-    #     token: ${{ inputs.github-pat }}
-    #     path: ${{ steps.destination_dir.outputs.name }}
+    - name: Checkout Argo Configuration
+      uses: actions/checkout@v2
+      with:
+        repository: ${{ steps.destination.outputs.owner }}/${{ steps.destination.outputs.name }}
+        ref: ${{ steps.destination.outputs.ref }}
+        token: ${{ inputs.github-pat }}
+        path: ${{ steps.destination_dir.outputs.name }}
 
     # - name: Read service context
     #   uses: docker://public.ecr.aws/u3q6g8t1/chamber:2.10.12
