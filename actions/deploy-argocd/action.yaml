@@ -361,13 +361,11 @@ runs:
         app-private-key: ${{ inputs.deployment-check-app-private-key }}
         token: ${{ inputs.github-pat }}
         check-retry-count: ${{ inputs.deployment-check-retry-count }}
-        check-retry-interval: ${{ inputs.deployment-check-retry-interval }}     
+        check-retry-interval: ${{ inputs.deployment-check-retry-interval }}
 
 
 
 
 
 
-
-
-
+        
