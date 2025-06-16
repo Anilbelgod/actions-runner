@@ -111,6 +111,9 @@ on:
       deployment-check-app-private-key:
         description: 'The Github App private key used for authentication when checking for deployment status'
         required: false
+      git-pat:
+        description: "GitHub Personal Access Token for private repositories"
+        required: true
 
 permissions:
   id-token: write
