@@ -235,7 +235,7 @@ runs:
         helmfile --namespace ${{ inputs.namespace }} \
           ${{ env.HELM_DEBUG_FLAG }} \
           --environment ${{ inputs.environment }} \
-          --file $GITHUB_WORKSPACE/deploy/releases/app.yaml \
+          --file actions-runner/deploy/releases/app.yaml \
           --state-values-file "${{ inputs.helm-values-file }}" \
           template \
           --args="${{ steps.arguments.outputs.kube_version }}" \
