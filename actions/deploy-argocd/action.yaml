@@ -260,7 +260,8 @@ runs:
           --values $(pwd)/platform.yaml \
           --values "${{ inputs.helm-values-file }}" \
           ${{ steps.arguments.outputs.kube_version }} \
-        > ${{ steps.config.outputs.tmp }}/manifests/resources.yaml
+        > $GITHUB_WORKSPACE/manifests/resources.yaml
+
       env:
         IMAGE_NAME: ${{ inputs.image }}
         IMAGE_TAG: ${{ inputs.image-tag }}
