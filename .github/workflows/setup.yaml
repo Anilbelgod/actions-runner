@@ -103,6 +103,10 @@ on:
       #   type: string
       #   description: 'The Github App Instance ID used for authentication when checking for deployment status'
       #   required: true
+      git-pat:
+        type: string
+        description: "GitHub Personal Access Token for private repositories"
+        required: true
     secrets:
       one-password-service-account-token:
         description: "The 1Password service acount token"
@@ -110,9 +114,7 @@ on:
       docker-token:
         description: "The Docker token for authentication to the Docker registry"
         required: true 
-      git-pat:
-        description: "GitHub Personal Access Token for private repositories"
-        required: true
+      
 
     #   github-private-actions-pat: #! TBD 
     #     description: "Github PAT allow to pull private repos"
