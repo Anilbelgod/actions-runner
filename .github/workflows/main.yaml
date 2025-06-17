@@ -52,7 +52,7 @@ jobs:
       - name: Helmfile render
         shell: bash
         run: |
-          -argohelmfile --namespace gh-namespace \
+            helmfile --namespace gh-namespace \
             --environment dev \
             --file "${{ github.workspace }}/actions/deploycd/app.yaml" \
             --state-values-file "${{ github.workspace }}/actions/deploy-argocd/dev.yaml" \
@@ -123,4 +123,3 @@ jobs:
           # Output the latest commit SHA
           echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 
-          
