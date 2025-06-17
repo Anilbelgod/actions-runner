@@ -143,6 +143,18 @@ jobs:
               value: ${{ inputs.app-name }}
             false:
               value: ${{ inputs.config-app-name }}
+  
+
+      - name: Import secrets into Secret Manager from 1PasswordAdd commentMore actions
+        uses: ./actions/import-secret 
+        id: import-secrets
+        with:
+          one-password-service-account-token: ${{ secrets.one-password-service-account-token }}
+          one-password-primary-vault: example-app 
+          one-password-primary-item: documents-api   
+          one-password-primary-field: dev 
+          import-secrets: true 
+          app-name: ${{ inputs.app-name }} 
 
      
       - name: Define Helm values file path
@@ -183,6 +195,7 @@ jobs:
           path: ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
           contents: ${{ env.CONTENT }}
           write-mode: overwrite
+
       - name: Display Deploy Helm Values File
         if: ${{ inputs.toolchain == 'helmfile' }}
         run: |
