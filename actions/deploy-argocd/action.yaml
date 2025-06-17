@@ -326,7 +326,7 @@ runs:
 
           # Set the remote URL with the token
           git remote remove origin
-          git remote set-url origin https://x-access-token:${{ secrets.github-pat }}@github.com/${{ github.repository }}.git
+          git remote set-url origin https://x-access-token:${{ inputs.github-pat }}@github.com/${{ github.repository }}.git
           
 
 
