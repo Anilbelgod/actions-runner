@@ -8,6 +8,10 @@ on:
   push:
     branches:
       - ft-atmos-pipeline
+  pull_request:
+    types: [closed, reopened, synchronize]
+    branches:
+      - ft-atmos-pipeline
 
 jobs:
   atmos-apply:
