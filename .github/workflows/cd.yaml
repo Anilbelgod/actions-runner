@@ -235,9 +235,7 @@ jobs:
           yq -i '.deployment.branch_or_tag_name = "${{ inputs.ref }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
           yq -i '.deployment.namespace = "${{ steps.environment.outputs.namespace }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
           yq -i '.deployment.version = "${{ inputs.version }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-          yq -i '.deployment.repo_values = {}' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-          yq -i '.deployment.dynamic_values = {}' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-
+          
       - name: Merge input Helm values file with deploy Helm values file
         if: ${{ inputs.toolchain == 'helmfile' && inputs.helm-values-file != '' }}
         shell: bash
