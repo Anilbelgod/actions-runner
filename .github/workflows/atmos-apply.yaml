@@ -48,3 +48,4 @@ jobs:
         id: atmos-apply
         run: |
           atmos terraform apply google-storage-bucket --stack plat-gbl-dev
+          
