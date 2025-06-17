@@ -41,6 +41,10 @@ on:
         description: "Artifact Registry region"
         required: true
         type: string
+      git-pat:
+        description: "GitHub Personal Access Token for private repositories"
+        required: false
+        type: string
     secrets:
        docker-token:
         description: "Docker token"
