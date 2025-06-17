@@ -127,7 +127,7 @@ runs:
     - id: destination
       uses: theowenyoung/git-url-parse@v1
       with:
-        url: "https://github.com/srinivasan-rajagopal/argocd-repo"
+        url: "https://github.com/srinivasan-rajagopal/argocd-repo" # {{ inputs.cluster}}
 
     - id: destination_dir
       shell: bash
@@ -324,7 +324,9 @@ runs:
           git config --global user.name "cloudpossebot"
 
           # Set the remote URL with the token
-          git remote set-url origin https://x-access-token:${{ inputs.GIT-PAT }}@github.com/srinivasan-rajagopal/argocd-repo.git
+          git remote remove origin
+          git remote add origin https://${{ inputs.git-pat }}@github.com/srinivasan-rajagopal/argocd-repo.git
+
 
           # Check if the branch exists remotely
           if git ls-remote --heads origin main | grep main >/dev/null; then
@@ -370,6 +372,10 @@ runs:
         token: ${{ inputs.github-pat }}
         check-retry-count: ${{ inputs.deployment-check-retry-count }}
         check-retry-interval: ${{ inputs.deployment-check-retry-interval }}
+
+
+
+
 
 
 
