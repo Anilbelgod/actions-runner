@@ -5,9 +5,6 @@ name: Atmos Plan Pipeline
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - ft-atmos-pipeline
   pull_request:
       branches:
         - ft-atmos-pipeline
@@ -50,4 +47,3 @@ jobs:
         id: atmos-plan
         run: |
           atmos terraform plan google-storage-bucket --stack plat-gbl-dev
-          
