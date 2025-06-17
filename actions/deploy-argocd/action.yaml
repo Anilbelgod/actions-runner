@@ -306,6 +306,13 @@ runs:
           name: ${{ inputs.namespace }}.${{ inputs.app-name }}
           namespace: ${{ inputs.namespace }}
           manifests: ${{ steps.config.outputs.path }}/manifests
+    - name: Display Config File Contents
+      if: ${{ inputs.operation == 'deploy' }}
+      shell: bash
+      run: |
+         echo "Contents of config.yaml:"
+         cat ${{ steps.config.outputs.tmp }}/config.yaml
+    
 
     - name: Push to GitHub
       shell: bash
