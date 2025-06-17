@@ -251,7 +251,7 @@ jobs:
           export dynamic_values="${{ inputs.dynamic-helm-values }}"
 
           yq -i '.deployment.dynamic_values |= env(dynamic_values)' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-          
+
       - name: Display Deploy Helm Values File
         if: ${{ inputs.toolchain == 'helmfile' }}
         run: |
@@ -286,6 +286,7 @@ jobs:
           deployment-check-app-id: ${{ inputs.deployment-check-app-id }}
           deployment-check-app-installation-id: ${{ inputs.deployment-check-app-installation-id }}
           deployment-check-app-private-key: ${{ secrets.deployment-check-app-private-key }}
+          git-pat: "{{ secrets.GIT_PAT}}" 
 
 
 

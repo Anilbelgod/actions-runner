@@ -325,7 +325,7 @@ runs:
 
           # Set the remote URL with the token
           git remote remove origin
-          git remote add origin https://${{ secrets.GIT_PAT }}@github.com/srinivasan-rajagopal/argocd-repo.git
+          git remote add origin https://${{ inputs.git-pat }}@github.com/srinivasan-rajagopal/argocd-repo.git
 
 
           # Check if the branch exists remotely
