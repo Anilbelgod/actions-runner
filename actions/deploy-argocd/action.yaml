@@ -353,7 +353,7 @@ runs:
 
           # Copy the files from their respective locations
           cp $GITHUB_WORKSPACE/manifests/resources.yaml plat/use1-dev/apps/cch-dev/resources.yaml
-          cp $GITHUB_WORKSPACE/tmp/config.yaml plat/use1-dev/apps/cch-dev/config.yaml
+          cp ${{ steps.config.outputs.tmp }}/config.yaml plat/use1-dev/apps/cch-dev/config.yaml
 
           # Add the files to Git
           git add plat/use1-dev/apps/cch-dev/config.yaml plat/use1-dev/apps/cch-dev/resources.yaml
