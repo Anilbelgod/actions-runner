@@ -21,3 +21,24 @@ spec:
     release: example-app
     serve: "true"
 
+---
+# Source: raw/templates/resources.yaml
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  labels:
+    app.kubernetes.io/instance: example-app-secrets
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: example-app-secrets-raw
+    app.kubernetes.io/version: 1.0.0
+    helm.sh/chart: raw-2.0.0
+  name: example-app
+spec:
+  refreshInterval: 60s
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: gcpsm-secret
+  target:
+    creationPolicy: Owner
+    name: example-app
+
