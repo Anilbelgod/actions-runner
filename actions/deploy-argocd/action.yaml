@@ -289,7 +289,7 @@ runs:
         query: .${{ inputs.gitref-sha == '' }}
         config: |-
           true: 
-            value: "reference"
+            value: ${{ inputs.ref }}
           false:
             value: ${{ inputs.gitref-sha }}      
 
