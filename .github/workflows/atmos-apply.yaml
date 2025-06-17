@@ -48,6 +48,6 @@ jobs:
           atmos terraform init google-storage-bucket --stack plat-gbl-dev
 
       - name: Atmos Terraform apply
-        id: atmos-plan
+        id: atmos-apply
         run: |
           atmos terraform apply google-storage-bucket --stack plat-gbl-dev
