@@ -23,31 +23,26 @@ variable "stage" {
   # You can add a default value if you want, e.g., default = "dev"
 }
 
-# Define the storage bucket resource
-resource "google_storage_bucket" "static-site" {
-  # Add your project ID here
-  project       = "cch-plat-gbl-dev-de0b9019" # 👈 FIX: Add this line
+# --- Generic Google Cloud Storage Bucket ---
 
-  name          = "image-store.com"
-  location      = "EU"
-  force_destroy = true
+resource "google_storage_bucket" "generic_bucket" {
+
+  project = "cch-plat-gbl-dev-de0b9019"
+  name = "globally-unique-bucket-name-raj-cch"
+  location = "US-CENTRAL1"
+  storage_class = "STANDARD"
 
   uniform_bucket_level_access = true
-
-  website {
-    main_page_suffix = "index.html"
-    not_found_page   = "404.html"
+  versioning {
+    enabled = true
   }
 
-  cors {
-    origin          = ["http://image-store.com"]
-    method          = ["GET", "HEAD", "PUT", "POST", "DELETE"]
-    response_header = ["*"]
-    max_age_seconds = 3600
+  force_destroy = false
+  labels = {
+    env      = "development"
+    origin   = "terraform"
   }
 }
-
-
 
 
 
