@@ -102,6 +102,12 @@ on:
         type: string
         description: 'service name for the deployment, used for SSM path and other purposes'
         required: false 
+      git-pat:
+        type: string
+        
+        description: "GitHub Personal Access Token for private repositories"
+        required: true
+      
 
     secrets:
       secret-outputs-passphrase:
@@ -116,10 +122,6 @@ on:
       deployment-check-app-private-key:
         description: 'The Github App private key used for authentication when checking for deployment status'
         required: false
-      git-pat:
-        
-        description: "GitHub Personal Access Token for private repositories"
-        required: true
       
 
 permissions:
