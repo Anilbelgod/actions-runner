@@ -98,6 +98,10 @@ on:
         type: string
         description: 'The Github App Instance ID used for authentication when checking for deployment status'
         required: false
+      service-name:
+        type: string
+        description: 'service name for the deployment, used for SSM path and other purposes'
+        required: false 
     secrets:
       secret-outputs-passphrase:
         description: "Passphrase to encrypt/decrypt secret outputs with gpg. For more information [read](https://github.com/cloudposse/github-action-secret-outputs)"
@@ -231,11 +235,12 @@ jobs:
           yq -i eval '{"deployment": .}' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
           yq -i '.deployment.region = "${{ steps.environment.outputs.region }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
           yq -i '.deployment.app_name = "${{ inputs.app-name }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+          yq -i '.deployment.service-name = "${{ inputs.service-name }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
           yq -i '.deployment.config_app_name = "${{ steps.config-app-name.outputs.value }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
           yq -i '.deployment.branch_or_tag_name = "${{ inputs.ref }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
           yq -i '.deployment.namespace = "${{ steps.environment.outputs.namespace }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
           yq -i '.deployment.version = "${{ inputs.version }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-          
+
       - name: Merge input Helm values file with deploy Helm values file
         if: ${{ inputs.toolchain == 'helmfile' && inputs.helm-values-file != '' }}
         shell: bash
