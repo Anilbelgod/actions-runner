@@ -83,6 +83,10 @@ on:
         required: false
         type: boolean
         default: true
+      service-name:
+        description: "Service name for the deployment (if different from app-name)"
+        required: false
+        type: string
       # deployment-check-retry-count: #!CD
       #   type: string
       #   description: 'Check retry count (for synchronously mode)'
