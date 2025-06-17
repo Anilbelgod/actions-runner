@@ -1,4 +1,4 @@
-name: Deploy Atmos Pipeline
+name: apply Atmos Pipeline
 # This workflow is triggered on push to the ft-atmos-pipeline branch or manually via workflow_dispatch
 # It sets up the environment for Atmos, Terraform, Helm, and Node.js, and runs an Atmos Terraform plan command
 # It uses a self-hosted runner and checks out the code from the repository
@@ -37,9 +37,6 @@ jobs:
         with:
           atmos-version: 1.179.0
           install-wrapper: false    
-
-      - name: List all files in current path
-        run: ls
 
       - name: Atmos Terraform init
         id: atmos-init
