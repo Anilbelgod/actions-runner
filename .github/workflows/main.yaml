@@ -54,7 +54,7 @@ jobs:
         run: |
             helmfile --namespace gh-namespace \
             --environment dev \
-            --file "${{ github.workspace }}/actions/deploycd/app.yaml" \
+            --file "${{ github.workspace }}/actions/deploy-argocd/app.yaml" \
             --state-values-file "${{ github.workspace }}/actions/deploy-argocd/dev.yaml" \
             template \
             > ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
