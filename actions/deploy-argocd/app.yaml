@@ -2,6 +2,9 @@ repositories:
   # Cloud Posse incubator repo of helm charts
   - name: "cloudposse-incubator"
     url: "https://charts.cloudposse.com/incubator/"
+  - name: 'bedag'
+    url: 'https://bedag.github.io/helm-charts/' # Source - https://github.com/bedag/helm-charts/tree/master/charts/raw
+
   # The bedag/raw chart is no longer needed for this basic setup
   # and has been removed to simplify the configuration.
 
