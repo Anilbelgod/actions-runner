@@ -104,7 +104,6 @@ on:
         required: false 
       git-pat:
         type: string
-        
         description: "GitHub Personal Access Token for private repositories"
         required: true
       
