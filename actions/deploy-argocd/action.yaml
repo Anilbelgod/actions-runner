@@ -328,20 +328,26 @@ runs:
           git remote remove origin
           git remote set-url origin https://x-access-token:${{ inputs.github-pat }}@github.com/${{ github.repository }}.git
           
-
-
-          # Check if the branch exists remotely
-          if git ls-remote --heads origin main | grep main >/dev/null; then
-            git checkout main
+          # Checkout the branch
+          if git rev-parse --verify dev >/dev/null 2>&1; then
+            git checkout dev
           else
-            # Create the main branch if it doesn't exist
-            git checkout --orphan main
-            git reset --hard
-            git commit --allow-empty -m "Initial commit"
-            git push origin main
+            git checkout -b dev
           fi
-
           git pull --rebase || true
+
+          # # Check if the branch exists remotely
+          # if git ls-remote --heads origin main | grep main >/dev/null; then
+          #   git checkout main
+          # else
+          #   # Create the main branch if it doesn't exist
+          #   git checkout --orphan main
+          #   git reset --hard
+          #   git commit --allow-empty -m "Initial commit"
+          #   git push origin main
+          # fi
+
+          # git pull --rebase || true
 
           # Ensure the files are added to the correct directory
           mkdir -p plat/use1-dev/apps/cch-dev
