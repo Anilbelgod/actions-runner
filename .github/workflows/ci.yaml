@@ -93,25 +93,6 @@ jobs:
             false:
               value: ${{ inputs.config-app-name }}
 
-      # - name: Environment Info
-      #   uses: github-action-interface-environment@main
-      #   id: environment
-      #   with:
-      #     implementation_repository: carecloud/actions-private #! Not able to access action-private repo.
-      #     implementation_path: argocd-environments
-      #     implementation_ref: main
-      #     implementation_github_pat: ${{ secrets.github-private-actions-pat }}
-      #     environment: ${{ inputs.environment }}
-      #     namespace: ${{ inputs.environment }}
-      #     repository: ${{ inputs.repository }}
-      #     config-app-name: ${{ steps.config-app-name.outputs.value }}
-      #     tenant: ${{ inputs.tenant }}
-
-    # outputs:
-      # config-app-name: ${{ steps.config-app-name.outputs.value }}
-    #   environment: ${{ inputs.environment }}
-    #   # build-role: ${{ steps.environment.outputs.build-role }}
-
 
   build-image:
     runs-on: ["self-hosted"]

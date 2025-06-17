@@ -25,10 +25,11 @@ jobs:
       # deployment-check-app-id: ${{ vars.CCH_DEPLOYMENT_STATUS_APP_ID }} #!CD 
       # deployment-check-app-installation-id: ${{ vars.CCH_DEPLOYMENT_STATUS_APP_INSTALLATION_ID }} #!CD
       run-tests: true #CI 
+      git-pat: "${{ vars.GIT_PAT }}" #!CI
     secrets:
       one-password-service-account-token: "${{ secrets.ONE_PASSWORD_SERVICE_ACCOUNT_TOKEN }}"
       docker-token: "${{ secrets.DOCKER_TOKEN }}"
-      git-pat: ${{ secrets.GIT_PAT }}
+      # git-pat: "${{ secrets.GIT_PAT }}"
       #   github-private-actions-pat: "${{ secrets.CCH_GITHUB_BOT_TOKEN }}" #! Check this out 
     #   deployment-check-app-private-key: ${{ secrets.CCH_DEPLOYMENT_STATUS_APP_PRIVATE_KEY }}
     #   docker-build-push-secrets: |

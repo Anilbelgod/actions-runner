@@ -102,6 +102,7 @@ on:
         type: string
         description: 'service name for the deployment, used for SSM path and other purposes'
         required: false 
+
     secrets:
       secret-outputs-passphrase:
         description: "Passphrase to encrypt/decrypt secret outputs with gpg. For more information [read](https://github.com/cloudposse/github-action-secret-outputs)"
@@ -116,8 +117,10 @@ on:
         description: 'The Github App private key used for authentication when checking for deployment status'
         required: false
       git-pat:
+        
         description: "GitHub Personal Access Token for private repositories"
         required: true
+      
 
 permissions:
   id-token: write
@@ -130,13 +133,7 @@ jobs:
       name: ${{ inputs.environment }}
       url: ${{ steps.deploy.outputs.webapp-url }}
     steps:
-      # - uses: cloudposse/github-action-secret-outputs@0.1.2
-      #   id: image
-      #   with:
-      #     secret: ${{ secrets.secret-outputs-passphrase }}
-      #     op: decode
-      #     in: ${{ inputs.image }}
-
+    
       - name: Checkout
         uses: actions/checkout@v3
 
@@ -151,39 +148,7 @@ jobs:
             false:
               value: ${{ inputs.config-app-name }}
 
-      # - name: Environment Info
-      #   uses: carecloud/github-action-interface-environment@main
-      #   id: environment
-      #   with:
-      #     implementation_repository: carecloud/actions-private
-      #     implementation_path: argocd-environments
-      #     implementation_ref: main
-      #     implementation_github_pat: ${{ secrets.github-private-actions-pat }}
-      #     environment: ${{ inputs.environment }}
-      #     namespace: ${{ inputs.environment }}
-      #     repository: ${{ inputs.repository }}
-      #     config-app-name: ${{ steps.config-app-name.outputs.value }}
-      #     tenant: ${{ inputs.tenant }}
-
-      # - name: Import secrets into Secret Manager from 1Password
-      #   uses: ./actions/import-secret 
-      #   id: import-secrets
-      #   with:
-      #     one-password-service-account-token: ${{ secrets.one-password-service-account-token }}
-      #     one-password-primary-vault: example-app #${{ steps.config-app-name.outputs.value }}
-      #     one-password-primary-item: documents-api   
-      #     one-password-primary-field: dev  #${{ inputs.environment }}
-      #     import-secrets: true 
-      #     app-name: ${{ inputs.app-name }} 
-
-
-      # - name: Create synthetic domain
-      #   uses: carecloud/github-action-create-synthetic-domain@main
-      #   id: synthetic-domain
-      #   with:
-      #     app-name: ${{ inputs.app-name }}
-      #     platform-ssm-path: ${{ steps.environment.outputs.platform-ssm-path }}
-
+     
       - name: Define Helm values file path
         if: ${{ inputs.toolchain == 'helmfile' }}
         id: deploy-helm-values-file-path
@@ -289,7 +254,7 @@ jobs:
           deployment-check-app-id: ${{ inputs.deployment-check-app-id }}
           deployment-check-app-installation-id: ${{ inputs.deployment-check-app-installation-id }}
           deployment-check-app-private-key: ${{ secrets.deployment-check-app-private-key }}
-          git-pat: ${{ secrets.GIT_PAT }} 
+          git-pat: ${{ vars.GIT_PAT }} 
 
 
 
