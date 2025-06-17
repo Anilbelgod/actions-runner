@@ -184,7 +184,7 @@ jobs:
       # deployment-check-app-installation-id: ${{ inputs.deployment-check-app-installation-id }}
     secrets: 
       one-password-service-account-token: ${{ secrets.one-password-service-account-token }}
-      git-pat: "{{ secrets.GIT_PAT}}" 
+      git-pat: ${{ secrets.GIT_PAT}}
       # deployment-check-app-private-key: ${{ secrets.deployment-check-app-private-key }}
 
 
