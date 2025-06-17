@@ -6,7 +6,7 @@ terraform:
 components:
   terraform:
      google-storage-bucket:
-        vars: 
+        vars:
           namespace: cch
           tenant: plat
           stage: dev
