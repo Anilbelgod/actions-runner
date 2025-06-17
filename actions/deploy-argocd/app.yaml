@@ -74,3 +74,39 @@ releases:
           limits:
             memory: "512Mi"
             cpu: "500m"
+
+  - name: '{{ .Values.deployment.app_name }}-secrets'
+    chart: "bedag/raw"
+    version: "2.0.0"
+    wait: true
+    force: true
+    recreatePods: false
+    values:
+    # References https://external-secrets.io/v0.9.3
+      - resources:
+        - apiVersion: external-secrets.io/v1beta1
+          kind: ExternalSecret
+          metadata:
+            name: '{{ .Values.deployment.app_name }}'
+          spec:
+            refreshInterval: 60s # Rate SecretManager pulls the AWS SSM Parameter Store
+            secretStoreRef:
+              name: gcpsm-secret
+              kind: ClusterSecretStore
+            target:
+              name: '{{ .Values.deployment.app_name }}' # Name of the k8s Secret to be created
+              creationPolicy: Owner
+          {{ if hasKey .Values.deployment "envar_keys" }}
+            data:
+            {{- $service_secret_sm_attribute := .Values.deployment.service_name }}
+            {{- range $i, $envar_key := .Values.deployment.envar_keys }}
+              - secretKey: '{{ $envar_key }}'
+                remoteRef:
+                  key: '{{ .Values.deployment.appName }}-{{ $service_secret_sm_attribute }}-{{ $envar_key }}'
+            {{ end }}
+          {{- end }}
+
+
+
+
+          
