@@ -5,6 +5,10 @@ name: Atmos Plan Pipeline
 
 on:
   workflow_dispatch:
+  # Trigger on pull requests to the ft-atmos-pipeline branch
+  push:
+    branches:
+      - ft-atmos-pipeline
   pull_request:
       branches:
         - ft-atmos-pipeline
