@@ -8,6 +8,9 @@ on:
   push:
     branches:
       - ft-atmos-pipeline
+  pull_request:
+      branches:
+        - ft-atmos-pipeline
 
 jobs:
   atmos-plan:
