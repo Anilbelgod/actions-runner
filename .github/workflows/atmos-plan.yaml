@@ -10,7 +10,7 @@ on:
       - ft-atmos-pipeline
 
 jobs:
-  deploy-atmos:
+  atmos-plan:
     runs-on: ["self-hosted"]
     steps:
       - name: Checkout code
