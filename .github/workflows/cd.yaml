@@ -102,11 +102,6 @@ on:
         type: string
         description: 'service name for the deployment, used for SSM path and other purposes'
         required: false 
-      git-pat:
-        type: string
-        description: "GitHub Personal Access Token for private repositories"
-        required: true
-      
 
     secrets:
       secret-outputs-passphrase:
@@ -247,7 +242,6 @@ jobs:
           image: ${{ steps.image.outputs.out }}
           image-tag: ${{ inputs.image-tag }}
           operation: deploy
-          github-pat: ${{ secrets.github-private-actions-pat }}
           ref: ${{ github.sha }}
           debug: true
           deployment-check-retry-count: ${{ inputs.deployment-check-retry-count }}
@@ -255,7 +249,8 @@ jobs:
           deployment-check-app-id: ${{ inputs.deployment-check-app-id }}
           deployment-check-app-installation-id: ${{ inputs.deployment-check-app-installation-id }}
           deployment-check-app-private-key: ${{ secrets.deployment-check-app-private-key }}
-          git-pat: ${{ inputs.git-pat }} 
+          github-pat: ${{ secrets.github-private-actions-pat }}
+
 
 
 

@@ -115,6 +115,9 @@ on:
       docker-token:
         description: "The Docker token for authentication to the Docker registry"
         required: true 
+      git-pat:
+        description: "GitHub Personal Access Token for private repositories"
+        required: true
       
 
     #   github-private-actions-pat: #! TBD 
@@ -185,7 +188,7 @@ jobs:
       toolchain: ${{ inputs.toolchain }}
       helm-file-path: ${{ inputs.helm-file-path }}
       helm-values-file: ${{ inputs.helm-values-file }}
-      git-pat: ${{ inputs.git-pat }}
+      # git-pat: ${{ inputs.git-pat }}
 
       # dynamic-helm-values: ${{ needs.setup.outputs.dynamic-helm-values-yaml }}
       # deployment-check-retry-count: ${{ inputs.deployment-check-retry-count }}
@@ -194,7 +197,7 @@ jobs:
       # deployment-check-app-installation-id: ${{ inputs.deployment-check-app-installation-id }}
     secrets: 
       one-password-service-account-token: ${{ secrets.one-password-service-account-token }}
-      # git-pat: ${{ secrets.GIT_PAT }}
+      github-private-actions-pat: ${{ secrets.git-pat }}
       # deployment-check-app-private-key: ${{ secrets.deployment-check-app-private-key }}
 
 

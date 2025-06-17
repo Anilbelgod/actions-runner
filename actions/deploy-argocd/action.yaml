@@ -90,9 +90,10 @@ inputs:
   deployment-check-app-private-key:
     description: 'The Github App private key used for authentication when checking for deployment status'
     required: false
-  git-pat:
-    description: "GitHub Personal Access Token for private repositories"
+  github-pat:
+    description: Github PAT to access argocd configuration repository
     required: true
+
 
 outputs:
   webapp-url:
@@ -325,7 +326,7 @@ runs:
 
           # Set the remote URL with the token
           git remote remove origin
-          git remote add origin https://${{ secrets.git-pat }}@github.com/srinivasan-rajagopal/argocd-repo.git
+          git remote add origin https://x-access-token:${{ inputs.github-pat }}@github.com/srinivasan-rajagopal/argocd-repo.git
 
 
           # Check if the branch exists remotely
