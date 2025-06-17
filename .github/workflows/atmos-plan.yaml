@@ -47,3 +47,8 @@ jobs:
         id: atmos-plan
         run: |
           atmos terraform plan google-storage-bucket --stack plat-gbl-dev
+      - name: Atmos Terraform plan output
+        run: |
+          atmos terraform plan google-storage-bucket --stack plat-gbl-dev --output-file plan_output.json
+          cat plan_output.json
+          echo "Plan output saved to plan_output.json"
