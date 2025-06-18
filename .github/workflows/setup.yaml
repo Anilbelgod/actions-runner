@@ -196,14 +196,21 @@ jobs:
    uses: ./.github/workflows/deploy.yaml
    needs: [ cd ]
    with:
-     organization: ${{ inputs.organization }}
-     repository: ${{ inputs.repository }}
-     app-name: ${{ inputs.app-name }}
-     service-name: ${{ inputs.service-name }}
-     tenant: ${{ inputs.tenant }}
-     ar-region: ${{ inputs.ar-region }}
-     registry: ${{ inputs.registry }}
-     toolchain: ${{ inputs.toolchain }}
-     helm-file-path: ${{ inputs.helm-file-path }}
-     helm-values-file: ${{ inputs.helm-values-file }}
-     run-tests: ${{ inputs.run-tests }}
+      version: 2.0 #${{ needs.ci.outputs.version }}
+      image: test #${{ needs.ci.outputs.image }}
+      image-tag: latest #${{ needs.ci.outputs.image-tag }}
+      organization: ${{ inputs.organization }}
+      repository: ${{ inputs.repository }}
+      app-name: ${{ inputs.app-name }}
+      service-name: ${{ inputs.service-name }} 
+      # vanity-domain: ${{ inputs.vanity-domain }}
+      environment: dev
+      synchronously: true
+      tenant: ${{ inputs.tenant }}
+      toolchain: ${{ inputs.toolchain }}
+      helm-file-path: ${{ inputs.helm-file-path }}
+      helm-values-file: ${{ inputs.helm-values-file }}
+   secrets: 
+      one-password-service-account-token: ${{ secrets.one-password-service-account-token }}
+      github-private-actions-pat: ${{ secrets.github-private-actions-pat }}
+      # deployment-check-app-private-key: ${{ secrets.deployment-check-app-private-key }}
