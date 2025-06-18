@@ -108,9 +108,6 @@ on:
       one-password-service-account-token:
         description: "The 1Password service acount token"
         required: true
-      docker-token:
-        description: "The Docker token for authentication to the Docker registry"
-        required: true 
       github-private-actions-pat:
         description: "GitHub Personal Access Token for private repositories"
         required: true
