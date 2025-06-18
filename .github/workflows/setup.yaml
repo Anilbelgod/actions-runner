@@ -87,10 +87,6 @@ on:
         description: "Service name for the deployment (if different from app-name)"
         required: false
         type: string
-      git-pat:
-        type: string
-        description: "GitHub Personal Access Token for private repositories"
-        required: true
       # deployment-check-retry-count: #!CD
       #   type: string
       #   description: 'Check retry count (for synchronously mode)'
@@ -115,7 +111,7 @@ on:
       docker-token:
         description: "The Docker token for authentication to the Docker registry"
         required: true 
-      git-pat:
+      github-private-actions-pat:
         description: "GitHub Personal Access Token for private repositories"
         required: true
       
@@ -184,7 +180,7 @@ jobs:
       toolchain: ${{ inputs.toolchain }}
       helm-file-path: ${{ inputs.helm-file-path }}
       helm-values-file: ${{ inputs.helm-values-file }}
-      # git-pat: ${{ inputs.git-pat }}
+      git-pat: ${{ inputs.git-pat }}
 
       # dynamic-helm-values: ${{ needs.setup.outputs.dynamic-helm-values-yaml }}
       # deployment-check-retry-count: ${{ inputs.deployment-check-retry-count }}
