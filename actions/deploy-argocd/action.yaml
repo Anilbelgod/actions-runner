@@ -332,7 +332,7 @@ runs:
           # Set the remote URL with the token
           pushd ./${{ steps.destination_dir.outputs.name }}
           
-          git reset --hard origin/${{ steps.destination.outputs.ref }}
+          git reset --hard origin/dev
           git pull --rebase
           
           popd
