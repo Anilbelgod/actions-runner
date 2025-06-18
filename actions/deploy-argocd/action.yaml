@@ -149,7 +149,7 @@ runs:
       with:
         repository: ${{ steps.destination.outputs.owner }}/${{ steps.destination.outputs.name }}
         ref: ${{ steps.destination.outputs.ref }}
-        token: ${{ inputs.git-pat }}
+        token: ${{ inputs.github-pat }}
         path: ${{ steps.destination_dir.outputs.name }}
 
     # - name: Read service context
