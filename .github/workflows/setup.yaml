@@ -134,8 +134,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # setup:
-  #   runs-on: self-hosted
+  setup:
+    runs-on: self-hosted
     # steps:
       # - name: Convert Dynamic Helm Values JSON to YAML
       #   uses: carecloud/github-action-convert-json-to-yaml@main
