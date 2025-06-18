@@ -235,35 +235,35 @@ jobs:
         run: |
           cat ${{ runner.temp }}/deploy-helm-values.yaml
       
-      - name: Deploy
-        uses: ./actions/deploy-argocd
-        id: deploy
-        with:
-          toolchain: ${{ inputs.toolchain }}
-          synchronously: ${{ inputs.synchronously }}
-          helm-file-path: ${{ inputs.helm-file-path }}
-          # Github Syntax of Ternary Operator https://github.com/actions/runner/issues/409#issuecomment-752775072
-          # ${{ condition && 'ifTrue' || 'ifFalse'  }}
-          helm-values-file: ${{ inputs.toolchain == 'helmfile' && steps.deploy-helm-values-file-path.outputs.deploy || format(inputs.helm-values-file, steps.environment.outputs.name) }}
-          repository: ${{ inputs.organization }}/${{ inputs.repository }}
-          app-name: ${{ inputs.app-name }}
-          service-config-ssm-path: ${{ steps.environment.outputs.service-config-ssm-path }}
-          platform-ssm-path: ${{ steps.environment.outputs.platform-ssm-path }}
-          region: ${{ steps.environment.outputs.region }}
-          cluster: ${{ steps.environment.outputs.cluster }}
-          environment: ${{ steps.environment.outputs.name }}
-          namespace: ${{ steps.environment.outputs.namespace }}
-          image: ${{ steps.image.outputs.out }}
-          image-tag: ${{ inputs.image-tag }}
-          operation: deploy
-          ref: ${{ github.sha }}
-          debug: true
-          deployment-check-retry-count: ${{ inputs.deployment-check-retry-count }}
-          deployment-check-retry-interval: ${{ inputs.deployment-check-retry-interval }}
-          deployment-check-app-id: ${{ inputs.deployment-check-app-id }}
-          deployment-check-app-installation-id: ${{ inputs.deployment-check-app-installation-id }}
-          deployment-check-app-private-key: ${{ secrets.deployment-check-app-private-key }}
-          github-pat: ${{ secrets.github-private-actions-pat }}
+      # - name: Deploy
+      #   uses: ./actions/deploy-argocd
+      #   id: deploy
+      #   with:
+      #     toolchain: ${{ inputs.toolchain }}
+      #     synchronously: ${{ inputs.synchronously }}
+      #     helm-file-path: ${{ inputs.helm-file-path }}
+      #     # Github Syntax of Ternary Operator https://github.com/actions/runner/issues/409#issuecomment-752775072
+      #     # ${{ condition && 'ifTrue' || 'ifFalse'  }}
+      #     helm-values-file: ${{ inputs.toolchain == 'helmfile' && steps.deploy-helm-values-file-path.outputs.deploy || format(inputs.helm-values-file, steps.environment.outputs.name) }}
+      #     repository: ${{ inputs.organization }}/${{ inputs.repository }}
+      #     app-name: ${{ inputs.app-name }}
+      #     service-config-ssm-path: ${{ steps.environment.outputs.service-config-ssm-path }}
+      #     platform-ssm-path: ${{ steps.environment.outputs.platform-ssm-path }}
+      #     region: ${{ steps.environment.outputs.region }}
+      #     cluster: ${{ steps.environment.outputs.cluster }}
+      #     environment: ${{ steps.environment.outputs.name }}
+      #     namespace: ${{ steps.environment.outputs.namespace }}
+      #     image: ${{ steps.image.outputs.out }}
+      #     image-tag: ${{ inputs.image-tag }}
+      #     operation: deploy
+      #     ref: ${{ github.sha }}
+      #     debug: true
+      #     deployment-check-retry-count: ${{ inputs.deployment-check-retry-count }}
+      #     deployment-check-retry-interval: ${{ inputs.deployment-check-retry-interval }}
+      #     deployment-check-app-id: ${{ inputs.deployment-check-app-id }}
+      #     deployment-check-app-installation-id: ${{ inputs.deployment-check-app-installation-id }}
+      #     deployment-check-app-private-key: ${{ secrets.deployment-check-app-private-key }}
+      #     github-pat: ${{ secrets.github-private-actions-pat }}
 
 
 
