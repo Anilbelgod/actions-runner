@@ -144,18 +144,32 @@ jobs:
               value: ${{ inputs.app-name }}
             false:
               value: ${{ inputs.config-app-name }}
+      
+      # - name: Environment Info
+      #   uses: carecloud/github-action-interface-environment@main
+      #   id: environment
+      #   with:
+      #     implementation_repository: carecloud/actions-private
+      #     implementation_path: argocd-environments
+      #     implementation_ref: main
+      #     implementation_github_pat: ${{ secrets.github-private-actions-pat }}
+      #     environment: ${{ inputs.environment }}
+      #     namespace: ${{ inputs.environment }}
+      #     repository: ${{ inputs.repository }}
+      #     config-app-name: ${{ steps.config-app-name.outputs.value }}
+      #     tenant: ${{ inputs.tenant }}
   
 
-      # - name: Import secrets into Secret Manager from 1PasswordAdd commentMore actions
-      #   uses: ./actions/import-secret 
-      #   id: import-secrets
-      #   with:
-      #     one-password-service-account-token: ${{ secrets.one-password-service-account-token }}
-      #     one-password-primary-vault: example-app 
-      #     one-password-primary-item: documents-api   
-      #     one-password-primary-field: dev 
-      #     import-secrets: true 
-      #     app-name: ${{ inputs.app-name }} 
+      - name: Import secrets into Secret Manager from 1PasswordAdd commentMore actions
+        uses: ./actions/import-secret 
+        id: import-secrets
+        with:
+          one-password-service-account-token: ${{ secrets.one-password-service-account-token }}
+          one-password-primary-vault: example-app 
+          one-password-primary-item: documents-api   
+          one-password-primary-field: dev 
+          import-secrets: true 
+          app-name: ${{ inputs.app-name }} 
 
      
       - name: Define Helm values file path
