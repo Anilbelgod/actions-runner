@@ -319,7 +319,7 @@ runs:
     - name: Push to GitHub
       shell: bash
       env: 
-        GITHUB_TOKEN: ${{ inputs.github-pat }}
+        GITHUB_TOKEN: ${{ secrets.GIT_PAT }}
       run: |
           set -e
 
