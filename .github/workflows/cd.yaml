@@ -118,13 +118,14 @@ on:
         required: false
       
 
-permissions:
-  id-token: write
-  contents: write 
+
 
 jobs:
   deploy:
+    permissions:
+      contents: write
     runs-on: ["self-hosted"]
+
     environment:
       name: ${{ inputs.environment }}
       url: ${{ steps.deploy.outputs.webapp-url }}
