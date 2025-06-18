@@ -129,7 +129,7 @@ runs:
     - id: destination
       uses: theowenyoung/git-url-parse@v1
       with:
-        url: "https://github.com/srinivasan-rajagopal/argocd-repo/blob/main/plat/use1-dev/apps" # {{ inputs.cluster}}
+        url: "https://github.com/srinivasan-rajagopal/argocd-repo/blob/main/plat/use1-dev/apps/cch-dev" # {{ inputs.cluster}}
 
     - id: destination_dir
       shell: bash
@@ -141,8 +141,8 @@ runs:
       uses: cloudposse/github-action-yaml-config-query@0.1.3
       with:
         config: |-
-          tmp: ./tmp/${{ steps.destination.outputs.filepath }}/${{ inputs.namespace }}/${{ inputs.app-name }}
-          path: ${{ steps.destination.outputs.filepath }}/${{ inputs.namespace }}/${{ inputs.app-name }}
+          tmp: ./tmp/${{ steps.destination.outputs.filepath }}/${{ inputs.app-name }}
+          path: ${{ steps.destination.outputs.filepath }}/${{ inputs.app-name }}
 
     - name: Checkout Argo Configuration
       uses: actions/checkout@v2
