@@ -105,7 +105,6 @@ outputs:
 
 
 runs:
-
   using: "composite"
   steps:
     - name: Setup yq
