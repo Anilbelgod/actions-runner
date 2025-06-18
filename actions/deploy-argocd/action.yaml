@@ -317,6 +317,9 @@ runs:
 
     - name: Push to GitHub
       shell: bash
+      env: 
+        GIT_TRACE: 1
+        GIT_CURL_VERBOSE: 1
       run: |
           set -e
 
@@ -361,7 +364,7 @@ runs:
           # Commit and push changes
           git status
           git diff-index --quiet HEAD || git commit -m "Add config.yaml and resources.yaml to plat/use1-dev/apps/cch-dev"
-          GIT_TRACE: 1 GIT_CURL_VERBOSE: 1 git push origin HEAD:dev 
+          git push origin HEAD:dev 
 
           # Output the latest commit SHA
           echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
