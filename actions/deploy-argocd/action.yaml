@@ -103,6 +103,7 @@ outputs:
     description: "Git commit SHA into argocd repo"
     value: ${{ steps.git.outputs.sha }}
 
+
 runs:
   using: "composite"
   steps:
@@ -318,8 +319,7 @@ runs:
     - name: Push to GitHub
       shell: bash
       env: 
-        GIT_TRACE: 1
-        GIT_CURL_VERBOSE: 1
+        GITHUB_TOKEN: ${{ inputs.github-pat }}
       run: |
           set -e
 
@@ -328,7 +328,7 @@ runs:
           git config --global user.name "srinivasan-rajagopal"
 
           # Set the remote URL with the token
-          git remote set-url origin https://x-access-token:${{ inputs.github-pat }}@github.com/srinivasan-rajagopal/argocd-repo.git
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/srinivasan-rajagopal/argocd-repo.git
           
           # Checkout the branch
           if git rev-parse --verify dev >/dev/null 2>&1; then
@@ -384,10 +384,8 @@ runs:
         app-private-key: ${{ inputs.deployment-check-app-private-key }}
         token: ${{ inputs.github-pat }}
         check-retry-count: ${{ inputs.deployment-check-retry-count }}
+
         check-retry-interval: ${{ inputs.deployment-check-retry-interval }}
-
-
-
 
 
 
