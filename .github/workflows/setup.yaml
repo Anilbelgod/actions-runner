@@ -149,6 +149,7 @@ jobs:
         run: echo "dynamic-helm-values-yaml=${{ steps.convert-dynamic-helm-values.outputs.yaml }}" >> $GITHUB_ENV
 
   ci: 
+    needs: [ setup ]
     uses: ./.github/workflows/ci.yaml
     with:
           organization: ${{ inputs.organization }}
