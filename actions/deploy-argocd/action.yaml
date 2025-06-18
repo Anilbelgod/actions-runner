@@ -206,11 +206,11 @@ runs:
             kube_version: --kube-version=${{ steps.metadata.outputs.kube_version }}      
 
 
-    # - name: Ensure argocd repo structure
-    #   if: ${{ inputs.operation == 'deploy' }}
-    #   shell: bash
-    #   run: |
-    #     mkdir -p $GITHUB_WORKSPACE/manifests
+    - name: Ensure argocd repo structure
+      if: ${{ inputs.operation == 'deploy' }}
+      shell: bash
+      run: |
+        mkdir -p $GITHUB_WORKSPACE/manifests
 
     - name: Read values file
       id: helm-values-file
