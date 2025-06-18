@@ -46,27 +46,19 @@ on:
         required: false
         type: string
     secrets:
-       docker-token:
-        description: "Docker token"
-        required: true
-
-
-      #   github-private-actions-pat:
-      #     description: "Github PAT allow to pull private repos"
-      #     required: true
-      #   docker-build-push-secrets:
-      #   description: "The secrets for authorizing access to private repos for a docker build"
-      #   required: false      
-    # outputs:
-    #   image:
-    #     description: "Docker Image"
-    #     value: ${{ jobs.build-image.outputs.image }}
-    #   image-tag:
-    #     description: "Docker image tag"
-    #     value: ${{ jobs.build-image.outputs.image-tag }}
-    #   version:
-    #     description: "The verion of the app"
-    #     value: ${{ jobs.build-image.outputs.version }}
+        github-private-actions-pat:
+          description: "Github PAT allow to pull private repos"
+          required: false      
+    outputs:
+      image:
+        description: "Docker Image"
+        value: ${{ jobs.build-image.outputs.image }}
+      image-tag:
+        description: "Docker image tag"
+        value: ${{ jobs.build-image.outputs.image-tag }}
+      version:
+        description: "The verion of the app"
+        value: ${{ jobs.build-image.outputs.version }}
 
 permissions:
   id-token: write
