@@ -319,9 +319,6 @@ runs:
 
     - name: Push to GitHub
       shell: bash
-      env: 
-        GIT_TRACE: 1
-        GIT_CURL_VERBOSE: 1
       run: |
           set -e
           # Configure Git
