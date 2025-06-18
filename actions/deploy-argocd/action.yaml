@@ -325,8 +325,7 @@ runs:
           git config --global user.name "srinivasan-rajagopal"
 
           # Set the remote URL with the token
-          # git remote set-url origin https://x-access-token:${{ inputs.github-pat }}@github.com/srinivasan-rajagopal/argocd-repo.git
-          git remote set-url origin https://github.com/srinivasan-rajagopal/argocd-repo.git
+          git remote set-url origin https://x-access-token:${{ inputs.github-pat }}@github.com/srinivasan-rajagopal/argocd-repo.git
           # Checkout the branch
           if git rev-parse --verify dev >/dev/null 2>&1; then
             git checkout dev
