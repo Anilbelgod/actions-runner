@@ -180,7 +180,6 @@ jobs:
       toolchain: ${{ inputs.toolchain }}
       helm-file-path: ${{ inputs.helm-file-path }}
       helm-values-file: ${{ inputs.helm-values-file }}
-      git-pat: ${{ inputs.git-pat }}
 
       # dynamic-helm-values: ${{ needs.setup.outputs.dynamic-helm-values-yaml }}
       # deployment-check-retry-count: ${{ inputs.deployment-check-retry-count }}
@@ -189,7 +188,7 @@ jobs:
       # deployment-check-app-installation-id: ${{ inputs.deployment-check-app-installation-id }}
     secrets: 
       one-password-service-account-token: ${{ secrets.one-password-service-account-token }}
-      github-private-actions-pat: ${{ secrets.git-pat }}
+      github-private-actions-pat: ${{ secrets.github-private-actions-pat }}
       # deployment-check-app-private-key: ${{ secrets.deployment-check-app-private-key }}
 
 
