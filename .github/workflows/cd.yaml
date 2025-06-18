@@ -209,6 +209,7 @@ jobs:
           contents: ${{ steps.import-secrets.outputs.envar-keys }}
           write-mode: overwrite
      
+      #! Testing step
       # - name: Read dev.yaml contents
       #   id: read-dev-yaml
       #   run: |
@@ -216,7 +217,7 @@ jobs:
       #     echo "CONTENT<<EOF" >> $GITHUB_ENV
       #     echo "$CONTENT" >> $GITHUB_ENV
       #     echo "EOF" >> $GITHUB_ENV
-
+      #! Testing step
       # - name: Create deploy Helm values file
       #   if: ${{ inputs.toolchain == 'helmfile' }}
       #   uses: DamianReeves/write-file-action@master
