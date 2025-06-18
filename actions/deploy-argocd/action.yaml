@@ -51,7 +51,7 @@ inputs:
   namespace:
     description: Kubernetes namespace
     required: true
-    default: "gh-namespace"
+    default: "cch-dev"
   app-name:
     description: Application name
     required: true
@@ -129,7 +129,7 @@ runs:
     - id: destination
       uses: theowenyoung/git-url-parse@v1
       with:
-        url: "https://github.com/srinivasan-rajagopal/argocd-repo" # {{ inputs.cluster}}
+        url: "https://github.com/srinivasan-rajagopal/argocd-repo/blob/main/plat/use1-dev/apps/cch-dev" # {{ inputs.cluster}}
 
     - id: destination_dir
       shell: bash
