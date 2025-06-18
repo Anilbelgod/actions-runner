@@ -144,13 +144,13 @@ runs:
           tmp: ./tmp/${{ inputs.namespace }}/${{ inputs.app-name }}
           path: ${{ inputs.namespace }}/${{ inputs.app-name }}
 
-    # - name: Checkout Argo Configuration
-    #   uses: actions/checkout@v2
-    #   with:
-    #     repository: ${{ steps.destination.outputs.owner }}/${{ steps.destination.outputs.name }}
-    #     ref: ${{ steps.destination.outputs.ref }}
-    #     token: ${{ inputs.git-pat }}
-    #     path: ${{ steps.destination_dir.outputs.name }}
+    - name: Checkout Argo Configuration
+      uses: actions/checkout@v2
+      with:
+        repository: ${{ steps.destination.outputs.owner }}/${{ steps.destination.outputs.name }}
+        ref: ${{ steps.destination.outputs.ref }}
+        token: ${{ inputs.git-pat }}
+        path: ${{ steps.destination_dir.outputs.name }}
 
     # - name: Read service context
     #   uses: docker://public.ecr.aws/u3q6g8t1/chamber:2.10.12
@@ -317,43 +317,52 @@ runs:
     
 
     - name: Push to GitHub
-      shell: bash
-      run: |
+      uses: nick-fields/retry@v2
+      id: git
+      with:
+        timeout_minutes: 1
+        max_attempts: 100
+        shell: bash
+        command: |-
           set -e
           # Configure Git
-          git config --global user.email "srinivasan.rajagopal@66degrees.com"
-          git config --global user.name "srinivasan-rajagopal"
+          git config --global user.email "bot@example.com"
+          git config --global user.name "cloudpossebot"
 
           # Set the remote URL with the token
-          git remote set-url origin https://x-access-token:${{ inputs.github-pat }}@github.com/srinivasan-rajagopal/argocd-repo.git
-          # Checkout the branch
-          if git rev-parse --verify dev >/dev/null 2>&1; then
-            git checkout dev
-          else
-            git checkout -b dev
-          fi
-
-          git stash 
-          git pull --rebase || true
-
-
-          # Ensure the files are added to the correct directory
-          mkdir -p plat/use1-dev/apps/cch-dev
-
-          # Copy the files from their respective locations
-          cp $GITHUB_WORKSPACE/manifests/resources.yaml plat/use1-dev/apps/cch-dev/resources.yaml
-          cp ${{ steps.config.outputs.tmp }}/config.yaml plat/use1-dev/apps/cch-dev/config.yaml
-
-          # Add the files to Git
-          git add plat/use1-dev/apps/cch-dev/config.yaml plat/use1-dev/apps/cch-dev/resources.yaml
-
-          # Commit and push changes
+          pushd ./${{ steps.destination_dir.outputs.name }}
+          
+          git reset --hard origin/${{ steps.destination.outputs.ref }}
+          git pull --rebase
+          
+          popd
+          
+          case '${{ inputs.operation }}' in
+        
+            deploy)
+              cp -r ./tmp/* ./${{ steps.destination_dir.outputs.name }}/
+            ;;
+          
+            destroy)
+              rm -rf ./${{ steps.destination_dir.outputs.name }}/${{ steps.config.outputs.path }}
+            ;;
+          
+            *)
+              echo "Operation should be `deploy` or `destroy`"
+              exit 1;
+            ;;
+          esac          
+          
+          pushd ./${{ steps.destination_dir.outputs.name }}
+          
+          git add -A
           git status
-          git diff-index --quiet HEAD || git commit -m "Add config.yaml and resources.yaml to plat/use1-dev/apps/cch-dev"
-          git push origin HEAD:dev 
+          git diff-index --quiet HEAD || git commit -m "Deploy ${{ github.repository }} SHA ${{ github.sha }} RUN ${{ github.run_id }} ATEMPT ${{ github.run_attempt }}"
+          git push origin ${{ steps.destination.outputs.ref }}
 
-          # Output the latest commit SHA
           echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+          
+          popd
 
     - uses: carecloud/github-action-wait-commit-status@main
       if: ${{ inputs.synchronously == 'true' && inputs.operation == 'deploy' }}

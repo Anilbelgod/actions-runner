@@ -1,7 +1,10 @@
+name: |-
+  CD 
+  ```
 
 on:
   workflow_call:
-     inputs:
+    inputs:
       version:
         description: "Version to deploy"
         required: true
@@ -99,7 +102,8 @@ on:
         type: string
         description: 'service name for the deployment, used for SSM path and other purposes'
         required: false 
-     secrets:
+
+    secrets:
       secret-outputs-passphrase:
         description: "Passphrase to encrypt/decrypt secret outputs with gpg. For more information [read](https://github.com/cloudposse/github-action-secret-outputs)"
         required: false
@@ -117,17 +121,123 @@ on:
 
 
 jobs:
-  release:
+  deploy:
     permissions:
       contents: write
-    runs-on: self-hosted
+    runs-on: ["self-hosted"]
+
+    environment:
+      name: ${{ inputs.environment }}
+      url: ${{ steps.deploy.outputs.webapp-url }}
     steps:
+    
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Determine the application name for configuration purposes
+        id: config-app-name
+        uses: cloudposse/github-action-yaml-config-query@0.1.2
+        with:
+          query: .${{ inputs.config-app-name == '' }}
+          config: |
+            true:
+              value: ${{ inputs.app-name }}
+            false:
+              value: ${{ inputs.config-app-name }}
+  
+
+      # - name: Import secrets into Secret Manager from 1PasswordAdd commentMore actions
+      #   uses: ./actions/import-secret 
+      #   id: import-secrets
+      #   with:
+      #     one-password-service-account-token: ${{ secrets.one-password-service-account-token }}
+      #     one-password-primary-vault: example-app 
+      #     one-password-primary-item: documents-api   
+      #     one-password-primary-field: dev 
+      #     import-secrets: true 
+      #     app-name: ${{ inputs.app-name }} 
+
+     
+      - name: Define Helm values file path
+        if: ${{ inputs.toolchain == 'helmfile' }}
+        id: deploy-helm-values-file-path
+        shell: bash
+        run: |
+          echo '::set-output name=deploy::${{ runner.temp }}/deploy-helm-values.yaml'
+
+      - name: Setup yq
+        if: ${{ inputs.toolchain == 'helmfile' }}
+        uses: dcarbone/install-yq-action@v1.1.0
+        with:
+          version: v4.35.1
+          download-compressed: true
+          force: true
+
+      # - name: Create deploy Helm values file
+      #   if: ${{ inputs.toolchain == 'helmfile' }}
+      #   uses: DamianReeves/write-file-action@master
+      #   with:
+      #     path: ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+      #     contents: {{ github.workspace }}/deploy/values/dev.yaml
+      #     write-mode: overwrite
+     
+      - name: Read dev.yaml contents
+        id: read-dev-yaml
+        run: |
+          CONTENT=$(cat $GITHUB_WORKSPACE/deploy/values/dev.yaml)
+          echo "CONTENT<<EOF" >> $GITHUB_ENV
+          echo "$CONTENT" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Create deploy Helm values file
+        if: ${{ inputs.toolchain == 'helmfile' }}
+        uses: DamianReeves/write-file-action@master
+        with:
+          path: ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+          contents: ${{ env.CONTENT }}
+          write-mode: overwrite
+
+      - name: Display Deploy Helm Values File
+        if: ${{ inputs.toolchain == 'helmfile' }}
+        run: |
+          cat ${{ runner.temp }}/deploy-helm-values.yaml
+
+      - name: Update deploy Helm values file
+        if: ${{ inputs.toolchain == 'helmfile' }}
+        shell: bash
+        run: |
+          yq -i eval '{"envar_keys": .}' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+          yq -i eval '{"deployment": .}' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+          yq -i '.deployment.region = "${{ steps.environment.outputs.region }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+          yq -i '.deployment.app_name = "${{ inputs.app-name }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+          yq -i '.deployment.service-name = "${{ inputs.service-name }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+          yq -i '.deployment.config_app_name = "${{ steps.config-app-name.outputs.value }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+          yq -i '.deployment.branch_or_tag_name = "${{ inputs.ref }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+          yq -i '.deployment.namespace = "${{ steps.environment.outputs.namespace }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+          yq -i '.deployment.version = "${{ inputs.version }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+
+      - name: Merge input Helm values file with deploy Helm values file
+        if: ${{ inputs.toolchain == 'helmfile' && inputs.helm-values-file != '' }}
+        shell: bash
+        run: |
+          yq -i '.deployment.repo_values |= load("${{ format(inputs.helm-values-file, steps.environment.outputs.name) }}")' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+
+      - name: Merge dynamic Helm values with deploy Helm values file
+        if: ${{ inputs.toolchain == 'helmfile' && inputs.dynamic-helm-values != '' }}
+        shell: bash
+        run: |
+          export dynamic_values="${{ inputs.dynamic-helm-values }}"
+
+          yq -i '.deployment.dynamic_values |= env(dynamic_values)' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+
+      - name: Display Deploy Helm Values File
+        if: ${{ inputs.toolchain == 'helmfile' }}
+        run: |
+          cat ${{ runner.temp }}/deploy-helm-values.yaml
+      
       - name: Deploy
         uses: ./actions/deploy-argocd
         id: deploy
-      
         with:
           toolchain: ${{ inputs.toolchain }}
           synchronously: ${{ inputs.synchronously }}
