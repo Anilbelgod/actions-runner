@@ -122,9 +122,12 @@ jobs:
       contents: write
     runs-on: self-hosted
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Deploy
         uses: ./actions/deploy-argocd
         id: deploy
+      
         with:
           toolchain: ${{ inputs.toolchain }}
           synchronously: ${{ inputs.synchronously }}
