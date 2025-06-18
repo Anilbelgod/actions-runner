@@ -124,7 +124,7 @@ jobs:
         uses: jayz-66/github-action-docker-build-push@main
         with:
           organization: ${{ steps.change-string-case-organization.outputs.lowercase }}
-          repository: "example-app" #${{ needs.setup.outputs.config-app-name }}
+          repository: ${{ inputs.app-name }}
           registry: ${{ inputs.registry }}
           secrets: ${{ secrets.docker-build-push-secrets }}
           docker-metadata-pr-head-sha: true

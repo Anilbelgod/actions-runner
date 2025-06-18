@@ -272,16 +272,16 @@ runs:
         IMAGE_NAME: ${{ inputs.image }}
         IMAGE_TAG: ${{ inputs.image-tag }}
 
-    # - name: Get Webapp
-    #   if: ${{ inputs.operation == 'deploy' }}
-    #   id: result
-    #   shell: bash
-    #   run: |-
-    #     WEBAPP_URL=$( \
-    #       yq eval-all '.metadata.annotations["outputs.platform.cloudposse.com/webapp-url"] | select(. != null)' \
-    #         ${{ steps.config.outputs.tmp }}/manifests/resources.yaml \
-    #     )
-    #     echo "webapp_url=${WEBAPP_URL}" >> $GITHUB_OUTPUT
+    - name: Get Webapp
+      if: ${{ inputs.operation == 'deploy' }}
+      id: result
+      shell: bash
+      run: |-
+        WEBAPP_URL=$( \
+          yq eval-all '.metadata.annotations["outputs.platform.cloudposse.com/webapp-url"] | select(. != null)' \
+            ${{ steps.config.outputs.tmp }}/manifests/resources.yaml \
+        )
+        echo "webapp_url=${WEBAPP_URL}" >> $GITHUB_OUTPUT
 
     - name: Deplicated Ref
       if: ${{ inputs.operation == 'deploy' }}
