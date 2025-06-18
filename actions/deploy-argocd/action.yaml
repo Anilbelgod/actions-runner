@@ -105,6 +105,7 @@ outputs:
 
 
 runs:
+
   using: "composite"
   steps:
     - name: Setup yq
@@ -319,16 +320,16 @@ runs:
     - name: Push to GitHub
       shell: bash
       env: 
-        GITHUB_TOKEN: ${{ secrets.GIT_PAT }}
+        GIT_TRACE: 1
+        GIT_CURL_VERBOSE: 1
       run: |
           set -e
-
           # Configure Git
           git config --global user.email "srinivasan.rajagopal@66degrees.com"
           git config --global user.name "srinivasan-rajagopal"
 
           # Set the remote URL with the token
-          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/srinivasan-rajagopal/argocd-repo.git
+          git remote set-url origin https://x-access-token:${{ inputs.github-pat }}@github.com/srinivasan-rajagopal/argocd-repo.git
           
           # Checkout the branch
           if git rev-parse --verify dev >/dev/null 2>&1; then
