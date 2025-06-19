@@ -305,7 +305,7 @@ runs:
           app_repository: ${{ inputs.repository }}
           app_commit: ${{ steps.ref.outputs.value }}
           app_hostname: ${{ steps.result.outputs.webapp_url }}
-          name: ${{ inputs.namespace }}.${{ inputs.app-name }}
+          name: ${{ inputs.app-name }}
           namespace: ${{ inputs.namespace }}
           manifests: ${{ steps.config.outputs.path }}/manifests
     
