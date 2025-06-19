@@ -246,9 +246,9 @@ runs:
           template \
           --args="${{ steps.arguments.outputs.kube_version }}" \
           > ${{ steps.config.outputs.tmp }}/manifests/resources.yaml
-      # env:
-      #   IMAGE_NAME: ${{ inputs.image }}
-      #   IMAGE_TAG: ${{ inputs.image-tag }}
+      env:
+        IMAGE_NAME: ${{ inputs.image }}
+        IMAGE_TAG: ${{ inputs.image-tag }}
 
     - name: Helm raw render
       if: ${{ inputs.toolchain == 'helm' && inputs.operation == 'deploy' }}
