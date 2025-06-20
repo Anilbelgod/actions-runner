@@ -6,7 +6,6 @@ DELETE_ALL="$3"
 DELETE_ALL_EXCEPT_KEYS="$4"   # Path to file with keys like: - region
 TEMP_SECRETS_FILE="$5"        # Path to file with full secret names
 
-GCS_BUCKET_PATH="gs://cch-cicd-test-bucket/temp"
 
 gcloud secrets list \
 --filter="name~'service-${APP_NAME}-secret-${ENVIRONMENT}-.*'" \
