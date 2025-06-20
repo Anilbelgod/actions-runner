@@ -3,18 +3,18 @@ name: "Export secrets from GCP Secrets Manager"
 description: "Export secrets from GCP Secrets Manager to temporary secrets file" 
 
 inputs:
-  secrets-file:
-    description: "The path to the secrets file in the repository"
-    required: true
   app-name:
     description: "The name of the application"
     required: true 
-  service-name:
-    description: "The name of the service to update secrets for"
+  environment:
+    description: "The environment (e.g., dev, staging, prod)"
     required: true
   vault-env-keys:
     description: "The environment variable keys to be used for the vault secrets"
     required: true 
+  secrets-file:
+    description: "The path to the secrets file in the repository"
+    required: true
 
 runs:
   using: "composite"
@@ -27,4 +27,4 @@ runs:
     - name: Run main script
       shell: bash
       run: | 
-       ${{ github.action_path }}/main.sh ${{ inputs.secrets-file }} ${{ inputs.app-name }} ${{ inputs.service-name }} ${{ inputs.vault-env-keys }}
+       ${{ github.action_path }}/main.sh ${{ inputs.app-name }} ${{ inputs.environment }} ${{ inputs.vault-env-keys }} ${{ inputs.secrets-file }}
