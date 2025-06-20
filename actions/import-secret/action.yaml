@@ -109,7 +109,7 @@ runs:
         app-name: ${{ inputs.one-password-primary-item }}
         environment: ${{ inputs.one-password-primary-field}} 
         vault-env-keys: ${{ steps.secrets-file.outputs.vault-keys }}
-        secrets-file: ${{ steps.secrets-file.outputs.sm }}
+        secrets-file: ${{ steps.secrets-file.outputs.sm }} 
 
     - name: upload secret file 
       shell: bash
