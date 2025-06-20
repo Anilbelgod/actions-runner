@@ -246,9 +246,9 @@ runs:
           template \
           --args="${{ steps.arguments.outputs.kube_version }}" \
           > ${{ steps.config.outputs.tmp }}/manifests/resources.yaml
-      # env:
-      #   IMAGE_NAME: ${{ inputs.image }}
-      #   IMAGE_TAG: ${{ inputs.image-tag }}
+      env:
+        IMAGE_NAME: ${{ inputs.image }}
+        IMAGE_TAG: ${{ inputs.image-tag }}
 
     - name: Helm raw render
       if: ${{ inputs.toolchain == 'helm' && inputs.operation == 'deploy' }}
@@ -305,7 +305,7 @@ runs:
           app_repository: ${{ inputs.repository }}
           app_commit: ${{ steps.ref.outputs.value }}
           app_hostname: ${{ steps.result.outputs.webapp_url }}
-          name: ${{ inputs.namespace }}.${{ inputs.app-name }}
+          name: ${{ inputs.app-name }}
           namespace: ${{ inputs.namespace }}
           manifests: ${{ steps.config.outputs.path }}/manifests
     
