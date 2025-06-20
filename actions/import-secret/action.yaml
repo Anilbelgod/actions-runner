@@ -64,8 +64,7 @@ runs:
       with:
         export-env: false  
       env:
-        SERVICE_SECRETS: op://ehr-envars-gcp/document-management-api/dev
-        #op://${{ inputs.one-password-primary-vault }}/${{ inputs.one-password-primary-item }}/${{ inputs.one-password-primary-field }}
+        SERVICE_SECRETS: op://${{ inputs.one-password-primary-vault }}/${{ inputs.one-password-primary-item }}/${{ inputs.one-password-primary-field }}
 
     - name: Define secrets temp files
       id: secrets-file
