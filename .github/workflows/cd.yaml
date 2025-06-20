@@ -172,7 +172,7 @@ jobs:
         id: import-secrets
         with:
           one-password-service-account-token: ${{ secrets.one-password-service-account-token }}
-          one-password-primary-vault: ${{ inputs.tenant }}-envars-gcp #tenant is ehr 
+          one-password-primary-vault: "${{ inputs.tenant }}-envars-gcp" #tenant is ehr 
           one-password-primary-item: ${{ inputs.app-name }} # documents-management-api 
           one-password-primary-field: ${{ inputs.environment }} # dev #! change when access to private repo is granted. 
           import-secrets: ${{ inputs.import-secrets }} 
