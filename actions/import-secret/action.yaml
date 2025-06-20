@@ -212,7 +212,7 @@ runs:
       if: ${{ inputs.import-secrets == 'true' }}
       with:
         app-name: ${{ inputs.one-password-primary-item }} 
-        environment: ${{ inputs.environment }}
+        environment: ${{ inputs.one-password-primary-field}}
         delete-all: false
         delete-all-except-keys: ${{ steps.secrets-file.outputs.vault-keys }} 
 
