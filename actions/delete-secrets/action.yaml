@@ -6,8 +6,8 @@ inputs:
   app-name:
     description: "The name of the application"
     required: true 
-  service-name:
-    description: "The name of the service to update secrets for"
+  environment:
+    description: "The name environment of the secrets (e.g., dev, staging, prod)"
     required: true
   delete-all:
     description: "Delete all secrets from Secrets Manager"
@@ -31,4 +31,4 @@ runs:
     - name: Run main script
       shell: bash
       run: | 
-        ${{ github.action_path }}/main.sh ${{ inputs.app-name }} ${{ inputs.service-name }} ${{ inputs.delete-all }} ${{ inputs.delete-all-except-keys }} ${{ github.action_path }}/temp_secrets.yaml 
+        ${{ github.action_path }}/main.sh ${{ inputs.app-name }} ${{ inputs.environment }} ${{ inputs.delete-all }} ${{ inputs.delete-all-except-keys }} ${{ github.action_path }}/temp_secrets.yaml 

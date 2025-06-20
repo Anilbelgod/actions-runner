@@ -211,8 +211,8 @@ runs:
       uses: ./actions/delete-secrets 
       if: ${{ inputs.import-secrets == 'true' }}
       with:
-        app-name: ${{ inputs.one-password-primary-vault }} 
-        service-name: ${{ inputs.one-password-primary-item }}
+        app-name: ${{ inputs.one-password-primary-item }} 
+        environment: ${{ inputs.environment }}
         delete-all: false
         delete-all-except-keys: ${{ steps.secrets-file.outputs.vault-keys }} 
 
