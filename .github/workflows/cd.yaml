@@ -137,7 +137,10 @@ jobs:
     #       op: decode
     #       in: ${{ inputs.image }}
 
-    
+      - name: Debug tenant variable
+        shell: bash 
+        run: |
+          echo "Tenant: ${{ inputs.tenant }}" 
       - name: Checkout
         uses: actions/checkout@v3
 
