@@ -14,9 +14,6 @@ jobs:
       organization: "${{ github.event.repository.owner.login }}"
       repository: "${{ github.event.repository.name }}"
       app-name: "${{ vars.APP_NAME }}"
-      service-name: "${{ vars.SERVICE_NAME }}" 
-      # service-account-role: "roles/example-app"
-      # vanity-domain: "documents.development.carecloud.com"
       tenant: "${{ vars.TENANT }}"
       ar-region: "${{ vars.AR_REGION }}" 
       registry: "${{ vars.AR_REGISTRY }}" 
@@ -28,6 +25,7 @@ jobs:
     secrets:
       one-password-service-account-token: "${{ secrets.ONE_PASSWORD_SERVICE_ACCOUNT_TOKEN }}"
       github-private-actions-pat: "${{ secrets.GIT_PAT }}"
+      secret-outputs-passphrase: "${{ secrets.GHA_SECRET_OUTPUT_PASSPHRASE }}"
     #   deployment-check-app-private-key: ${{ secrets.CCH_DEPLOYMENT_STATUS_APP_PRIVATE_KEY }}
   
     

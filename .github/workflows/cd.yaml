@@ -130,12 +130,12 @@ jobs:
       name: ${{ inputs.environment }}
       url: ${{ steps.deploy.outputs.webapp-url }}
     steps:
-    #   - uses: cloudposse/github-action-secret-outputs@0.1.2
-    #     id: image
-    #     with:
-    #       secret: ${{ secrets.secret-outputs-passphrase }}
-    #       op: decode
-    #       in: ${{ inputs.image }}
+      - uses: cloudposse/github-action-secret-outputs@0.1.2
+        id: image
+        with:
+          secret: ${{ secrets.secret-outputs-passphrase }}
+          op: decode
+          in: ${{ inputs.image }}
 
 
       - name: Checkout
