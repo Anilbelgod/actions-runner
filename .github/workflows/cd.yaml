@@ -137,13 +137,14 @@ jobs:
     #       op: decode
     #       in: ${{ inputs.image }}
 
+
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Debug tenant variable
         shell: bash 
         run: |
           echo "Tenant: ${{ inputs.tenant }}" 
-      - name: Checkout
-        uses: actions/checkout@v3
-
+          echo "Tenant envars: ${{ inputs.tenant }}-envars-gcp"
       - name: Determine the application name for configuration purposes
         id: config-app-name
         uses: cloudposse/github-action-yaml-config-query@0.1.2
