@@ -167,7 +167,7 @@ jobs:
       #     tenant: ${{ inputs.tenant }}
   
 
-      - name: Import secrets into Secret Manager from 1PasswordAdd commentMore actions
+      - name: Import secrets into Secret Manager from 1Password 
         uses: ./actions/import-secret 
         id: import-secrets
         with:
