@@ -163,7 +163,7 @@ jobs:
       organization: ${{ inputs.organization }}
       repository: ${{ inputs.repository }}
       app-name: ${{ inputs.app-name }}
-      config-app-name: ${{ inputs.app-name }}
+      config-app-name: docu-api
       environment: dev
       synchronously: true
       tenant: ${{ inputs.tenant }}
