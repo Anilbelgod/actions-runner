@@ -130,12 +130,12 @@ jobs:
       name: ${{ inputs.environment }}
       url: ${{ steps.deploy.outputs.webapp-url }}
     steps:
-      - uses: cloudposse/github-action-secret-outputs@0.1.2
-        id: image
-        with:
-          secret: ${{ secrets.secret-outputs-passphrase }}
-          op: decode
-          in: ${{ inputs.image }}
+      # - uses: cloudposse/github-action-secret-outputs@0.1.2
+      #   id: image
+      #   with:
+      #     secret: ${{ secrets.secret-outputs-passphrase }}
+      #     op: decode
+      #     in: ${{ inputs.image }}
 
 
       - name: Checkout
@@ -173,8 +173,9 @@ jobs:
         with:
           one-password-service-account-token: ${{ secrets.one-password-service-account-token }}
           one-password-primary-vault: "${{ inputs.tenant }}-envars-gcp" #tenant is ehr 
-          one-password-primary-item: ${{ inputs.app-name }} # documents-management-api 
-          one-password-primary-field: ${{ inputs.environment }} # dev #! change when access to private repo is granted. 
+          one-password-primary-item: ${{ steps.config-app-name.outputs.value }} # documents-management-api 
+          one-password-primary-field: ${{ steps.environment.outputs.name }} # dev 
+          service-secret-sm-path: ${{ steps.environment.outputs.service-secret-sm-path }} 
           import-secrets: ${{ inputs.import-secrets }} 
 
       # - name: Create synthetic domain

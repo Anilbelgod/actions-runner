@@ -16,18 +16,9 @@ inputs:
   one-password-primary-field:
     description: "The 1Password primary field"
     required: true 
-  one-password-secondary-vault:
-    description: "The 1Password secondary vault containing the secrets. This is used if the secrets are not present in the primary vault."
-    required: false
-  one-password-secondary-item:
-    description: "The 1Password secondary item"
-    required: false
-  one-password-secondary-field:
-    description: "The 1Password secondary field"
-    required: false
-  region:
-    description: "The region"
-    required: true
+  service-secret-sm-path:
+    description: "The path to the service secret in Secret Manager"
+    required: true 
   import-secrets:
     description: "Whether to import secrets. Otherwise just outputs are returned."
     required: true
@@ -105,8 +96,7 @@ runs:
     - name: Export secrets from Secret Manager to sm temp file
       uses: ./actions/export-secrets 
       with:
-        app-name: ${{ inputs.one-password-primary-item }}
-        environment: ${{ inputs.one-password-primary-field}} 
+        service-secret-sm-path: ${{ inputs.service-secret-sm-path }} 
         vault-env-keys: ${{ steps.secrets-file.outputs.vault-keys }}
         secrets-file: ${{ steps.secrets-file.outputs.sm }} 
     
