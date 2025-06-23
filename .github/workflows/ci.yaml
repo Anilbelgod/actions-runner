@@ -96,6 +96,10 @@ jobs:
           config-app-name: ${{ steps.config-app-name.outputs.value }}
           tenant: ${{ inputs.tenant }}
 
+    outputs:
+      config-app-name: ${{ steps.config-app-name.outputs.value }}
+      environment: ${{ steps.environment.outputs.name }}
+
 
   build-image:
     runs-on: ["self-hosted"]
