@@ -153,32 +153,29 @@ jobs:
     secrets:
           github-private-actions-pat: ${{ secrets.github-private-actions-pat }}
 
-  cd:
-    uses: ./.github/workflows/cd.yaml   
-    needs: [ ci ]
-    with:
-      version: ${{ needs.ci.outputs.version }}
-      image: ${{ needs.ci.outputs.image }}
-      image-tag: ${{ needs.ci.outputs.image-tag }}
-      organization: ${{ inputs.organization }}
-      repository: ${{ inputs.repository }}
-      app-name: ${{ inputs.app-name }}
-      environment: dev
-      synchronously: true
-      tenant: ${{ inputs.tenant }}
-      toolchain: ${{ inputs.toolchain }}
-      helm-file-path: ${{ inputs.helm-file-path }}
-      helm-values-file: ${{ inputs.helm-values-file }}
+  # cd:
+  #   uses: ./.github/workflows/cd.yaml   
+  #   needs: [ ci ]
+  #   with:
+  #     version: ${{ needs.ci.outputs.version }}
+  #     image: ${{ needs.ci.outputs.image }}
+  #     image-tag: ${{ needs.ci.outputs.image-tag }}
+  #     organization: ${{ inputs.organization }}
+  #     repository: ${{ inputs.repository }}
+  #     app-name: ${{ inputs.app-name }}
+  #     environment: dev
+  #     synchronously: true
+  #     tenant: ${{ inputs.tenant }}
+  #     toolchain: ${{ inputs.toolchain }}
+  #     helm-file-path: ${{ inputs.helm-file-path }}
+  #     helm-values-file: ${{ inputs.helm-values-file }}
 
-      # dynamic-helm-values: ${{ needs.setup.outputs.dynamic-helm-values-yaml }}
-      # deployment-check-retry-count: ${{ inputs.deployment-check-retry-count }}
-      # deployment-check-retry-interval: ${{ inputs.deployment-check-retry-interval }}
-      # deployment-check-app-id: ${{ inputs.deployment-check-app-id }}
-      # deployment-check-app-installation-id: ${{ inputs.deployment-check-app-installation-id }}
-    secrets: 
-      one-password-service-account-token: ${{ secrets.one-password-service-account-token }}
-      github-private-actions-pat: ${{ secrets.github-private-actions-pat }}
-      # deployment-check-app-private-key: ${{ secrets.deployment-check-app-private-key }}
-
-
-  
+  #     # dynamic-helm-values: ${{ needs.setup.outputs.dynamic-helm-values-yaml }}
+  #     # deployment-check-retry-count: ${{ inputs.deployment-check-retry-count }}
+  #     # deployment-check-retry-interval: ${{ inputs.deployment-check-retry-interval }}
+  #     # deployment-check-app-id: ${{ inputs.deployment-check-app-id }}
+  #     # deployment-check-app-installation-id: ${{ inputs.deployment-check-app-installation-id }}
+  #   secrets: 
+  #     one-password-service-account-token: ${{ secrets.one-password-service-account-token }}
+  #     github-private-actions-pat: ${{ secrets.github-private-actions-pat }}
+  #     # deployment-check-app-private-key: ${{ secrets.deployment-check-app-private-key }}  
