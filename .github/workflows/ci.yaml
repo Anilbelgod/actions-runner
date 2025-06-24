@@ -171,3 +171,4 @@ jobs:
         service: app
         command: test/test.sh
         registry: ${{ inputs.registry }}      
+        
