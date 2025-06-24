@@ -13,6 +13,9 @@ jobs:
   atmos-plan:
     runs-on: ["self-hosted"]
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Setup Atmos Environment
         uses: ./.github/actions/setup-atmos
 
@@ -25,3 +28,4 @@ jobs:
         id: atmos-plan
         run: |
           atmos terraform plan google-storage-bucket --stack plat-gbl-dev
+          
