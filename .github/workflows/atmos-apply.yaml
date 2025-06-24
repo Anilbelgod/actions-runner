@@ -14,6 +14,8 @@ jobs:
   atmos-apply:
     runs-on: ["self-hosted"]
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
       - name: Setup Atmos Environment
         uses: ./.github/actions/setup-atmos
 
