@@ -166,7 +166,13 @@ jobs:
           config-app-name: ${{ steps.config-app-name.outputs.value }}
           tenant: ${{ inputs.tenant }}
   
-
+      - name: Print Environment Info
+        run: |
+          echo "Environment: ${{ steps.environment.outputs.name }}"
+          echo "Namespace: ${{ steps.environment.outputs.namespace }}"
+          echo "Region: ${{ steps.environment.outputs.region }}"
+          echo "Cluster: ${{ steps.environment.outputs.cluster }}"
+          echo "Service Secret SM Path: ${{ steps.environment.outputs.service-secret-sm-path }}" 
       - name: Import secrets into Secret Manager from 1Password 
         uses: ./actions/import-secret 
         id: import-secrets

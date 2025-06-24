@@ -96,6 +96,14 @@ jobs:
           config-app-name: ${{ steps.config-app-name.outputs.value }}
           tenant: ${{ inputs.tenant }}
 
+      - name: Print Environment Info
+        run: |
+          echo "Environment: ${{ steps.environment.outputs.name }}"
+          echo "Namespace: ${{ steps.environment.outputs.namespace }}"
+          echo "Region: ${{ steps.environment.outputs.region }}"
+          echo "Cluster: ${{ steps.environment.outputs.cluster }}"
+          echo "Service Secret SM Path: ${{ steps.environment.outputs.service-secret-sm-path }}" 
+
     outputs:
       config-app-name: ${{ steps.config-app-name.outputs.value }}
       environment: ${{ steps.environment.outputs.name }}

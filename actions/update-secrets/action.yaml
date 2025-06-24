@@ -3,12 +3,9 @@ name: "Update Secrets in GCP Secrets Manager"
 description: "Update secrets in GCP Secrets Manager for a specific service using 1Password" 
 
 inputs:
-  app-name:
-    description: "The name of the application"
-    required: true 
-  environment:
-    description: "The path to the secrets file in the repository"
-    required: true
+  service-secret-sm-path:
+    description: "The path to the service secret in GCP Secrets Manager"
+    required: true  
   service-name:
     description: "The name of the service to update secrets for"
     required: true
@@ -34,4 +31,4 @@ runs:
     - name: Run main script
       shell: bash
       run: | 
-       ${{ github.action_path }}/main.sh ${{ inputs.app-name }} ${{ inputs.environment }} ${{ inputs.secrets-file }}  ${{ steps.temp-secrets-file.outputs.temp_sm }} 
+       ${{ github.action_path }}/main.sh ${{ inputs.service-secret-sm-path }} ${{ inputs.secrets-file }}  ${{ steps.temp-secrets-file.outputs.temp_sm }} 

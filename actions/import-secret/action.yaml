@@ -168,8 +168,7 @@ runs:
       uses: ./actions/update-secrets
       if: ${{ steps.remove-secrets.outputs.do-import == 'true' && inputs.import-secrets == 'true' }} 
       with:
-        app-name: ${{ inputs.one-password-primary-item }} 
-        environment: ${{ inputs.one-password-primary-field}}
+        service-secret-sm-path: ${{ inputs.service-secret-sm-path }} 
         secrets-file: ${{ steps.secrets-file.outputs.vault }}
 
     - name: No new or updated secrets to import
