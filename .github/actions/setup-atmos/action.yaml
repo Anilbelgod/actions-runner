@@ -5,13 +5,7 @@ runs:
   steps:
     - name: Checkout code
       uses: actions/checkout@v3
-    - name: Show service account email
-      shell: bash
-      run: |
-        echo "${{ secrets.GCP_SA_KEY }}" | base64 --decode | jq -r .client_email
-    - name: Setup Google Cloud SDK
-      uses: google-github-actions/setup-gcloud@v2
-
+      
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
 
