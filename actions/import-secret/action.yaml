@@ -126,24 +126,6 @@ runs:
           fi
         done <<< "$sm_key_list"
 
-        #! --- MODIFICATION START ---
-
-        sm_keys=() # Initialize sm_keys as empty array by default
-
-        # Check if SM_SECRETS_FILE_PATH exists and is not empty
-        if [ -s "$SM_SECRETS_FILE_PATH" ]; then
-          sm_key_list=$(yq ". | keys | .[]" "$SM_SECRETS_FILE_PATH")
-          while IFS= read -r line ; do
-            if [ ! -z "$line" ]; then
-              sm_keys+=("$line")
-            fi
-          done <<< "$sm_key_list"
-        else
-          echo "SM_SECRETS_FILE_PATH ($SM_SECRETS_FILE_PATH) is empty or does not exist. Initializing sm_keys as empty."
-          # sm_keys is already initialized as empty, so no further action needed here.
-        fi
-
-        #! --- MODIFICATION END ---
 
         for vault_key in "${vault_keys[@]}"; do
           vault_value=$(yq ".$vault_key" $VAULT_SECRETS_FILE_PATH)
