@@ -3,9 +3,6 @@ description: 'Sets up GCloud, Terraform, Helm, Node.js, and Atmos'
 runs:
   using: "composite"
   steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
     - name: Setup Google Cloud SDK
       uses: google-github-actions/setup-gcloud@v2
 
