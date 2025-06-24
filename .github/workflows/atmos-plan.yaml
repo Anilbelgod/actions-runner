@@ -28,3 +28,4 @@ jobs:
         id: atmos-plan
         run: |
           atmos terraform plan google-storage-bucket --stack plat-gbl-dev
+          
