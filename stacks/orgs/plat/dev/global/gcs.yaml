@@ -1,5 +1,8 @@
 terraform:
   backend_type: gcs
+  backend:
+    gcs:
+      bucket: cch-state
 components:
   terraform:
      google-storage-bucket:
