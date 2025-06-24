@@ -5,11 +5,16 @@ runs:
   steps:
     - name: Checkout code
       uses: actions/checkout@v3
+
+    - name: Setup Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+
     - name: (Optional) GCloud Auth Login
       shell: bash
       run: |
         echo "gcloud auth login"
-        gcloud auth login 
+        gcloud auth login
+
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
 
