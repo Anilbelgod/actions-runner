@@ -29,8 +29,8 @@ jobs:
         run: |
           atmos terraform plan google-storage-bucket --stack plat-gbl-dev
 
-          - name: Show Terraform plan as JSON
-          run: |
-            terraform show -json components/terraform/google-storage-bucket/plat-gbl-dev-google-storage-bucket.planfile > plan_output.json
-            cat plan_output.json
-            echo "Plan output saved to plan_output.json"
+      - name: Show Terraform plan as JSON
+        run: |
+          terraform show -json components/terraform/google-storage-bucket/plat-gbl-dev-google-storage-bucket.planfile > plan_output.json
+          cat plan_output.json
+          echo "Plan output saved to plan_output.json"
