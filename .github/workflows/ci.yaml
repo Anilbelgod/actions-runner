@@ -103,6 +103,8 @@ jobs:
           echo "Region: ${{ steps.environment.outputs.region }}"
           echo "Cluster: ${{ steps.environment.outputs.cluster }}"
           echo "Service Secret SM Path: ${{ steps.environment.outputs.service-secret-sm-path }}" 
+          echo "Service Config SM Path: ${{ steps.environment.outputs.service-config-sm-path }}"
+          echo "Platform SM Path: ${{ steps.environment.outputs.platform-sm-path }}"
 
     outputs:
       config-app-name: ${{ steps.config-app-name.outputs.value }}
