@@ -153,7 +153,7 @@ jobs:
               value: ${{ inputs.config-app-name }}
       
       - name: Environment Info
-        uses: carecloud/github-action-interface-environment@main
+        uses: Anilbelgod/github-action-interface-environment@main
         id: environment
         with:
           implementation_repository: Anilbelgod/actions-private
@@ -173,6 +173,7 @@ jobs:
           echo "Region: ${{ steps.environment.outputs.region }}"
           echo "Cluster: ${{ steps.environment.outputs.cluster }}"
           echo "Service Secret SM Path: ${{ steps.environment.outputs.service-secret-sm-path }}" 
+          
       - name: Import secrets into Secret Manager from 1Password 
         uses: ./actions/import-secret 
         id: import-secrets
