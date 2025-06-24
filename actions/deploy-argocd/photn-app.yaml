@@ -1,0 +1,281 @@
+repositories:
+  - name: 'bedag'
+    url: 'https://bedag.github.io/helm-charts/' # Source - https://github.com/bedag/helm-charts/tree/master/charts/raw
+
+releases:  
+  - name: '{{ .Values.deployment.app_name }}-svc'
+    chart: 'bedag/raw'
+    version: '2.0.0'
+    values:
+      - resources:
+        - apiVersion: v1
+          kind: Service
+          metadata:
+            name: {{ .Values.deployment.app_name }}
+            labels:
+              app: {{ .Values.deployment.app_name }}
+              version: {{ .Values.deployment.version }}
+          spec:
+            type: ClusterIP
+            ports:
+              - targetPort: default
+                port: 80
+                protocol: TCP
+                name: default
+            selector:
+              app: {{ .Values.deployment.app_name }}
+
+  - name: '{{ .Values.deployment.app_name }}-svc-act'
+    chart: 'bedag/raw'
+    version: '2.0.0'
+    values:
+    - resources:
+        - apiVersion: v1
+          kind: ServiceAccount
+          metadata:
+            name: {{ .Values.deployment.app_name }}
+            annotations:
+            {{ if and (hasKey .Values.deployment "service_account_role_arn") (.Values.deployment.service_account_role_arn) }}
+              eks.amazonaws.com/role-arn: {{ .Values.deployment.service_account_role_arn }}
+            {{ else if hasKey .Values.service "service_account_role_arn" }}
+              eks.amazonaws.com/role-arn: {{ .Values.service.service_account_role_arn }}
+            {{ end }}
+            labels:
+              app: {{ .Values.deployment.app_name }}
+
+  - name: '{{ .Values.deployment.app_name }}-deploy'
+    chart: 'bedag/raw'
+    version: '2.0.0'
+    values:
+      - resources:
+        - apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: {{ .Values.deployment.app_name }}
+            annotations:
+              reloader.stakater.com/auto: 'true' # Reload pods for any modification of a ConfigMap or Secret
+            labels:
+              app: {{ .Values.deployment.app_name }}
+              version: {{ .Values.deployment.version }}
+              tags.datadoghq.com/env: {{ .Values.deployment.namespace }}
+              tags.datadoghq.com/service: {{ .Values.deployment.app_name }}
+              tags.datadoghq.com/version: {{ .Values.deployment.version }}
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app: {{ .Values.deployment.app_name }}
+            strategy:
+              rollingUpdate:
+                maxSurge: {{ .Values.deployment.repo_values.deploy.rolling_update.max_surge }}
+                maxUnavailable: {{ .Values.deployment.repo_values.deploy.rolling_update.max_unavailable }}
+              type: RollingUpdate
+            revisionHistoryLimit: 3
+            template:
+              metadata:
+                name: {{ .Values.deployment.app_name }}
+                labels:
+                  app: {{ .Values.deployment.app_name }}
+                  version: {{ .Values.deployment.version }}
+                  tags.datadoghq.com/env: {{ .Values.deployment.namespace }}
+                  tags.datadoghq.com/service: {{ .Values.deployment.app_name }}
+                  tags.datadoghq.com/version: {{ .Values.deployment.version }}
+              spec:
+                serviceAccountName: {{ .Values.deployment.app_name }}
+                topologySpreadConstraints:
+                  - maxSkew: 1
+                    topologyKey: topology.kubernetes.io/zone
+                    whenUnsatisfiable: DoNotSchedule
+                    labelSelector:
+                      matchLabels:
+                        app: {{ .Values.deployment.app_name }}
+                        version: {{ .Values.deployment.version }}
+                terminationGracePeriodSeconds: 60 # Ensure the queue processor has time to detect the termination of the pod and properly stop processing
+                containers:
+                  - name: {{ .Values.deployment.app_name }}
+                    image: '{{ env "IMAGE_NAME" }}:{{ env "IMAGE_TAG" }}'
+                    imagePullPolicy: IfNotPresent
+                    lifecycle:
+                      preStop:
+                        exec:
+                          command: 
+                            - /bin/bash
+                            - -c
+                            - touch "$K8S_TERMINATION_FILE" && sleep 120 # Let the health check know the container is shutting down
+                    envFrom:
+                      - secretRef:
+                          name: {{ .Values.deployment.app_name }}
+                    env:
+                      - name: K8S_TERMINATION_FILE
+                        value: "/app/www/k8s_termination.txt"
+                      - name: APP_NAME
+                        value: {{ .Values.deployment.app_name }}
+                      - name: APP_VERSION
+                        value: {{ .Values.deployment.version }}
+                      - name: DD_LOGS_INJECTION
+                        value: 'true'
+                      - name: DD_PROFILING_ENABLED
+                        value: 'false'
+                      - name: DD_RUNTIME_METRICS_ENABLED
+                        value: 'true'
+                      - name: DD_TRACE_AGENT_URL
+                        value: 'unix:///var/run/datadog/apm.socket'
+                      - name: DD_ENV
+                        value: {{ .Values.deployment.namespace }}
+                      - name: DD_TRACE_AGENT_HOSTNAME
+                        valueFrom:
+                          fieldRef:
+                            fieldPath: status.hostIP
+                      - name: RAILS_MIN_THREADS
+                        value: "1"
+                      - name: RAILS_MAX_THREADS
+                        value: "1"
+                    ports:
+                      - name: default
+                        containerPort: 3000
+                        protocol: TCP
+                    livenessProbe:
+                      httpGet:
+                        path: /health_check
+                        port: default
+                        scheme: HTTP
+                      periodSeconds: 16
+                      initialDelaySeconds: 10
+                      timeoutSeconds: 15
+                      successThreshold: 1
+                      failureThreshold: 6
+                    startupProbe:
+                      httpGet:
+                        path: /health_check
+                        port: default
+                        scheme: HTTP
+                      periodSeconds: 4
+                      initialDelaySeconds: 10
+                      timeoutSeconds: 3
+                      successThreshold: 1
+                      failureThreshold: 20
+                    resources:
+                      requests:
+                        cpu: {{ .Values.deployment.repo_values.resources.requests.cpu }}
+                        memory: {{ .Values.deployment.repo_values.resources.requests.memory }}
+                      limits:
+                        cpu: {{ .Values.deployment.repo_values.resources.limits.cpu }}
+                        memory: {{ .Values.deployment.repo_values.resources.limits.memory }}
+                    volumeMounts:
+                      - name: apm-socket
+                        mountPath: /var/run/datadog
+                volumes:
+                  - name: apm-socket
+                    hostPath:
+                      path: /var/run/datadog/
+
+  - name: '{{ .Values.deployment.app_name }}-keda-so'
+    chart: "bedag/raw"
+    version: "2.0.0"
+    wait: true
+    force: true
+    recreatePods: false
+    values:
+    - resources:
+        - apiVersion: keda.sh/v1alpha1
+          kind: ScaledObject
+          metadata:
+            name: {{ .Values.deployment.app_name }}
+            labels:
+              app: {{ .Values.deployment.app_name }}
+          spec:
+            scaleTargetRef:
+              name: {{ .Values.deployment.app_name }}
+              kind: Deployment
+            minReplicaCount: {{ .Values.deployment.repo_values.keda.min_replica_count }}
+            maxReplicaCount: {{ .Values.deployment.repo_values.keda.max_replica_count }}
+            fallback:
+              failureThreshold: {{ .Values.deployment.repo_values.keda.fallback.failure_threshold }}
+              replicas: {{ .Values.deployment.repo_values.keda.fallback.replicas }}
+            triggers:
+            - type: aws-sqs-queue
+              metadata:
+                awsRegion: {{ .Values.deployment.aws_region }}
+                identityOwner: operator
+                queueURLFromEnv: SQS_QUEUE_URL
+                queueLength: '{{ .Values.deployment.repo_values.keda.queue_length }}'
+
+  - name: '{{ .Values.deployment.app_name }}-ingress'
+    chart: 'bedag/raw'
+    version: '2.0.0'
+    values:
+      - resources:
+        - apiVersion: networking.k8s.io/v1
+          kind: Ingress
+          metadata:
+            name: {{ .Values.deployment.app_name }}
+            annotations:
+              alb.ingress.kubernetes.io/group.name: {{ .Values.platform.default_alb_ingress_group_name_internal }}
+              kubernetes.io/ingress.class: {{ .Values.platform.default_alb_ingress_class_internal }}
+              alb.ingress.kubernetes.io/scheme: {{ .Values.platform.default_alb_ingress_scheme_internal }}
+              alb.ingress.kubernetes.io/actions.ssl-redirect: '{"RedirectConfig":{"Port":"443","Protocol":"HTTPS","StatusCode":"HTTP_301"},"Type":"redirect"}'
+              alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+              alb.ingress.kubernetes.io/ssl-redirect: '443'
+              alb.ingress.kubernetes.io/target-type: ip
+              alb.ingress.kubernetes.io/healthcheck-path: /ping
+              alb.ingress.kubernetes.io/healthcheck-interval-seconds: '16'
+              alb.ingress.kubernetes.io/healthcheck-timeout-seconds: '15'
+              alb.ingress.kubernetes.io/healthy-threshold-count: '2'
+              alb.ingress.kubernetes.io/unhealthy-threshold-count: '3'
+              external-dns.alpha.kubernetes.io/hostname: '{{ .Values.deployment.synthetic_domain }}{{ if and (hasKey .Values.deployment "vanity_domain") (.Values.deployment.vanity_domain) }}, {{ .Values.deployment.vanity_domain }}{{ end }}'
+              outputs.platform.cloudposse.com/webapp-url: 'https://{{ .Values.deployment.synthetic_domain }}/health_check'
+            labels:
+              app: {{ .Values.deployment.app_name }}
+              version: {{ .Values.deployment.version }}
+          spec:
+            rules:            
+              - host: {{ .Values.deployment.synthetic_domain }}
+                http:
+                  paths:
+                    - path: /*
+                      pathType: ImplementationSpecific
+                      backend:
+                        service:
+                          name:  {{ .Values.deployment.app_name }}
+                          port:
+                            name: default
+            {{ if and (hasKey .Values.deployment "vanity_domain") (.Values.deployment.vanity_domain) }}
+              - host: {{ .Values.deployment.vanity_domain }}
+                http:
+                  paths:
+                    - path: /*
+                      pathType: ImplementationSpecific
+                      backend:
+                        service:
+                          name:  {{ .Values.deployment.app_name }}
+                          port:
+                            name: default
+            {{ end }}
+
+  - name: '{{ .Values.deployment.app_name }}-secrets'
+    chart: 'bedag/raw'
+    version: '2.0.0'
+    values:
+    # References https://external-secrets.io/v0.9.3
+    - resources:
+        - apiVersion: external-secrets.io/v1beta1
+          kind: ExternalSecret
+          metadata:
+            name: {{ .Values.deployment.app_name }}
+          spec:
+            refreshInterval: 60s # Rate SecretManager pulls the AWS SSM Parameter Store
+            secretStoreRef:
+              name: secret-store-parameter-store
+              kind: ClusterSecretStore
+            target:
+              name: {{ .Values.deployment.app_name }} # Name of the k8s Secret to be created
+              creationPolicy: Owner
+          {{ if hasKey .Values.deployment "envar_keys" }}
+            data:
+            {{ $service_secret_ssm_path := .Values.deployment.service_secret_ssm_path }}
+            {{ range $i, $envar_key := .Values.deployment.envar_keys }}
+              - secretKey: {{ $envar_key }}
+                remoteRef:
+                  key: /{{ $service_secret_ssm_path }}/{{ $envar_key }}
+            {{ end }}
+          {{ end }}

@@ -15,7 +15,6 @@ jobs:
       repository: "${{ github.event.repository.name }}"
       app-name: "${{ vars.APP_NAME }}"
       tenant: "${{ vars.TENANT }}"
-      ar-region: "${{ vars.AR_REGION }}" 
       registry: "${{ vars.AR_REGISTRY }}" 
       helm-values-file: "./deploy/values/dev.yaml"   
       # deployment-check-retry-count: "30"  

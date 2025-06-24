@@ -87,7 +87,7 @@ releases:
     values:
     # References https://external-secrets.io/v0.9.3
       - resources:
-        - apiVersion: external-secrets.io/v1beta1
+        - apiVersion: external-secrets.io/v1
           kind: ExternalSecret
           metadata:
             name: '{{ .Values.deployment.appName }}'

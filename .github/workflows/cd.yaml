@@ -166,14 +166,6 @@ jobs:
           config-app-name: ${{ steps.config-app-name.outputs.value }}
           tenant: ${{ inputs.tenant }}
   
-      - name: Print Environment Info
-        run: |
-          echo "Environment: ${{ steps.environment.outputs.name }}"
-          echo "Namespace: ${{ steps.environment.outputs.namespace }}"
-          echo "Region: ${{ steps.environment.outputs.region }}"
-          echo "Cluster: ${{ steps.environment.outputs.cluster }}"
-          echo "Service Secret SM Path: ${{ steps.environment.outputs.service-secret-sm-path }}" 
-          
       - name: Import secrets into Secret Manager from 1Password 
         uses: ./actions/import-secret 
         id: import-secrets
@@ -216,22 +208,6 @@ jobs:
           contents: ${{ steps.import-secrets.outputs.envar-keys }}
           write-mode: overwrite
      
-      #! Testing step
-      # - name: Read dev.yaml contents
-      #   id: read-dev-yaml
-      #   run: |
-      #     CONTENT=$(cat $GITHUB_WORKSPACE/deploy/values/dev.yaml)
-      #     echo "CONTENT<<EOF" >> $GITHUB_ENV
-      #     echo "$CONTENT" >> $GITHUB_ENV
-      #     echo "EOF" >> $GITHUB_ENV
-      #! Testing step
-      # - name: Create deploy Helm values file
-      #   if: ${{ inputs.toolchain == 'helmfile' }}
-      #   uses: DamianReeves/write-file-action@master
-      #   with:
-      #     path: ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
-      #     contents: ${{ env.CONTENT }}
-      #     write-mode: overwrite
 
       - name: Update deploy Helm values file
         if: ${{ inputs.toolchain == 'helmfile' }}
