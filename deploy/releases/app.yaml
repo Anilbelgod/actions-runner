@@ -91,17 +91,17 @@ releases:
           spec:
             refreshInterval: 60s # Rate SecretManager pulls the GCP Secret Manager 
             secretStoreRef:
-              name: secret-store-parameter-store
-              kind: ClusterSecretStore
+              name: gcp-secret-manager-store
+              kind: SecretStore
             target:
               name: {{ .Values.deployment.app_name }} # Name of the k8s Secret to be created
               creationPolicy: Owner
           {{ if hasKey .Values.deployment "envar_keys" }}
             data:
-            {{ $service_secret_ssm_path := .Values.deployment.service_secret_ssm_path }}
+            {{ $service_secret_sm_path := .Values.deployment.service_secret_sm_path }}
             {{ range $i, $envar_key := .Values.deployment.envar_keys }}
               - secretKey: {{ $envar_key }}
                 remoteRef:
-                  key: /{{ $service_secret_ssm_path }}/{{ $envar_key }}
+                  key: {{ $service_secret_ssm_path }}-{{ $envar_key }}
             {{ end }}
           {{ end }}

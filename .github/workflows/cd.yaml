@@ -217,6 +217,7 @@ jobs:
           yq -i eval '{"deployment": .}' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
           yq -i '.deployment.region = "${{ steps.environment.outputs.region }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
           yq -i '.deployment.app_name = "${{ inputs.app-name }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+          yq -i '.deployment.service_secret_sm_path = ' '${{ steps.environment.outputs.service-secret-sm-path }}' ${{ steps.deploy-helm-values-file-path.outputs.deploy }} 
           yq -i '.deployment.config_app_name = "${{ steps.config-app-name.outputs.value }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
           yq -i '.deployment.branch_or_tag_name = "${{ inputs.ref }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
           yq -i '.deployment.namespace = "${{ steps.environment.outputs.namespace }}"' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
