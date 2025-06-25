@@ -102,6 +102,6 @@ releases:
             {{ range $i, $envar_key := .Values.deployment.envar_keys }}
               - secretKey: {{ $envar_key }}
                 remoteRef:
-                  key: {{ $service_secret_ssm_path }}-{{ $envar_key }}
+                  key: {{ $service_secret_sm_path }}-{{ $envar_key }}
             {{ end }}
           {{ end }}
