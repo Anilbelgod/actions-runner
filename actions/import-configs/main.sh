@@ -30,4 +30,4 @@ for CONFIGS in $CONFIG_NAMES; do
 done
 
 echo "Secrets successfully written to $CONFIGS_FILE"
-cat "$CONFIGS_FILE" # Optional: Display the content of the generated YAML
+cat $CONFIGS_FILE # Optional: Display the content of the generated YAML
