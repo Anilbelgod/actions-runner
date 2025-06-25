@@ -171,25 +171,24 @@ runs:
         sm-path: ${{ inputs.service-config-sm-path }}
         configs-file: ${{ github.action_path }}/service.yaml
 
-    # - name: YQ Platform settings
-    #   if: ${{ inputs.operation == 'deploy' }}
-    #   shell: bash
-    #   run: |
-    #     sudo chmod 777 ./service.yaml 
-    #     yq --exit-status --no-colors --inplace eval '{"service": .}' ./service.yaml
+    - name: YQ Platform settings
+      if: ${{ inputs.operation == 'deploy' }}
+      shell: bash
+      run: | 
+        yq --exit-status --no-colors --inplace eval '{"service": .}' ./service.yaml
 
-    # - name: Read platform context
-    #   uses: docker://public.ecr.aws/u3q6g8t1/chamber:2.10.12
-    #   if: ${{ inputs.operation == 'deploy' }}
-    #   with:
-    #     args: --verbose export ${{ inputs.platform-ssm-path }} --format yaml --output-file ./platform.yaml
+    - name: Read platform context
+      uses: ./actions/import-configs
+      if: ${{ inputs.operation == 'deploy' }}
+      with:
+        sm-path: ${{ inputs.platform-ssm-path }}
+        configs-file: ${{ github.action_path }}/platform.yaml
 
-    # - name: YQ Platform settings
-    #   if: ${{ inputs.operation == 'deploy' }}
-    #   shell: bash
-    #   run: |
-    #     sudo chmod 777 ./platform.yaml 
-    #     yq --exit-status --no-colors --inplace eval '{"platform": .}' ./platform.yaml
+    - name: YQ Platform settings
+      if: ${{ inputs.operation == 'deploy' }}
+      shell: bash
+      run: |
+        yq --exit-status --no-colors --inplace eval '{"platform": .}' ./platform.yaml
 
     # - name: Read platform metadata
     #   uses: docker://public.ecr.aws/u3q6g8t1/chamber:2.10.12

@@ -257,6 +257,7 @@ jobs:
           image: ${{ steps.image.outputs.out }}
           image-tag: ${{ inputs.image-tag }}
           service-config-sm-path: ${{ steps.environment.outputs.service-config-sm-path }} 
+          platform-ssm-path: ${{ steps.environment.outputs.platform-ssm-path }}
           operation: deploy
           ref: ${{ github.sha }}
           debug: true
