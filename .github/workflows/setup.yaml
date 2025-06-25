@@ -70,10 +70,6 @@ on:
         description: Dynamic Helm values in JSON #! TBD 
         default: ''
         required: false
-      ar-region:
-        description: "Artifact Registry region"
-        required: true
-        type: string
       registry:
         description: "Artifact Registry repository"
         required: true
@@ -147,7 +143,6 @@ jobs:
           repository: ${{ inputs.repository }}
           tenant: ${{ inputs.tenant }}
           app-name: ${{ inputs.app-name }}
-          ar-region: ${{ inputs.ar-region }}
           registry: ${{ inputs.registry }}
           run-tests: ${{ inputs.run-tests }} 
     secrets:

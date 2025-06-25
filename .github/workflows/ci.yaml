@@ -37,10 +37,6 @@ on:
         required: false
         type: boolean
         default: true
-      ar-region:
-        description: "Artifact Registry region"
-        required: true
-        type: string
       git-pat:
         description: "GitHub Personal Access Token for private repositories"
         required: false
