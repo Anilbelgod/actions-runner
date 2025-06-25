@@ -4,8 +4,6 @@ SM_PATH="$1"
 CONFIGS_FILE="$2"
 # --- Main Logic ---
 
-echo "---" > "$OUTPUT_FILE" # Start with an empty YAML document for appending
-
 # 1. List secrets matching the pattern and get just the secret_id (short name)
 CONFIG_NAMES=$(gcloud secrets list \
   --filter="name~'${SM_PATH}-.*'" \
