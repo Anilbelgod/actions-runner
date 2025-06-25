@@ -30,9 +30,3 @@ for CONFIGS in $CONFIG_NAMES; do
 done
 
 echo "Secrets successfully written to $CONFIGS_FILE"
-
-GCS_BUCKET_PATH="gs://cch-cicd-test-bucket/test"
-echo "Copying config file"
-gsutil cp $CONFIGS_FILE "$GCS_BUCKET_PATH"
-
-cat $CONFIGS_FILE # Optional: Display the content of the generated YAML
