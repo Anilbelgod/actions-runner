@@ -16,6 +16,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
       - name: Setup Atmos Environment
         uses: ./.github/actions/setup-atmos
 
@@ -24,8 +25,14 @@ jobs:
         run: |
           atmos terraform init google-storage-bucket --stack plat-gbl-dev
 
+      - name: Atmos Terraform plan
+        id: atmos-plan  
+        run: |
+          atmos terraform plan google-storage-bucket --stack plat-gbl-dev
+
       - name: Atmos Terraform apply
         id: atmos-apply
+        environment:
+          name: apply-approval   # <-- Create this environment in GitHub and add required reviewers
         run: |
           atmos terraform apply google-storage-bucket --stack plat-gbl-dev
-          
