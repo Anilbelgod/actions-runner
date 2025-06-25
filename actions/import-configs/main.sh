@@ -4,7 +4,6 @@ SM_PATH="$1"
 CONFIGS_FILE="$2"
 # --- Main Logic ---
 
-echo 
 # 1. List secrets matching the pattern and get just the secret_id (short name)
 CONFIG_NAMES=$(gcloud secrets list \
   --filter="name~'${SM_PATH}-.*'" \
@@ -31,4 +30,9 @@ for CONFIGS in $CONFIG_NAMES; do
 done
 
 echo "Secrets successfully written to $CONFIGS_FILE"
+
+GCS_BUCKET_PATH="gs://cch-cicd-test-bucket/test"
+echo "Copying config file"
+gsutil cp $CONFIGS_FILE "$GCS_BUCKET_PATH"
+
 cat $CONFIGS_FILE # Optional: Display the content of the generated YAML
