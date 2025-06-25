@@ -41,7 +41,5 @@ jobs:
 
       - name: Atmos Terraform apply
         id: atmos-apply
-        environment:
-          name: apply-approval   # <-- Create this environment in GitHub and add required reviewers
         run: |
           atmos terraform apply google-storage-bucket --stack plat-gbl-dev
