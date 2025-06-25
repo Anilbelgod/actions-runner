@@ -69,6 +69,7 @@ inputs:
     description: The name of the label used to describe the helm release
     default: "release"
     required: false
+  
    
   synchronously:
     description: "Wait until ArgoCD successfully apply the changes"
@@ -92,6 +93,9 @@ inputs:
     required: false
   github-pat:
     description: Github PAT to access argocd configuration repository
+    required: true
+  service-config-sm-path:
+    description: "The path to the service configs in GCP Secrets Manager"
     required: true
 
 
@@ -164,7 +168,7 @@ runs:
       uses: ./actions/import-configs 
       if: ${{ inputs.operation == 'deploy' }}
       with:
-        sm-path: ${{ inputs.service-config-ssm-path }}
+        sm-path: ${{ inputs.service-config-sm-path }}
         configs-file: ${{ github.action_path }}/service.yaml
 
     # - name: YQ Platform settings
