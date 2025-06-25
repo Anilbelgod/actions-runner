@@ -161,7 +161,7 @@ runs:
     - name: Create and set permissions for config files
       shell: bash 
       env:
-        CONFIG_FILES: "${{ github.action_path }}/service.yaml ${{ github.action.path }}/platform.yaml ${{ github.action_path }}/_metadata.yaml"
+        CONFIG_FILES: "${{ github.action_path }}/service.yaml ${{ github.action.path }}/platform.yaml ${{ github.action_path }}/metadata.yaml"
       run: |
         sudo touch $CONFIG_FILES
         sudo chmod 777 $CONFIG_FILES
@@ -192,32 +192,33 @@ runs:
       run: |
         yq --exit-status --no-colors --inplace eval '{"platform": .}' ${{ github.action_path }}/platform.yaml
 
-    # - name: Read platform metadata
-    #   uses: docker://public.ecr.aws/u3q6g8t1/chamber:2.10.12
-    #   if: ${{ inputs.operation == 'deploy' }}
-    #   with:
-    #     args: --verbose export ${{ inputs.platform-ssm-path }}/_metadata --format yaml --output-file ./_metadata.yaml
+    - name: Read platform metadata
+      uses: ./actions/import-configs
+      if: ${{ inputs.operation == 'deploy' }}
+      with:
+        sm-path: ${{ inputs.platform-sm-path }}-metadata 
+        configs-file: ${{ github.action_path }}/metadata.yaml
 
-    # - name: YQ Platform settings
-    #   if: ${{ inputs.operation == 'deploy' }}
-    #   shell: bash
-    #   id: metadata
-    #   run: |
-    #     for output in $(yq --exit-status --no-colors eval-all '. | to_entries | map( .key + "=" + .value ) | join("\n")' ./_metadata.yaml); do
-    #       echo "${output}" >> $GITHUB_OUTPUT ;
-    #     done
+    - name: YQ Platform settings
+      if: ${{ inputs.operation == 'deploy' }}
+      shell: bash
+      id: metadata
+      run: |
+        for output in $(yq --exit-status --no-colors eval-all '. | to_entries | map( .key + "=" + .value ) | join("\n")' ${{ github.action_path }}/metadata.yaml); do
+          echo "${output}" >> $GITHUB_OUTPUT ;
+        done
 
     - name: Context
       if: ${{ inputs.operation == 'deploy' }}
       id: arguments
       uses: cloudposse/github-action-yaml-config-query@0.1.3
       with:
-        query: .${{ steps.metadata.outputs.kube_version == '' }}
+        query: .${{ steps.metadata.outputs.kube-version == '' }}
         config: |-
           true: 
-            kube_version: ""
+            kube-version: ""
           false:
-            kube_version: --kube-version=${{ steps.metadata.outputs.kube_version }}      
+            kube-version: --kube-version=${{ steps.metadata.outputs.kube-version }}      
 
 
     - name: Ensure argocd repo structure
@@ -258,7 +259,7 @@ runs:
           --file "${{ github.workspace }}/actions/deploy-argocd/app.yaml" \
           --state-values-file "${{ github.workspace }}/actions/deploy-argocd/dev.yaml" \
           template \
-          --args="${{ steps.arguments.outputs.kube_version }}" \
+          --args="${{ steps.arguments.outputs.kube-version }}" \
           > ${{ steps.config.outputs.tmp }}/manifests/resources.yaml
       env:
         IMAGE_NAME: ${{ inputs.image }}
@@ -279,7 +280,7 @@ runs:
           --values $(pwd)/service.yaml \
           --values $(pwd)/platform.yaml \
           --values "${{ inputs.helm-values-file }}" \
-          ${{ steps.arguments.outputs.kube_version }} \
+          ${{ steps.arguments.outputs.kube-version }} \
         > $GITHUB_WORKSPACE/manifests/resources.yaml
 
       env:
