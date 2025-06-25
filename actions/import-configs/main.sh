@@ -7,7 +7,7 @@ CONFIGS_FILE="$2"
 # 1. List secrets matching the pattern and get just the secret_id (short name)
 CONFIG_NAMES=$(gcloud secrets list \
   --filter="name~'${SM_PATH}-.*'" \
-  --format="value(secret_id)")
+  --format="value(name)")
 
 
 # 2. Iterate through each short secret name, fetch its latest version, and format
