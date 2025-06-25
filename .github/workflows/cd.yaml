@@ -258,6 +258,7 @@ jobs:
           image-tag: ${{ inputs.image-tag }}
           service-config-sm-path: ${{ steps.environment.outputs.service-config-sm-path }} 
           platform-sm-path: ${{ steps.environment.outputs.platform-sm-path }}
+          platform-metadata-sm-path: ${{ steps.environment.outputs.platform-metadata-sm-path }} 
           operation: deploy
           ref: ${{ github.sha }}
           debug: true

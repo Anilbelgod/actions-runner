@@ -100,6 +100,9 @@ inputs:
   platform-sm-path:
     description: "The path to the platform configs in GCP Secrets Manager"
     required: true 
+  platform-metadata-sm-path:
+    description: "The path to the platform metadata in GCP Secrets Manager"
+    required: true
 
 outputs:
   webapp-url:
@@ -196,7 +199,7 @@ runs:
       uses: ./actions/import-configs
       if: ${{ inputs.operation == 'deploy' }}
       with:
-        sm-path: ${{ inputs.platform-sm-path }}-metadata 
+        sm-path: ${{ inputs.platform-metadata-sm-path }}  
         configs-file: ${{ github.action_path }}/metadata.yaml
 
     - name: YQ Platform settings

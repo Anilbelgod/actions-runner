@@ -84,12 +84,12 @@ releases:
     values:
     # References https://external-secrets.io/v0.9.3
     - resources:
-        - apiVersion: external-secrets.io/v1beta1
+        - apiVersion: external-secrets.io/v1
           kind: ExternalSecret
           metadata:
             name: {{ .Values.deployment.app_name }}
           spec:
-            refreshInterval: 60s # Rate SecretManager pulls the AWS SSM Parameter Store
+            refreshInterval: 60s # Rate SecretManager pulls the GCP Secret Manager 
             secretStoreRef:
               name: secret-store-parameter-store
               kind: ClusterSecretStore
