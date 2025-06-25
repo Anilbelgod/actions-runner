@@ -26,7 +26,7 @@ for CONFIGS in $CONFIG_NAMES; do
     --quiet | tr -d '\n')
 
   # Append the key-value pair to the YAML file using yq
-  yq eval -i ".${CONFIG_KEY} = ${SECRET_VALUE}" "$CONFIGS_FILE"
+  yq eval -i ".${CONFIG_KEY} = \"${SECRET_VALUE}\"" "$CONFIGS_FILE"
 done
 
 echo "Secrets successfully written to $CONFIGS_FILE"
