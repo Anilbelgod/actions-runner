@@ -97,7 +97,9 @@ inputs:
   service-config-sm-path:
     description: "The path to the service configs in GCP Secrets Manager"
     required: true
-
+  platform-sm-path:
+    description: "The path to the platform configs in GCP Secrets Manager"
+    required: true 
 
 outputs:
   webapp-url:
@@ -181,7 +183,7 @@ runs:
       uses: ./actions/import-configs
       if: ${{ inputs.operation == 'deploy' }}
       with:
-        sm-path: ${{ inputs.platform-ssm-path }}
+        sm-path: ${{ inputs.platform-sm-path }}
         configs-file: ${{ github.action_path }}/platform.yaml
 
     - name: YQ Platform settings
