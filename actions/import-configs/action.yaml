@@ -1,0 +1,24 @@
+name: "Export secrets from GCP Secrets Manager" 
+
+description: "Export secrets from GCP Secrets Manager to temporary secrets file" 
+
+inputs:
+  sm-path:
+    description: "The path to the configs in GCP Secrets Manager"
+    required: true 
+  configs-file:
+    description: "The path to the secrets file in the repository"
+    required: true
+
+runs:
+  using: "composite" 
+  steps:
+
+    - name: Make file executable
+      run: chmod +x ${{ github.action_path }}/main.sh
+      shell: bash
+
+    - name: Run main script
+      shell: bash
+      run: | 
+       ${{ github.action_path }}/main.sh ${{ inputs.sm-path }} ${{ inputs.configs-file }}

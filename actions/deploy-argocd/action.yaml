@@ -151,12 +151,21 @@ runs:
         ref: ${{ steps.destination.outputs.ref }}
         token: ${{ inputs.github-pat }}
         path: ${{ steps.destination_dir.outputs.name }}
+    
+    - name: Create and set permissions for config files
+      shell: bash 
+      env:
+        CONFIG_FILES: "${{ github.action_path }}/service.yaml ${{ github.action.path }}/platform.yaml ${{ github.action_path }}/_metadata.yaml"
+      run: |
+        touch $CONFIG_FILES
+        sudo chmod 777 $CONFIG_FILES
 
-    # - name: Read service context
-    #   uses: docker://public.ecr.aws/u3q6g8t1/chamber:2.10.12
-    #   if: ${{ inputs.operation == 'deploy' }}
-    #   with:
-    #     args: --verbose export ${{ inputs.service-config-ssm-path }} --format yaml --output-file ./service.yaml
+    - name: Read service context
+      uses: ./actions/import-configs 
+      if: ${{ inputs.operation == 'deploy' }}
+      with:
+        sm-path: ${{ inputs.service-config-ssm-path }}
+        configs-file: ./service.yaml 
 
     # - name: YQ Platform settings
     #   if: ${{ inputs.operation == 'deploy' }}
