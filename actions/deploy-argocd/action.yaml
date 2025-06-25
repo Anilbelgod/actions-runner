@@ -165,7 +165,7 @@ runs:
       if: ${{ inputs.operation == 'deploy' }}
       with:
         sm-path: ${{ inputs.service-config-ssm-path }}
-        configs-file: ./service.yaml 
+        configs-file: ${{ github.action_path }}/service.yaml
 
     # - name: YQ Platform settings
     #   if: ${{ inputs.operation == 'deploy' }}
