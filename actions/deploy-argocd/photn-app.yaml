@@ -30,13 +30,15 @@ releases:
     version: '2.0.0'
     values:
     - resources:
-        - apiVersion: v1
-          kind: ServiceAccount
-          metadata:
-            name: {{ .Values.deployment.app_name }}
-            annotations:
-            labels:
-              app: {{ .Values.deployment.app_name }}
+      # This is where your provided snippet should go, with correct indentation
+      - apiVersion: v1
+        kind: ServiceAccount
+        metadata:
+          name: {{ .Values.deployment.app_name }}
+          annotations:
+            iam.gke.io/gcp-service-account: "{{ .Values.gsa.name }}@{{ .Values.gsa.project_id }}.iam.gserviceaccount.com"
+          labels:
+            app: {{ .Values.deployment.app_name }}
 
   - name: '{{ .Values.deployment.app_name }}-deploy'
     chart: 'bedag/raw'
