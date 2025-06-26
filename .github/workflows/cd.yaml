@@ -246,6 +246,14 @@ jobs:
           export dynamic_values="${{ inputs.dynamic-helm-values }}"
 
           yq -i '.deployment.dynamic_values |= env(dynamic_values)' ${{ steps.deploy-helm-values-file-path.outputs.deploy }}
+          
+      - name: Show deploy Helm values file
+        if: ${{ inputs.toolchain == 'helmfile' }}
+        shell: bash
+        run: |
+          echo "Contents of deploy Helm values file:"
+          cat "${{ steps.deploy-helm-values-file-path.outputs.deploy }}"
+        
 
       
 
