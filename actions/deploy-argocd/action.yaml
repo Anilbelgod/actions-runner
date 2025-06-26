@@ -258,6 +258,7 @@ runs:
       shell: bash
       run: |
         helmfile --namespace gh-namespace \
+          --debug
           --environment dev \
           --file "${{ github.workspace }}/actions/deploy-argocd/app.yaml" \
           --state-values-file "${{ github.workspace }}/actions/deploy-argocd/dev.yaml" \
