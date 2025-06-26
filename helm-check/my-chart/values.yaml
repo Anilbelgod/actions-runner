@@ -1,0 +1,16 @@
+
+replicaCount: 1
+
+
+deployment:
+  appName: "my-example-app" # This will substitute into '{{ .Values.deployment.appName }}'
+  
+
+image:
+  repository: "us-east4-docker.pkg.dev/cch-plat-glb-dev-project-4/cch-cicd-test/anilbelgod/example-app"
+  tag: 'sha-b113bd3e011c8bcba64bd56f8ba5a6db713b7b14'
+
+
+ingress:
+ 
+  host: ""

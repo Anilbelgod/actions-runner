@@ -1,41 +1,143 @@
+# repositories:
+#   # Cloud Posse incubator repo of helm charts
+#   - name: "cloudposse-incubator"
+#     url: "https://charts.cloudposse.com/incubator/"
+#   - name: 'bedag'
+#     url: 'https://bedag.github.io/helm-charts/' # Source - https://github.com/bedag/helm-charts/tree/master/charts/raw
+
+#   # The bedag/raw chart is no longer needed for this basic setup
+#   # and has been removed to simplify the configuration.
+
+# releases:
+#   # Main application release using a general-purpose monochart.
+#   # References:
+#   #   - https://github.com/cloudposse/charts/tree/master/incubator/monochart
+#   - name: '{{ .Values.deployment.appName }}'
+#     chart: "cloudposse-incubator/monochart"
+#     version: "0.26.0"
+#     wait: true
+#     force: true
+#     values:
+#       - fullnameOverride: '{{ .Values.deployment.appName }}'
+#         nameOverride: '{{ .Values.deployment.appName }}'
+
+#         image:
+#           repository: '{{ .Values.image.repository }}'
+#           tag: '{{ .Values.image.tag }}'
+#           pullPolicy: Always
+
+#         replicaCount: {{ .Values.replicaCount }}
+
+#         # Simplified environment variables.
+#         # Secrets should be managed via a GCP-native method,
+#         # such as Google Secret Manager and the External Secrets Operator.
+#         envFrom:
+#         - secretRef:
+#             name: '{{ .Values.deployment.appName }}-secrets'
+
+#         # Standard Kubernetes service definition.
+#         service:
+#           enabled: true
+#           type: ClusterIP
+#           ports:
+#             default:
+#               internal: 8080
+#               external: 80
+
+#         # Ingress configuration for GCP.
+#         # This uses the standard GKE Ingress controller.
+
+#         # Health checks for the application.
+#         probes:
+#           livenessProbe:
+#             httpGet:
+#               path: /healthz
+#               port: default
+#               scheme: HTTP
+#             initialDelaySeconds: 15
+#             periodSeconds: 10
+#             timeoutSeconds: 5
+#             failureThreshold: 3
+#           readinessProbe:
+#             httpGet:
+#               path: /healthz
+#               port: default
+#               scheme: HTTP
+#             initialDelaySeconds: 5
+#             periodSeconds: 10
+#             timeoutSeconds: 5
+#             failureThreshold: 3
+
+#         # Resource requests and limits for the container.
+#         # It's good practice to start with reasonable values and adjust as needed.
+#         resources:
+#           requests:
+#             memory: "256Mi"
+#             cpu: "250m"
+#           limits:
+#             memory: "512Mi"
+#             cpu: "500m"
+
+#   - name: '{{ .Values.deployment.appName }}-secrets'
+#     chart: 'bedag/raw'
+#     version: '2.0.0'
+#     values:
+#     # References https://external-secrets.io/v0.9.3
+#       - resources:
+#         - apiVersion: external-secrets.io/v1
+#           kind: ExternalSecret
+#           metadata:
+#             name: {{ .Values.deployment.appName }}
+#           spec:
+#             refreshInterval: 60s # Rate SecretManager pulls the GCP Secret Manager 
+#             secretStoreRef:
+#               name: gcp-secret-manager-store
+#               kind: SecretStore
+#             target:
+#               name: {{ .Values.deployment.appName }} # Name of the k8s Secret to be created
+#               creationPolicy: Owner
+#             data:
+#             {{ $service_secret_sm_path := $.Values.deployment.service_secret_sm_path }}
+#             {{ range $i, $envar_key := $.Values.deployment.envar_keys }}
+#               - secretKey: {{ $envar_key }}
+#                 remoteRef:
+#                   key: {{ $service_secret_sm_path }}-{{ $envar_key }}
+#             {{ end }}
+
+
+# In your helmfile.yaml-like file (the one that uses {{ .Values }} templating)
+
 repositories:
   # Cloud Posse incubator repo of helm charts
   - name: "cloudposse-incubator"
     url: "https://charts.cloudposse.com/incubator/"
   - name: 'bedag'
-    url: 'https://bedag.github.io/helm-charts/' # Source - https://github.com/bedag/helm-charts/tree/master/charts/raw
-
-  # The bedag/raw chart is no longer needed for this basic setup
-  # and has been removed to simplify the configuration.
+    url: 'https://bedag.github.io/helm-charts/'
 
 releases:
-  # Main application release using a general-purpose monochart.
-  # References:
-  #   - https://github.com/cloudposse/charts/tree/master/incubator/monochart
-  - name: '{{ .Values.deployment.appName }}'
+  # This uses the 'app_name' set directly by yq (from inputs.app-name)
+  - name: '{{ .Values.deployment.app_name }}'
     chart: "cloudposse-incubator/monochart"
     version: "0.26.0"
     wait: true
     force: true
     values:
-      - fullnameOverride: '{{ .Values.deployment.appName }}'
-        nameOverride: '{{ .Values.deployment.appName }}'
+      # These values now come from .Values.deployment.repo_values.<key>
+      # Accessing the key changed from 'appName' to 'app_name'
+      - fullnameOverride: '{{ .Values.deployment.repo_values.deployment.app_name }}' # <-- CHANGE HERE
+        nameOverride: '{{ .Values.deployment.repo_values.deployment.app_name }}'     # <-- CHANGE HERE
 
         image:
-          repository: '{{ .Values.image.repository }}'
-          tag: '{{ .Values.image.tag }}'
+          repository: '{{ .Values.deployment.repo_values.image.repository }}'
+          tag: '{{ .Values.deployment.repo_values.image.tag }}'
           pullPolicy: Always
 
-        replicaCount: {{ .Values.replicaCount }}
+        replicaCount: {{ .Values.deployment.repo_values.replicaCount }}
 
-        # Simplified environment variables.
-        # Secrets should be managed via a GCP-native method,
-        # such as Google Secret Manager and the External Secrets Operator.
         envFrom:
         - secretRef:
-            name: '{{ .Values.deployment.appName }}-secrets'
+            name: '{{ .Values.deployment.app_name }}-secrets' # Keep consistent with this app_name
 
-        # Standard Kubernetes service definition.
         service:
           enabled: true
           type: ClusterIP
@@ -44,61 +146,33 @@ releases:
               internal: 8080
               external: 80
 
-        # Ingress configuration for GCP.
-        # This uses the standard GKE Ingress controller.
+        # ... (probes, resources, ingress as they were, adjusted to repo_values. only if they are coming from the inputs.helm-values-file) ...
+        # Example for ingress:
+        # ingress:
+        #   host: '{{ .Values.deployment.repo_values.ingress.host }}'
+        #   enabled: true
 
-        # Health checks for the application.
-        probes:
-          livenessProbe:
-            httpGet:
-              path: /healthz
-              port: default
-              scheme: HTTP
-            initialDelaySeconds: 15
-            periodSeconds: 10
-            timeoutSeconds: 5
-            failureThreshold: 3
-          readinessProbe:
-            httpGet:
-              path: /healthz
-              port: default
-              scheme: HTTP
-            initialDelaySeconds: 5
-            periodSeconds: 10
-            timeoutSeconds: 5
-            failureThreshold: 3
 
-        # Resource requests and limits for the container.
-        # It's good practice to start with reasonable values and adjust as needed.
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
-
-  - name: '{{ .Values.deployment.appName }}-secrets'
+  - name: '{{ .Values.deployment.app_name }}-secrets' # Consistent with first release name
     chart: 'bedag/raw'
     version: '2.0.0'
     values:
-    # References https://external-secrets.io/v0.9.3
       - resources:
         - apiVersion: external-secrets.io/v1
           kind: ExternalSecret
           metadata:
-            name: {{ .Values.deployment.appName }}
+            name: {{ .Values.deployment.app_name }} # Consistent secret name
           spec:
-            refreshInterval: 60s # Rate SecretManager pulls the GCP Secret Manager 
+            refreshInterval: 60s
             secretStoreRef:
               name: gcp-secret-manager-store
               kind: SecretStore
             target:
-              name: {{ .Values.deployment.appName }} # Name of the k8s Secret to be created
+              name: {{ .Values.deployment.app_name }} # Consistent secret target name
               creationPolicy: Owner
             data:
-            {{ $service_secret_sm_path := $.Values.deployment.service_secret_sm_path }}
-            {{ range $i, $envar_key := $.Values.deployment.envar_keys }}
+            {{ $service_secret_sm_path := .Values.deployment.service_secret_sm_path }}
+            {{ range $i, $envar_key := .Values.deployment.envar_keys }}
               - secretKey: {{ $envar_key }}
                 remoteRef:
                   key: {{ $service_secret_sm_path }}-{{ $envar_key }}

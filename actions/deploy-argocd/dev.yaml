@@ -1,16 +1,9 @@
+# my-chart/values.yaml (this is what you provide to inputs.helm-values-file)
 
 replicaCount: 1
 
-
 deployment:
-  appName: "example-app"
-
-
-image:
-  repository: "us-east4-docker.pkg.dev/cch-plat-glb-dev-project-4/cch-cicd-test/anilbelgod/example-app"
-  tag: 'sha-b113bd3e011c8bcba64bd56f8ba5a6db713b7b14'
-
+  app_name: "my-example-app" # <-- Changed from appName to app_name here
 
 ingress:
- 
   host: ""
