@@ -247,7 +247,7 @@ runs:
       if: ${{ inputs.debug == 'true' }}
       shell: bash
       run: echo "HELM_DEBUG_FLAG=--debug" >> $GITHUB_ENV
-      
+
     - name: Ensure output directory and file exist
       shell: bash
       run: |
@@ -258,9 +258,8 @@ runs:
       if: ${{ inputs.toolchain == 'helmfile' && inputs.operation == 'deploy' }}
       shell: bash
       run: |
-        helmfile --namespace gh-namespace \
+        helmfile --namespace ${{ inputs.namespace }} \
           ${{ env.HELM_DEBUG_FLAG }} \
-
           --environment dev \
           --file "${{ github.workspace }}/actions/deploy-argocd/app.yaml" \
           --state-values-file "${{ github.workspace }}/actions/deploy-argocd/dev.yaml" \
