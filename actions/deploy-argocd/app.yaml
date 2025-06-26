@@ -83,7 +83,7 @@ releases:
     version: '2.0.0'
     values:
     # References https://external-secrets.io/v0.9.3
-    - resources:
+      - resources:
         - apiVersion: external-secrets.io/v1
           kind: ExternalSecret
           metadata:
