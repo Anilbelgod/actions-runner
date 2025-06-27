@@ -266,8 +266,8 @@ runs:
           --args="${{ steps.arguments.outputs.kube-version }}" \
           > ${{ steps.config.outputs.tmp }}/manifests/resources.yaml
       env:
-        IMAGE_NAME: ${{ inputs.image }}
-        IMAGE_TAG: ${{ inputs.image-tag }}
+        IMAGE_NAME: "us-east4-docker.pkg.dev/cch-plat-glb-dev-project-4/cch-cicd-test/anilbelgod/example-app" #${{ inputs.image }}
+        IMAGE_TAG: "latest" #${{ inputs.image-tag }}
 
     - name: Helm raw render
       if: ${{ inputs.toolchain == 'helm' && inputs.operation == 'deploy' }}
