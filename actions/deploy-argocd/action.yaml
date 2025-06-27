@@ -138,7 +138,7 @@ runs:
     - id: destination
       uses: theowenyoung/git-url-parse@v1
       with:
-        url: "https://github.com/srinivasan-rajagopal/argocd-repo/blob/main/plat/use1-dev/apps/cch-dev" # {{ inputs.cluster}}
+        url: "https://github.com/CareCloud/argocd-deploy-non-prod-gcp/blob/main/plat/use4-dev/argocd" # {{ inputs.cluster}}
 
     - id: destination_dir
       shell: bash
