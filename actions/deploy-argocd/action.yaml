@@ -260,7 +260,7 @@ runs:
       run: |
         helmfile --namespace ${{ inputs.namespace }} \
           ${{ env.HELM_DEBUG_FLAG }} \
-          --file "${{ github.workspace }}/actions/deploy-argocd/app.yaml" \
+          --file "${{ github.workspace }}/actions/deploy-argocd/helmfile.yaml" \
           --state-values-file "${{ github.workspace }}/actions/deploy-argocd/dev.yaml" \
           template \
           --args="${{ steps.arguments.outputs.kube-version }}" \
