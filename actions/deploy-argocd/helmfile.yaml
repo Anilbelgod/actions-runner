@@ -1,0 +1,5 @@
+helmfiles:
+  - path: "app.yaml"
+    values:
+      -
+{{ .Values | toYaml | indent 8 }}

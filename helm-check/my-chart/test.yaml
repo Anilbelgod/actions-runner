@@ -1,0 +1,112 @@
+---
+# Source: monochart/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: example-app
+  labels:
+    app: example-app
+    chart: monochart-0.26.0
+    heritage: "Helm"
+    release: "example-app"
+spec:
+  type: ClusterIP
+  ports:
+  - targetPort: default
+    port: 80
+    protocol: TCP
+    name: default
+  selector:
+    app: example-app
+    release: example-app
+    serve: "true"
+---
+# Source: monochart/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-app
+  annotations:
+    reloader.stakater.com/auto: "true"
+  labels:
+    app: example-app
+    chart: monochart-0.26.0
+    heritage: "Helm"
+    release: "example-app"
+    tags.datadoghq.com/env: cch-plat-dev
+    tags.datadoghq.com/service: example-app
+    tags.datadoghq.com/version: 3781e9b7fd8022920a5379241dad8cf1c9372a6f
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: example-app
+      release: example-app
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 1
+    type: RollingUpdate
+  revisionHistoryLimit: 10
+  template:
+    metadata:
+      name: example-app
+      annotations:
+        checksum/config: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+        checksum/secret: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      labels:
+        app: example-app
+        release: "example-app"
+        serve: "true"
+        tags.datadoghq.com/env: cch-plat-dev
+        tags.datadoghq.com/service: example-app
+        tags.datadoghq.com/version: 3781e9b7fd8022920a5379241dad8cf1c9372a6f
+    spec:
+      serviceAccountName: example-app
+      containers:
+      - name: example-app
+        image: gcr.io/cch-plat-dev/example-app:latest
+        imagePullPolicy: Always
+        
+        envFrom:
+        - secretRef:
+            name: example-app
+        env:
+          - name: DD_LOGS_INJECTION
+            value: "true"
+          - name: DD_RUNTIME_METRICS_ENABLED
+            value: "true"
+        
+        env:
+          - name: DD_AGENT_HOST
+            valueFrom:
+              fieldRef:
+                fieldPath: status.hostIP
+          - name: DD_ENV
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.labels['tags.datadoghq.com/env']
+          - name: DD_SERVICE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.labels['tags.datadoghq.com/service']
+          - name: DD_VERSION
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.labels['tags.datadoghq.com/version']
+        
+        ports:
+          - name: default
+            containerPort: 8080
+            protocol: TCP
+        volumeMounts:
+        
+        resources:
+          limits:
+            cpu: 100m
+            memory: 10Mi
+          requests:
+            cpu: 100m
+            memory: 10Mi
+      imagePullSecrets:
+      volumes:
+

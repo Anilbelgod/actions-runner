@@ -1,0 +1,4 @@
+helmfiles:
+  - path: "app.yaml"
+    values:
+      - values.yaml

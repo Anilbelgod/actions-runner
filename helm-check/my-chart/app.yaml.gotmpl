@@ -22,9 +22,10 @@ releases:
     - fullnameOverride: '{{ .Values.deployment.app_name }}'
       nameOverride: '{{ .Values.deployment.app_name }}'
       serviceAccountName: '{{ .Values.deployment.app_name }}'
+
       image:
-        repository: '{{ .Values.IMAGE_NAME }}'
-        tag: '{{ .Values.IMAGE_TAG }}'
+        repository: '{{ .Values.image.repository }}'
+        tag: '{{ .Values.image.tag }}'
         pullPolicy: Always
       replicaCount: 2
 
@@ -33,6 +34,15 @@ releases:
         enabled: true
         annotations:
           reloader.stakater.com/auto: "true" # Reload pods for any modification of a ConfigMap or Secret
+        pod: 
+          labels:
+            tags.datadoghq.com/env: '{{ .Values.deployment.namespace }}'
+            tags.datadoghq.com/service: '{{ .Values.deployment.app_name }}'
+            tags.datadoghq.com/version: '{{ .Values.deployment.version }}'
+        labels: 
+          tags.datadoghq.com/env: '{{ .Values.deployment.namespace }}'
+          tags.datadoghq.com/service: '{{ .Values.deployment.app_name }}'
+          tags.datadoghq.com/version: '{{ .Values.deployment.version }}'
         strategy:
           type: "RollingUpdate"
           rollingUpdate:
@@ -44,15 +54,32 @@ releases:
         default:
           enabled: true
 
+      # Datadog APM
+      env:
+        DD_LOGS_INJECTION: "true"
+        DD_RUNTIME_METRICS_ENABLED: "true"
+      envFromFieldRefFieldPath:
+        DD_AGENT_HOST: status.hostIP
+        DD_ENV: metadata.labels['tags.datadoghq.com/env']
+        DD_SERVICE: metadata.labels['tags.datadoghq.com/service']
+        DD_VERSION: metadata.labels['tags.datadoghq.com/version']
+
+      envFrom:
+        secrets:
+          - '{{ .Values.deployment.app_name }}'
+
       # Service endpoint 
       service:
         enabled: true
-        type: LoadBalancer
+        type: ClusterIP
         ports:
           default:
             internal: 8080
             external: 80
-
+      ingress:
+        default:
+          enabled: false
+          port: default
 
       resources:
         requests:
@@ -60,32 +87,5 @@ releases:
           cpu: 100m
         limits:
           memory: 10Mi
-        cpu: 100m
-    - name: '{{ .Values.deployment.app_name }}-secrets' # Consistent with first release name
-      chart: 'bedag/raw'
-      version: '2.0.0'
-      values:
-        - resources:
-          - apiVersion: external-secrets.io/v1
-            kind: ExternalSecret
-            metadata:
-              name: {{ .Values.deployment.app_name }} # Consistent secret name
-            spec:
-              refreshInterval: 60s
-              secretStoreRef:
-                name: gcp-secret-manager-store
-                kind: SecretStore
-              target:
-                name: {{ .Values.deployment.app_name }} # Consistent secret target name
-                creationPolicy: Owner
-              data:
-              {{ $service_secret_sm_path := .Values.deployment.service_secret_sm_path }}
-              {{ range $i, $envar_key := .Values.deployment.envar_keys }}
-                - secretKey: {{ $envar_key }}
-                  remoteRef:
-                    key: {{ $service_secret_sm_path }}-{{ $envar_key }}
-              {{ end }}
+          cpu: 100m
 
-
-
-  

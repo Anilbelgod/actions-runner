@@ -65,7 +65,7 @@ on:
       helm-file-path:
         description: "The path where lives the helmfile or helm chart."
         required: false
-        default: './actions/deploy-argocd/app.yaml'
+        default: './actions/deploy-argocd/helmfile.yaml'
         type: string
       helm-values-file:
         type: string
