@@ -3,27 +3,28 @@ deployment:
     - db-user
     - gcp-region
   region: us-east4
-  
   app_name: example-app
-  IMAGE_NAME: us-east4-docker.pkg.dev/cch-plat-glb-dev-project-4/cch-cicd-test/anilbelgod/example-app
-  IMAGE_TAG: sha-b113bd3e011c8bcba64bd56f
+
   service_secret_sm_path: service-example-app-secret-plat
   config_app_name: example-app
-  branch_or_tag_name: 
+  branch_or_tag_name: ""
   namespace: cch-plat-dev
-  version: 0b901e3c4d5f9b3abb04504ac3e5dee4bd6b7100
+  version: 3781e9b7fd8022920a5379241dad8cf1c9372a6f
   repo_values:
-    # Number of pod replicas to run.
-    replicaCount: 1
-    # Deployment-specific configurations.
-    deployment:
-      appName: example-app
-    # Image settings for your application's container.
-    image:
-      repository: us-east4-docker.pkg.dev/cch-plat-glb-dev-project-4/cch-cicd-test/anilbelgod/example-app
-      tag: 'sha-b113bd3e011c8bcba64bd56f8ba5a6db713b7b14'
-    # Ingress settings for exposing your application.
-    ingress:
-      # Replace with the domain you want to use for your application.
-      host: 
+    deploy:
+      rolling_update:
+        max_surge: 25%
+        max_unavailable: 0
+    auto_scaler:
+      min_replicas: 1
+      max_replicas: 3
+    resources:
+      requests:
+        cpu: 200m
+        memory: 800Mi
+      limits:
+        cpu: 250m
+        memory: 1000Mi
   dynamic_values: {}
+  IMAGE_NAME: gcr.io/cch-plat-dev/example-app:latest
+  IMAGE_TAG: latest
