@@ -215,18 +215,17 @@ runs:
           done <<< "$vault_key_list"
 
 
-        secrets_keys_to_import_count=${#vault_keys[@]}
-        echo "Secret keys count to import: $secrets_keys_to_import_count"
+          secrets_keys_to_import_count=${#vault_keys[@]}
+          echo "Secret keys count to import: $secrets_keys_to_import_count"
 
-        if [ "$secrets_keys_to_import_count" -gt "0" ]; then
-            do_import="true"
-            secrets_keys_to_import=$(yq ". | keys" "$VAULT_SECRETS_FILE_PATH")
-            echo "Secret keys to import:"
-            echo "$secrets_keys_to_import"
-        else
-            echo "No secrets found in Vault file to import."
-        fi
-      
+          if [ "$secrets_keys_to_import_count" -gt "0" ]; then
+              do_import="true"
+              secrets_keys_to_import=$(yq ". | keys" "$VAULT_SECRETS_FILE_PATH")
+              echo "Secret keys to import:"
+              echo "$secrets_keys_to_import"
+          else
+              echo "No secrets found in Vault file to import."
+          fi
         fi
 
         echo "do-import=$do_import" >> "$GITHUB_OUTPUT" 
