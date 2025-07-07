@@ -108,61 +108,128 @@ runs:
         VAULT_SECRETS_FILE_PATH=${{ steps.secrets-file.outputs.vault }}
         SM_SECRETS_FILE_PATH=${{ steps.secrets-file.outputs.sm }}
 
-        vault_key_list=$(yq ". | keys | .[]" $VAULT_SECRETS_FILE_PATH)
-        vault_keys=()
-
-        while IFS= read -r line ; do
-          if [ ! -z "$line" ]; then
-            vault_keys+=("$line")
-          fi
-        done <<< "$vault_key_list"
-
-        sm_key_list=$(yq ". | keys | .[]" $SM_SECRETS_FILE_PATH)
+        # --- Start of modifications ---
+        # Initialize variables for the case where SM_SECRETS_FILE_PATH is empty
         sm_keys=()
-
-        while IFS= read -r line ; do 
-          if [ ! -z "$line" ]; then
-            sm_keys+=("$line")
-          fi
-        done <<< "$sm_key_list"
-
-
-        for vault_key in "${vault_keys[@]}"; do
-          vault_value=$(yq ".$vault_key" $VAULT_SECRETS_FILE_PATH)
-              
-          if [ "$vault_value" == "" ]; then
-              echo "Error - Vault secret has no value. Secret key: $vault_key"
-              exit 1
-          fi
-
-          for sm_key in "${sm_keys[@]}"; do
-            if [ "$vault_key" == "$sm_key" ]; then
-              sm_value=$(yq ".$sm_key" $SM_SECRETS_FILE_PATH)
-
-              if [ "$vault_value" == "$sm_value" ]; then
-                yq -i "del(.$vault_key)" $VAULT_SECRETS_FILE_PATH
-
-                echo "Existing secret with no value change: $vault_key"
-              fi
-              break
-            fi
-          done;
-        done;
-
-        secrets_keys_to_import_count=$(yq ". | keys | length" $VAULT_SECRETS_FILE_PATH)
-        echo "Secret keys count to import: $secrets_keys_to_import_count"
-
+        secrets_keys_to_import_count=0
         do_import="false"
+
+        # Check if SM_SECRETS_FILE_PATH exists and is not empty
+        if [ -s "$SM_SECRETS_FILE_PATH" ]; then
+          echo "SM_SECRETS_FILE_PATH exists and is not empty. Proceeding with comparison."
+
+          sm_key_list=$(yq ". | keys | .[]" "$SM_SECRETS_FILE_PATH")
+          sm_keys=() # Re-initialize, as it's already set above, but good for clarity
+          while IFS= read -r line ; do 
+            if [ ! -z "$line" ]; then
+              sm_keys+=("$line")
+            fi
+          done <<< "$sm_key_list"
+
+          # Get vault keys (this section is moved inside the IF block for clarity)
+          vault_key_list=$(yq ". | keys | .[]" "$VAULT_SECRETS_FILE_PATH")
+          vault_keys=()
+
+          while IFS= read -r line ; do
+            if [ ! -z "$line" ]; then
+              vault_keys+=("$line")
+            fi
+          done <<< "$vault_key_list"
+
+          if [ -s "$SM_SECRETS_FILE_PATH" ]; then
+            echo "SM_SECRETS_FILE_PATH exists and is not empty. Proceeding with comparison."
+
+          sm_key_list=$(yq ". | keys | .[]" "$SM_SECRETS_FILE_PATH")
+          sm_keys=() # Re-initialize, as it's already set above, but good for clarity
+          while IFS= read -r line ; do 
+            if [ ! -z "$line" ]; then
+              sm_keys+=("$line")
+            fi
+          done <<< "$sm_key_list"
+
+          vault_key_list=$(yq ". | keys | .[]" "$VAULT_SECRETS_FILE_PATH")
+          vault_keys=()
+          while IFS= read -r line ; do
+            if [ ! -z "$line" ]; then
+              vault_keys+=("$line")
+            fi
+          done <<< "$vault_key_list"
+
+          # Only proceed with comparison if both vault_keys and sm_keys have content
+          if [ ${#vault_keys[@]} -gt 0 ] && [ ${#sm_keys[@]} -gt 0 ]; then
+            for vault_key in "${vault_keys[@]}"; do
+              vault_value=$(yq ".$vault_key" "$VAULT_SECRETS_FILE_PATH")
+                  
+              if [ "$vault_value" == "" ]; then
+                  echo "Error - Vault secret has no value. Secret key: $vault_key"
+                  exit 1
+              fi        
+        
+              for sm_key in "${sm_keys[@]}"; do
+                if [ "$vault_key" == "$sm_key" ]; then
+                  sm_value=$(yq ".$sm_key" "$SM_SECRETS_FILE_PATH")
+
+                  if [ "$vault_value" == "$sm_value" ]; then
+                    yq -i "del(.$vault_key)" "$VAULT_SECRETS_FILE_PATH"
+                    echo "Existing secret with no value change: $vault_key (removed from VAULT_SECRETS_FILE_PATH for import)"
+                  fi
+                  break
+                fi
+              done;
+            done;
+
+            secrets_keys_to_import_count=$(yq ". | keys | length" "$VAULT_SECRETS_FILE_PATH")
+            echo "Secret keys count to import: $secrets_keys_to_import_count"
+
+            if [ "$secrets_keys_to_import_count" -gt "0" ]; then
+                do_import="true"
+                secrets_keys_to_import=$(yq ". | keys" "$VAULT_SECRETS_FILE_PATH")
+
+                echo "Secret keys to import:"
+                echo "$secrets_keys_to_import"
+            else
+                echo "No new or changed secrets to import."
+            fi
+          else
+            echo "Either VAULT_SECRETS_FILE_PATH or SM_SECRETS_FILE_PATH is empty or has no keys. No comparison performed."
+            # If vault_keys is not empty but sm_keys is, then all vault keys need to be imported
+            if [ ${#vault_keys[@]} -gt 0 ] && [ ${#sm_keys[@]} -eq 0 ]; then
+                secrets_keys_to_import_count=${#vault_keys[@]}
+                do_import="true"
+                secrets_keys_to_import=$(yq ". | keys" "$VAULT_SECRETS_FILE_PATH")
+                echo "Secret keys count to import (SM was empty): $secrets_keys_to_import_count"
+                echo "Secret keys to import:"
+                echo "$secrets_keys_to_import"
+            fi
+          fi
+        else # This is the 'else' for the main 'if [ -s "$SM_SECRETS_FILE_PATH" ]'
+          echo "SM_SECRETS_FILE_PATH ($SM_SECRETS_FILE_PATH) is empty or does not exist. All secrets from Vault will be considered for import if present."
+          # If SM_SECRETS_FILE_PATH is empty, all secrets from vault_keys are candidates for import.
+          # We still need to populate vault_keys to get the count and keys for import.
+          vault_key_list=$(yq ". | keys | .[]" "$VAULT_SECRETS_FILE_PATH")
+          vault_keys=()
+          while IFS= read -r line ; do
+            if [ ! -z "$line" ]; then
+              vault_keys+=("$line")
+            fi
+          done <<< "$vault_key_list"
+
+
+        secrets_keys_to_import_count=${#vault_keys[@]}
+        echo "Secret keys count to import: $secrets_keys_to_import_count"
 
         if [ "$secrets_keys_to_import_count" -gt "0" ]; then
             do_import="true"
-            secrets_keys_to_import=$(yq ". | keys" $VAULT_SECRETS_FILE_PATH)
-
+            secrets_keys_to_import=$(yq ". | keys" "$VAULT_SECRETS_FILE_PATH")
             echo "Secret keys to import:"
             echo "$secrets_keys_to_import"
+        else
+            echo "No secrets found in Vault file to import."
+        fi
+      
         fi
 
-        echo "do-import=$do_import" >> "$GITHUB_OUTPUT"
+        echo "do-import=$do_import" >> "$GITHUB_OUTPUT" 
 
 
     - name: Import secrets from vault temp file to SM  

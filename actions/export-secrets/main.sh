@@ -14,7 +14,9 @@ while IFS=: read -r line; do
 
 
     if [ $? -ne 0 ]; then
-        echo "Secret not found: $SECRET_NAME — skipping."
+        echo "Secret not found: $SECRET_NAME ."
+        echo "Creating secret: $SECRET_NAME"
+        gcloud secrets create "$SECRET_NAME" 
         continue
     fi
 
