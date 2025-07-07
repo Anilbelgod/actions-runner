@@ -136,9 +136,6 @@ runs:
             fi
           done <<< "$vault_key_list"
 
-          if [ -s "$SM_SECRETS_FILE_PATH" ]; then
-            echo "SM_SECRETS_FILE_PATH exists and is not empty. Proceeding with comparison."
-
           sm_key_list=$(yq ". | keys | .[]" "$SM_SECRETS_FILE_PATH")
           sm_keys=() # Re-initialize, as it's already set above, but good for clarity
           while IFS= read -r line ; do 
@@ -203,7 +200,7 @@ runs:
             fi
           fi
         else # This is the 'else' for the main 'if [ -s "$SM_SECRETS_FILE_PATH" ]'
-          echo "SM_SECRETS_FILE_PATH ($SM_SECRETS_FILE_PATH) is empty or does not exist. All secrets from Vault will be considered for import if present."
+          echo "SM_SECRETS_FILE_PATH is empty or does not exist. All secrets from Vault will be considered for import if present."
           # If SM_SECRETS_FILE_PATH is empty, all secrets from vault_keys are candidates for import.
           # We still need to populate vault_keys to get the count and keys for import.
           vault_key_list=$(yq ". | keys | .[]" "$VAULT_SECRETS_FILE_PATH")
