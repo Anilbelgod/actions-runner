@@ -16,10 +16,10 @@ while IFS=: read -r key value; do
   
   SECRET_NAME="${SECRET_SM_PATH}-${key}"
   
-  if ! gcloud secrets describe "$SECRET_NAME" >/dev/null 2>&1; then
-    echo "Creating secret: $SECRET_NAME"
-    gcloud secrets create "$SECRET_NAME"  
-  fi 
+  # if ! gcloud secrets describe "$SECRET_NAME" >/dev/null 2>&1; then
+  #   echo "Creating secret: $SECRET_NAME"
+  #   gcloud secrets create "$SECRET_NAME"  
+  # fi 
 
   echo "$value" > $TEMP_SECRET_FILE  
   echo "Adding version to secret: $SECRET_NAME"
