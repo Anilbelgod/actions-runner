@@ -108,7 +108,6 @@ runs:
         VAULT_SECRETS_FILE_PATH=${{ steps.secrets-file.outputs.vault }}
         SM_SECRETS_FILE_PATH=${{ steps.secrets-file.outputs.sm }}
 
-        # --- Start of modifications ---
         # Initialize variables for the case where SM_SECRETS_FILE_PATH is empty
         sm_keys=()
         secrets_keys_to_import_count=0
@@ -119,14 +118,13 @@ runs:
           echo "SM_SECRETS_FILE_PATH exists and is not empty. Proceeding with comparison."
 
           sm_key_list=$(yq ". | keys | .[]" "$SM_SECRETS_FILE_PATH")
-          sm_keys=() # Re-initialize, as it's already set above, but good for clarity
+          sm_keys=()
           while IFS= read -r line ; do 
             if [ ! -z "$line" ]; then
               sm_keys+=("$line")
             fi
           done <<< "$sm_key_list"
 
-          # Get vault keys (this section is moved inside the IF block for clarity)
           vault_key_list=$(yq ". | keys | .[]" "$VAULT_SECRETS_FILE_PATH")
           vault_keys=()
 
@@ -201,8 +199,6 @@ runs:
           fi
         else # This is the 'else' for the main 'if [ -s "$SM_SECRETS_FILE_PATH" ]'
           echo "SM_SECRETS_FILE_PATH is empty or does not exist. All secrets from Vault will be considered for import if present."
-          # If SM_SECRETS_FILE_PATH is empty, all secrets from vault_keys are candidates for import.
-          # We still need to populate vault_keys to get the count and keys for import.
           vault_key_list=$(yq ". | keys | .[]" "$VAULT_SECRETS_FILE_PATH")
           vault_keys=()
           while IFS= read -r line ; do
